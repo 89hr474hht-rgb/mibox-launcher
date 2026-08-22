@@ -74,15 +74,37 @@ object UpdateChecker {
         }
     }
 
-    suspend fun downloadApk(context: Context, url: String): File = withContext(Dispatchers.IO) {
+    suspend fun downloadApk(
+        context: Context,
+        url: String,
+        onProgress: (percent: Int) -> Unit
+    ): File = withContext(Dispatchers.IO) {
         val connection = (URL(url).openConnection() as HttpURLConnection).apply {
             instanceFollowRedirects = true
             connectTimeout = 15_000
             readTimeout = 15_000
         }
+        val totalSize = connection.contentLength
         val file = File(context.getExternalFilesDir(null), "update.apk")
         connection.inputStream.use { input ->
-            file.outputStream().use { output -> input.copyTo(output) }
+            file.outputStream().use { output ->
+                val buffer = ByteArray(8 * 1024)
+                var bytesCopied = 0L
+                var lastReportedPercent = -1
+                var bytesRead = input.read(buffer)
+                while (bytesRead >= 0) {
+                    output.write(buffer, 0, bytesRead)
+                    bytesCopied += bytesRead
+                    if (totalSize > 0) {
+                        val percent = ((bytesCopied * 100) / totalSize).toInt()
+                        if (percent != lastReportedPercent) {
+                            lastReportedPercent = percent
+                            onProgress(percent)
+                        }
+                    }
+                    bytesRead = input.read(buffer)
+                }
+            }
         }
         file
     }

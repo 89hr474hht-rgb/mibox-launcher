@@ -23,8 +23,8 @@ android {
         applicationId = "com.mibox.launcher"
         minSdk = 30
         targetSdk = 37
-        versionCode = 7
-        versionName = "0.1.6"
+        versionCode = 8
+        versionName = "0.2.0"
     }
 
     signingConfigs {
@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.tv:tv-material:1.1.0")
     implementation("androidx.tv:tv-foundation:1.0.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
+    implementation("androidx.core:core-ktx:1.19.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
