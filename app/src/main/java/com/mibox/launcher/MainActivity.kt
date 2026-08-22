@@ -21,8 +21,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
@@ -70,7 +73,10 @@ class MainActivity : ComponentActivity() {
               Surface(modifier = Modifier.fillMaxSize()) {
                 var screen by remember { mutableStateOf(Screen.HOME) }
                 when (screen) {
-                    Screen.HOME -> HomeScreen(onOpenSettings = { screen = Screen.SETTINGS })
+                    Screen.HOME -> HomeScreen(
+                        onOpenSettings = { screen = Screen.SETTINGS },
+                        onExitToSystem = { moveTaskToBack(true) }
+                    )
                     Screen.SETTINGS -> SettingsScreen(
                         isHomeRoleHeldInitially = isHomeRoleHeld(),
                         onBack = { screen = Screen.HOME },
@@ -119,9 +125,18 @@ class MainActivity : ComponentActivity() {
 private enum class Screen { HOME, SETTINGS }
 
 @androidx.compose.runtime.Composable
-private fun HomeScreen(onOpenSettings: () -> Unit) {
+private fun HomeScreen(onOpenSettings: () -> Unit, onExitToSystem: () -> Unit) {
     val context = LocalContext.current
     val apps = remember { InstalledApps.query(context) }
+    val firstItemFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        if (apps.isNotEmpty()) {
+            firstItemFocusRequester.requestFocus()
+        }
+    }
+
+    BackHandler(onBack = onExitToSystem)
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
@@ -131,10 +146,15 @@ private fun HomeScreen(onOpenSettings: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(apps) { app ->
+            itemsIndexed(apps) { index, app ->
                 Card(
                     onClick = { context.startActivity(app.launchIntent) },
-                    modifier = Modifier.aspectRatio(1f)
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .then(
+                            if (index == 0) Modifier.focusRequester(firstItemFocusRequester)
+                            else Modifier
+                        )
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize().padding(8.dp),

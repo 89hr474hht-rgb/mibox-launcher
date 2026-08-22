@@ -23,8 +23,8 @@ android {
         applicationId = "com.mibox.launcher"
         minSdk = 30
         targetSdk = 37
-        versionCode = 8
-        versionName = "0.2.0"
+        versionCode = 9
+        versionName = "0.2.1"
     }
 
     signingConfigs {
