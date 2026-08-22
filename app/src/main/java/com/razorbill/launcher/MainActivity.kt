@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.core.Animatable
@@ -84,9 +85,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -926,6 +931,132 @@ private fun SystemSection(
     }
 }
 
+private enum class CoreState { IDLE, SCAN, FOUND, DOWNLOAD }
+
+private data class CoreStateParams(
+    val distance: Float,
+    val tiltScaleY: Float,
+    val spin: Float,
+    val glow: Float,
+    val color: Color
+)
+
+private val CORE_MINT = Color(0xFF6FB3A8)
+private val CORE_AMBER = Color(0xFFD9A86A)
+
+private fun paramsFor(state: CoreState, progress: Float): CoreStateParams = when (state) {
+    CoreState.IDLE -> CoreStateParams(0.42f, 1f, 0.10f, 0.22f, CORE_MINT)
+    CoreState.SCAN -> CoreStateParams(0.56f, 0.93f, 0.42f, 0.40f, CORE_MINT)
+    CoreState.FOUND -> CoreStateParams(0.68f, 0.85f, 0.14f, 0.75f, CORE_AMBER)
+    CoreState.DOWNLOAD -> CoreStateParams(
+        distance = 0.68f - (0.68f - 0.42f) * progress,
+        tiltScaleY = 0.85f + (1f - 0.85f) * progress,
+        spin = 0.24f,
+        glow = 0.45f,
+        color = CORE_MINT
+    )
+}
+
+/**
+ * 2D Compose recreation of the "launcher core" design handoff (mint/amber orb + opening
+ * shell of 6 plates + progress ring) — decorative only, deliberately not real 3D given
+ * this device's Mali G31 GPU and 2GB RAM.
+ */
+@androidx.compose.runtime.Composable
+private fun LauncherCoreVisual(state: CoreState, downloadProgress: Float, modifier: Modifier = Modifier) {
+    val target = paramsFor(state, downloadProgress)
+    val distance by animateFloatAsState(target.distance, tween(700), label = "coreDistance")
+    val tiltScaleY by animateFloatAsState(target.tiltScaleY, tween(700), label = "coreTilt")
+    val spin by animateFloatAsState(target.spin, tween(700), label = "coreSpin")
+    val glow by animateFloatAsState(target.glow, tween(1200), label = "coreGlow")
+    val color by animateColorAsState(target.color, tween(1200), label = "coreColor")
+
+    var angle by remember { mutableStateOf(0f) }
+    var scanArcDeg by remember { mutableStateOf(0f) }
+    LaunchedEffect(Unit) {
+        var lastNanos = -1L
+        while (true) {
+            withFrameNanos { now ->
+                if (lastNanos >= 0) {
+                    val dt = (now - lastNanos) / 1_000_000_000f
+                    angle += spin * dt
+                    scanArcDeg = (scanArcDeg + 92f * dt) % 360f
+                }
+                lastNanos = now
+            }
+        }
+    }
+
+    Canvas(modifier = modifier) {
+        val cx = size.width / 2f
+        val cy = size.height / 2f
+        val r = size.minDimension / 2f
+
+        drawCircle(
+            brush = Brush.radialGradient(
+                listOf(color.copy(alpha = glow * 0.5f), Color.Transparent),
+                center = Offset(cx, cy), radius = r * 0.9f
+            ),
+            radius = r * 0.9f, center = Offset(cx, cy)
+        )
+
+        val trackRadius = r * 0.82f
+        if (state != CoreState.IDLE) {
+            drawCircle(
+                color = Color.White.copy(alpha = 0.14f), radius = trackRadius, center = Offset(cx, cy),
+                style = Stroke(width = 2.dp.toPx())
+            )
+            val arcTopLeft = Offset(cx - trackRadius, cy - trackRadius)
+            val arcSize = androidx.compose.ui.geometry.Size(trackRadius * 2, trackRadius * 2)
+            when (state) {
+                CoreState.SCAN -> drawArc(
+                    color = color, startAngle = scanArcDeg, sweepAngle = 65f, useCenter = false,
+                    style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round),
+                    topLeft = arcTopLeft, size = arcSize
+                )
+                CoreState.FOUND -> drawCircle(
+                    color = color, radius = trackRadius, center = Offset(cx, cy),
+                    style = Stroke(width = 3.dp.toPx())
+                )
+                CoreState.DOWNLOAD -> drawArc(
+                    color = color, startAngle = -90f, sweepAngle = 360f * downloadProgress, useCenter = false,
+                    style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round),
+                    topLeft = arcTopLeft, size = arcSize
+                )
+                else -> {}
+            }
+        }
+
+        val plateDistancePx = r * distance
+        val plateSize = r * 0.62f
+        for (i in 0 until 6) {
+            val a = angle + i * (PI.toFloat() / 3f)
+            val px = cx + cos(a) * plateDistancePx
+            val py = cy + sin(a) * plateDistancePx
+            rotate(degrees = Math.toDegrees(a.toDouble()).toFloat(), pivot = Offset(px, py)) {
+                scale(scaleX = 1f, scaleY = tiltScaleY, pivot = Offset(px, py)) {
+                    drawRoundRect(
+                        color = Color(0xFFF1EEE9),
+                        topLeft = Offset(px - plateSize / 2, py - plateSize / 2),
+                        size = androidx.compose.ui.geometry.Size(plateSize, plateSize),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(plateSize * 0.24f, plateSize * 0.24f)
+                    )
+                }
+            }
+        }
+
+        val coreRadius = r * 0.34f
+        drawCircle(color = color, radius = coreRadius, center = Offset(cx, cy))
+        drawCircle(
+            brush = Brush.radialGradient(
+                listOf(Color.White.copy(alpha = 0.35f), Color.Transparent),
+                center = Offset(cx - coreRadius * 0.3f, cy - coreRadius * 0.3f), radius = coreRadius * 0.9f
+            ),
+            radius = coreRadius * 0.9f, center = Offset(cx - coreRadius * 0.3f, cy - coreRadius * 0.3f)
+        )
+    }
+}
+
 @androidx.compose.runtime.Composable
 private fun UpdateSection() {
     var updateStatus by remember { mutableStateOf("(pas encore de résultat)") }
@@ -936,7 +1067,22 @@ private fun UpdateSection() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val coreState = when {
+        downloadPercent != null -> CoreState.DOWNLOAD
+        pendingUpdate != null -> CoreState.FOUND
+        isBusy -> CoreState.SCAN
+        else -> CoreState.IDLE
+    }
+
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        LauncherCoreVisual(
+            state = coreState,
+            downloadProgress = (downloadPercent ?: 0) / 100f,
+            modifier = Modifier
+                .size(160.dp)
+                .align(Alignment.CenterHorizontally)
+                .semantics { invisibleToUser() }
+        )
         Text("Version actuelle : ${BuildConfig.VERSION_NAME}")
         Button(
             enabled = !isBusy,
