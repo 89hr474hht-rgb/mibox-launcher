@@ -64,7 +64,9 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -111,6 +113,14 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+val LocalAccentColor = compositionLocalOf { Color(0xFF6FD3E8) }
+
+private fun parseHexColor(hex: String): Color = try {
+    Color(android.graphics.Color.parseColor(hex))
+} catch (_: Exception) {
+    Color(0xFF6FD3E8)
+}
+
 class MainActivity : ComponentActivity() {
 
     companion object {
@@ -141,7 +151,9 @@ class MainActivity : ComponentActivity() {
         pinnedAppsStore = PinnedAppsStore(applicationContext)
         val jumpToSystemSettings = intent?.getBooleanExtra(EXTRA_OPEN_SYSTEM_SETTINGS, false) == true
         setContent {
+            val accentHex by pinnedAppsStore.accentColorHex.collectAsState(initial = DEFAULT_ACCENT_COLOR)
             MaterialTheme(colorScheme = razorbillDarkColorScheme()) {
+              CompositionLocalProvider(LocalAccentColor provides parseHexColor(accentHex)) {
               Surface(modifier = Modifier.fillMaxSize()) {
                 var showSplash by remember { mutableStateOf(!jumpToSystemSettings) }
                 var homeEverShown by remember { mutableStateOf(jumpToSystemSettings) }
@@ -160,6 +172,7 @@ class MainActivity : ComponentActivity() {
                     else -> SettingsArea(
                         section = settingsSection,
                         isHomeRoleHeldInitially = isHomeRoleHeld(),
+                        pinnedAppsStore = pinnedAppsStore,
                         onSelectSection = { settingsSection = it },
                         onBackToHome = { screen = Screen.HOME },
                         onRequestHomeRole = { callback ->
@@ -197,6 +210,7 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                 }
+              }
               }
             }
         }
@@ -457,7 +471,7 @@ private fun LiveClock(ambient: Boolean) {
             delay(1000)
         }
     }
-    val clockSizeSp by animateFloatAsState(if (ambient) 92f else 56f, tween(500), label = "clockSize")
+    val clockSizeSp by animateFloatAsState(if (ambient) 92f else 68f, tween(500), label = "clockSize")
     val dateSizeSp by animateFloatAsState(if (ambient) 20f else 15f, tween(500), label = "dateSize")
 
     Column {
@@ -475,6 +489,7 @@ private fun LiveClock(ambient: Boolean) {
                     fontFamily = RazorbillFont,
                     fontSize = clockSizeSp.sp,
                     fontWeight = FontWeight.SemiBold,
+                    letterSpacing = (-0.5).sp,
                     color = Color.White.copy(alpha = 0.96f)
                 )
             }
@@ -524,7 +539,7 @@ private fun AppCard(
     val iconBitmap = remember(app.packageName) { app.icon.toBitmap(width = 256, height = 256).asImageBitmap() }
     val shineAlpha by animateFloatAsState(if (focused) 1f else 0f, tween(200), label = "shineAlpha")
     val shineOffset by animateDpAsState(if (focused) 0.dp else -size, tween(550), label = "shineOffset")
-    val accent = Color(0xFF6FD3E8)
+    val accent = LocalAccentColor.current
 
     val holdProgress = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
@@ -665,10 +680,12 @@ private fun HomeScreen(
     onExitToSystem: () -> Unit
 ) {
     val context = LocalContext.current
-    val allApps = remember { InstalledApps.query(context) }
+    val allAppsRaw = remember { InstalledApps.query(context) }
     val pinnedPackages by pinnedAppsStore.pinnedPackages.collectAsState(initial = emptySet())
+    val hiddenPackages by pinnedAppsStore.hiddenPackages.collectAsState(initial = emptySet())
     val scope = rememberCoroutineScope()
 
+    val allApps = allAppsRaw.filter { it.packageName !in hiddenPackages }
     val pinnedApps = allApps.filter { it.packageName in pinnedPackages }
     val unpinnedApps = allApps.filter { it.packageName !in pinnedPackages }
 
@@ -741,63 +758,95 @@ private fun HomeScreen(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(28.dp)) {
                     if (pinnedApps.isNotEmpty()) {
-                        val accent = Color(0xFF6FD3E8)
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(28.dp))
-                                .background(
-                                    Brush.verticalGradient(
-                                        listOf(Color(0xFF17323A).copy(alpha = 0.6f), Color(0xFF0D1517).copy(alpha = 0.45f))
-                                    )
-                                )
-                                .border(1.dp, accent.copy(alpha = 0.35f), RoundedCornerShape(28.dp))
-                        ) {
-                            Column {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(1.dp)
-                                        .background(Color.White.copy(alpha = 0.25f))
-                                )
-                                Row(
-                                    modifier = Modifier.padding(24.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(20.dp)
-                                ) {
-                                    pinnedApps.forEachIndexed { index, app ->
-                                        AppCard(
-                                            app = app,
-                                            size = 104.dp,
-                                            focusRequester = if (index == 0) shelfFirstFocusRequester else null,
-                                            entranceDelayMs = if (playEntrance) index * 40L else 0,
-                                            onLaunch = { context.startActivity(app.launchIntent) },
-                                            onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
+                        val accent = LocalAccentColor.current
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Text(
+                                text = "FAVORIS",
+                                fontFamily = RazorbillFont,
+                                fontSize = 13.sp,
+                                letterSpacing = 1.5.sp,
+                                color = Color.White.copy(alpha = 0.4f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(28.dp))
+                                    .background(
+                                        Brush.verticalGradient(
+                                            listOf(Color(0xFF17323A).copy(alpha = 0.6f), Color(0xFF0D1517).copy(alpha = 0.45f))
                                         )
+                                    )
+                                    .border(1.dp, accent.copy(alpha = 0.35f), RoundedCornerShape(28.dp))
+                            ) {
+                                Column {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(Color.White.copy(alpha = 0.25f))
+                                    )
+                                    Row(
+                                        modifier = Modifier.padding(24.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(20.dp)
+                                    ) {
+                                        pinnedApps.forEachIndexed { index, app ->
+                                            AppCard(
+                                                app = app,
+                                                size = 104.dp,
+                                                focusRequester = if (index == 0) shelfFirstFocusRequester else null,
+                                                entranceDelayMs = if (playEntrance) index * 40L else 0,
+                                                onLaunch = { context.startActivity(app.launchIntent) },
+                                                onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
 
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(7),
-                        contentPadding = PaddingValues(bottom = 24.dp),
-                        horizontalArrangement = Arrangement.spacedBy(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(20.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        itemsIndexed(unpinnedApps) { index, app ->
-                            AppCard(
-                                app = app,
-                                size = 88.dp,
-                                focusRequester = if (index == 0) gridFirstFocusRequester else null,
-                                entranceDelayMs = if (playEntrance) (pinnedApps.size + index) * 40L else 0,
-                                onLaunch = { context.startActivity(app.launchIntent) },
-                                onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
-                            )
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(
+                            text = "TOUTES LES APPLICATIONS",
+                            fontFamily = RazorbillFont,
+                            fontSize = 13.sp,
+                            letterSpacing = 1.5.sp,
+                            color = Color.White.copy(alpha = 0.4f)
+                        )
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(7),
+                            contentPadding = PaddingValues(bottom = 24.dp),
+                            horizontalArrangement = Arrangement.spacedBy(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(20.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            itemsIndexed(unpinnedApps) { index, app ->
+                                AppCard(
+                                    app = app,
+                                    size = 88.dp,
+                                    focusRequester = if (index == 0) gridFirstFocusRequester else null,
+                                    entranceDelayMs = if (playEntrance) (pinnedApps.size + index) * 40L else 0,
+                                    onLaunch = { context.startActivity(app.launchIntent) },
+                                    onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
+                                )
+                            }
                         }
                     }
                 }
+            }
+
+            AnimatedVisibility(
+                visible = contentVisible,
+                enter = fadeIn(tween(380)),
+                exit = fadeOut(tween(280))
+            ) {
+                Text(
+                    text = "Flèches — naviguer      OK — ouvrir      OK maintenu — épingler      Retour — veille",
+                    fontFamily = RazorbillFont,
+                    fontSize = 13.sp,
+                    letterSpacing = 0.5.sp,
+                    color = Color.White.copy(alpha = 0.28f)
+                )
             }
         }
     }
@@ -807,6 +856,7 @@ private fun HomeScreen(
 private fun SettingsArea(
     section: SettingsSection,
     isHomeRoleHeldInitially: Boolean,
+    pinnedAppsStore: PinnedAppsStore,
     onSelectSection: (SettingsSection) -> Unit,
     onBackToHome: () -> Unit,
     onRequestHomeRole: ((Boolean) -> Unit) -> Unit,
@@ -815,10 +865,12 @@ private fun SettingsArea(
     onOpenDeveloperOptions: () -> Unit
 ) {
     BackHandler(onBack = onBackToHome)
-    val accent = Color(0xFF6FD3E8)
+    val accent = LocalAccentColor.current
     val activeRowFocusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { activeRowFocusRequester.requestFocus() }
 
+    Box(modifier = Modifier.fillMaxSize()) {
+    AnimatedBackground()
     Row(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -889,11 +941,15 @@ private fun SettingsArea(
                             onOpenDeveloperOptions
                         )
                         SettingsSection.ABOUT -> AboutSection()
-                        else -> Text("Contenu à définir.", color = Color.White.copy(alpha = 0.45f))
+                        SettingsSection.GENERAL -> GeneralSection(pinnedAppsStore)
+                        SettingsSection.APPEARANCE -> AppearanceSection(pinnedAppsStore)
+                        SettingsSection.APPS -> ApplicationsSection(pinnedAppsStore)
+                        SettingsSection.DIAGNOSTICS -> DiagnosticsSection()
                     }
                 }
             }
         }
+    }
     }
 }
 
@@ -1161,5 +1217,126 @@ private fun AboutSection() {
             } catch (_: Exception) {
             }
         }) { Text("Voir sur GitHub") }
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun GeneralSection(pinnedAppsStore: PinnedAppsStore) {
+    val scope = rememberCoroutineScope()
+    val pinnedPackages by pinnedAppsStore.pinnedPackages.collectAsState(initial = emptySet())
+    var resetDone by remember { mutableStateOf(false) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text("Favoris épinglés : ${pinnedPackages.size}")
+        Button(onClick = {
+            scope.launch {
+                pinnedAppsStore.resetFavorites()
+                resetDone = true
+            }
+        }) { Text("Réinitialiser les favoris") }
+        if (resetDone) {
+            Text("Favoris réinitialisés.", color = Color.White.copy(alpha = 0.5f))
+        }
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun AppearanceSection(pinnedAppsStore: PinnedAppsStore) {
+    val scope = rememberCoroutineScope()
+    val currentHex by pinnedAppsStore.accentColorHex.collectAsState(initial = DEFAULT_ACCENT_COLOR)
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text("Couleur d'accent", fontWeight = FontWeight.SemiBold)
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            ACCENT_COLOR_CHOICES.forEach { hex ->
+                val swatchColor = parseHexColor(hex)
+                val selected = hex.equals(currentHex, ignoreCase = true)
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(swatchColor)
+                        .then(
+                            if (selected) Modifier.border(3.dp, Color.White, RoundedCornerShape(12.dp))
+                            else Modifier
+                        )
+                        .focusable()
+                        .onKeyEvent { e ->
+                            if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
+                                scope.launch { pinnedAppsStore.setAccentColor(hex) }
+                                true
+                            } else false
+                        }
+                )
+            }
+        }
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun ApplicationsSection(pinnedAppsStore: PinnedAppsStore) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val allApps = remember { InstalledApps.query(context) }
+    val hiddenPackages by pinnedAppsStore.hiddenPackages.collectAsState(initial = emptySet())
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            "Masquer une app la retire de l'accueil sans la désinstaller.",
+            fontSize = 13.sp,
+            color = Color.White.copy(alpha = 0.5f)
+        )
+        allApps.forEach { app ->
+            val hidden = app.packageName in hiddenPackages
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .focusable()
+                    .onKeyEvent { e ->
+                        if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
+                            scope.launch { pinnedAppsStore.toggleHidden(app.packageName) }
+                            true
+                        } else false
+                    }
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(app.label, color = if (hidden) Color.White.copy(alpha = 0.4f) else Color.White)
+                Text(if (hidden) "Masquée" else "Visible", color = Color.White.copy(alpha = 0.5f))
+            }
+        }
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun DiagnosticsSection() {
+    val context = LocalContext.current
+    val info = remember {
+        val am = context.getSystemService(android.app.ActivityManager::class.java)
+        val memInfo = android.app.ActivityManager.MemoryInfo()
+        am?.getMemoryInfo(memInfo)
+        val totalRamMb = (memInfo.totalMem / (1024 * 1024))
+        val availRamMb = (memInfo.availMem / (1024 * 1024))
+        listOf(
+            "Modèle" to Build.MODEL,
+            "Android" to "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
+            "RAM disponible" to "$availRamMb Mo / $totalRamMb Mo",
+            "Version Razorbill" to BuildConfig.VERSION_NAME
+        )
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        info.forEach { (label, value) ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(label, color = Color.White.copy(alpha = 0.5f))
+                Text(value, fontWeight = FontWeight.SemiBold)
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Envoi de rapport de crash vers GitHub : à venir.",
+            fontSize = 13.sp,
+            color = Color.White.copy(alpha = 0.4f)
+        )
     }
 }
