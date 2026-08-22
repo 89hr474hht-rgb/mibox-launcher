@@ -38,7 +38,9 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -633,8 +635,8 @@ private fun HomeScreen(
 
     val shelfFirstFocusRequester = remember { FocusRequester() }
     val gridFirstFocusRequester = remember { FocusRequester() }
-    var shelfVisible by remember { mutableStateOf(true) }
-    var idleTicket by remember { mutableStateOf(0) }
+    var contentVisible by remember { mutableStateOf(true) }
+    var interactionTick by remember { mutableStateOf(0) }
 
     LaunchedEffect(allApps.size) {
         if (allApps.isNotEmpty()) {
@@ -643,17 +645,19 @@ private fun HomeScreen(
         }
     }
     LaunchedEffect(Unit) { onEntranceShown() }
-    LaunchedEffect(idleTicket, shelfVisible) {
-        if (shelfVisible) {
-            delay(10_000)
-            shelfVisible = false
-            if (unpinnedApps.isNotEmpty()) gridFirstFocusRequester.requestFocus()
-        }
+    LaunchedEffect(interactionTick) {
+        contentVisible = true
+        delay(10_000)
+        contentVisible = false
     }
 
     BackHandler(onBack = onExitToSystem)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onPreviewKeyEvent { interactionTick++; false }
+    ) {
         AnimatedBackground()
 
         Column(
@@ -671,64 +675,70 @@ private fun HomeScreen(
                 Button(onClick = onOpenSettings) { Text("⚙") }
             }
 
-            if (pinnedApps.isNotEmpty()) {
-                AnimatedVisibility(
-                    visible = shelfVisible,
-                    enter = expandVertically(tween(320)) + fadeIn(tween(320)),
-                    exit = shrinkVertically(tween(320)) + fadeOut(tween(220))
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(28.dp))
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(Color.White.copy(alpha = 0.09f), Color.White.copy(alpha = 0.04f))
+            AnimatedVisibility(
+                visible = contentVisible,
+                enter = slideInVertically(tween(380, easing = FastOutSlowInEasing)) { it / 3 } + fadeIn(tween(380)),
+                exit = slideOutVertically(tween(380, easing = FastOutSlowInEasing)) { it / 3 } + fadeOut(tween(280))
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(28.dp)) {
+                    if (pinnedApps.isNotEmpty()) {
+                        val accent = Color(0xFF6FD3E8)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .shadow(20.dp, RoundedCornerShape(28.dp), ambientColor = accent, spotColor = accent)
+                                .clip(RoundedCornerShape(28.dp))
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(Color(0xFF17323A).copy(alpha = 0.6f), Color(0xFF0D1517).copy(alpha = 0.45f))
+                                    )
                                 )
-                            )
-                            .border(1.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(28.dp))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalArrangement = Arrangement.spacedBy(20.dp)
+                                .border(1.dp, accent.copy(alpha = 0.35f), RoundedCornerShape(28.dp))
                         ) {
-                            pinnedApps.forEachIndexed { index, app ->
-                                AppCard(
-                                    app = app,
-                                    size = 104.dp,
-                                    focusRequester = if (index == 0) shelfFirstFocusRequester else null,
-                                    entranceDelayMs = if (playEntrance) index * 40L else 0,
-                                    onFocusChanged = { isFocused ->
-                                        if (isFocused) { shelfVisible = true; idleTicket++ }
-                                    },
-                                    onLaunch = { context.startActivity(app.launchIntent) },
-                                    onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
+                            Column {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(1.dp)
+                                        .background(Color.White.copy(alpha = 0.25f))
                                 )
+                                Row(
+                                    modifier = Modifier.padding(24.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                                ) {
+                                    pinnedApps.forEachIndexed { index, app ->
+                                        AppCard(
+                                            app = app,
+                                            size = 104.dp,
+                                            focusRequester = if (index == 0) shelfFirstFocusRequester else null,
+                                            entranceDelayMs = if (playEntrance) index * 40L else 0,
+                                            onLaunch = { context.startActivity(app.launchIntent) },
+                                            onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
-                }
-            }
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(7),
-                contentPadding = PaddingValues(bottom = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                itemsIndexed(unpinnedApps) { index, app ->
-                    AppCard(
-                        app = app,
-                        size = 88.dp,
-                        focusRequester = if (index == 0) gridFirstFocusRequester else null,
-                        entranceDelayMs = if (playEntrance) (pinnedApps.size + index) * 40L else 0,
-                        onFocusChanged = { isFocused ->
-                            if (isFocused) { shelfVisible = false; idleTicket++ }
-                        },
-                        onLaunch = { context.startActivity(app.launchIntent) },
-                        onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
-                    )
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(7),
+                        contentPadding = PaddingValues(bottom = 24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        itemsIndexed(unpinnedApps) { index, app ->
+                            AppCard(
+                                app = app,
+                                size = 88.dp,
+                                focusRequester = if (index == 0) gridFirstFocusRequester else null,
+                                entranceDelayMs = if (playEntrance) (pinnedApps.size + index) * 40L else 0,
+                                onLaunch = { context.startActivity(app.launchIntent) },
+                                onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
+                            )
+                        }
+                    }
                 }
             }
         }
