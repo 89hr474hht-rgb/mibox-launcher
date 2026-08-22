@@ -669,6 +669,7 @@ private fun HomeScreen(
 
     val shelfFirstFocusRequester = remember { FocusRequester() }
     val gridFirstFocusRequester = remember { FocusRequester() }
+    val rootFocusRequester = remember { FocusRequester() }
     var contentVisible by remember { mutableStateOf(true) }
     var interactionTick by remember { mutableStateOf(0) }
 
@@ -684,12 +685,25 @@ private fun HomeScreen(
         delay(10_000)
         contentVisible = false
     }
+    // Content (shelf/grid/gear) is removed from composition while hidden, so nothing
+    // would hold focus and D-pad key events would have nowhere to go. Keep the root
+    // itself focusable so it can always catch the first key press and wake things back up.
+    LaunchedEffect(contentVisible) {
+        if (!contentVisible) {
+            rootFocusRequester.requestFocus()
+        } else if (allApps.isNotEmpty()) {
+            if (pinnedApps.isNotEmpty()) shelfFirstFocusRequester.requestFocus()
+            else gridFirstFocusRequester.requestFocus()
+        }
+    }
 
     BackHandler(onBack = onExitToSystem)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .focusRequester(rootFocusRequester)
+            .focusable()
             .onPreviewKeyEvent { interactionTick++; false }
     ) {
         AnimatedBackground()

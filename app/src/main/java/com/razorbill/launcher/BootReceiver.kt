@@ -13,8 +13,19 @@ import androidx.core.app.NotificationCompat
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED && intent.action != Intent.ACTION_MY_PACKAGE_REPLACED) return
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
 
+        // Try to grab the foreground directly, regardless of role state — Android TV
+        // historically allows apps to self-start from BOOT_COMPLETED (unlike phones),
+        // and this sidesteps whatever is causing the stock launcher to win the race.
+        try {
+            val launchIntent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(launchIntent)
+        } catch (_: Exception) {
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
         val roleManager = context.getSystemService(RoleManager::class.java) ?: return
         if (!roleManager.isRoleAvailable(RoleManager.ROLE_HOME)) return
         if (roleManager.isRoleHeld(RoleManager.ROLE_HOME)) return
