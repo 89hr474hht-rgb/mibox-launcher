@@ -672,7 +672,13 @@ private fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 LiveClock()
-                Button(onClick = onOpenSettings) { Text("⚙") }
+                AnimatedVisibility(
+                    visible = contentVisible,
+                    enter = slideInVertically(tween(380, easing = FastOutSlowInEasing)) { -it } + fadeIn(tween(380)),
+                    exit = slideOutVertically(tween(380, easing = FastOutSlowInEasing)) { -it } + fadeOut(tween(280))
+                ) {
+                    Button(onClick = onOpenSettings) { Text("⚙") }
+                }
             }
 
             AnimatedVisibility(
