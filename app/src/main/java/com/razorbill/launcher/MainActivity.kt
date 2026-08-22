@@ -108,6 +108,10 @@ import kotlin.math.sin
 
 class MainActivity : ComponentActivity() {
 
+    companion object {
+        const val EXTRA_OPEN_SYSTEM_SETTINGS = "open_system_settings"
+    }
+
     private var onNotificationResult: ((Boolean) -> Unit)? = null
     private var onHomeRoleResult: ((Boolean) -> Unit)? = null
     private lateinit var pinnedAppsStore: PinnedAppsStore
@@ -130,13 +134,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         pinnedAppsStore = PinnedAppsStore(applicationContext)
+        val jumpToSystemSettings = intent?.getBooleanExtra(EXTRA_OPEN_SYSTEM_SETTINGS, false) == true
         setContent {
             MaterialTheme(colorScheme = razorbillDarkColorScheme()) {
               Surface(modifier = Modifier.fillMaxSize()) {
-                var showSplash by remember { mutableStateOf(true) }
-                var homeEverShown by remember { mutableStateOf(false) }
-                var screen by remember { mutableStateOf(Screen.HOME) }
-                var settingsSection by remember { mutableStateOf(SettingsSection.UPDATE) }
+                var showSplash by remember { mutableStateOf(!jumpToSystemSettings) }
+                var homeEverShown by remember { mutableStateOf(jumpToSystemSettings) }
+                var screen by remember { mutableStateOf(if (jumpToSystemSettings) Screen.SETTINGS else Screen.HOME) }
+                var settingsSection by remember { mutableStateOf(if (jumpToSystemSettings) SettingsSection.SYSTEM else SettingsSection.UPDATE) }
                 if (showSplash) {
                     SplashScreen(onFinished = { showSplash = false })
                 } else when (screen) {
