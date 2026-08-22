@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import kotlinx.coroutines.launch
 
@@ -53,6 +55,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
+              Surface(modifier = Modifier.fillMaxSize()) {
                 var screen by remember { mutableStateOf(Screen.HOME) }
                 when (screen) {
                     Screen.HOME -> HomeScreen(onOpenSettings = { screen = Screen.SETTINGS })
@@ -95,6 +98,7 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                 }
+              }
             }
         }
     }
@@ -140,6 +144,8 @@ private fun SettingsScreen(
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    BackHandler(onBack = onBack)
 
     Box(modifier = Modifier.fillMaxSize().padding(48.dp)) {
         Column(
