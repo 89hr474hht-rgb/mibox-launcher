@@ -17,13 +17,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -127,6 +130,12 @@ private fun SettingsScreen(
     var homeStatus by remember {
         mutableStateOf(if (isHomeRoleHeldInitially) "Actif" else "Pas encore actif")
     }
+    var updateStatus by remember { mutableStateOf("Jamais vérifié") }
+    var pendingUpdate by remember { mutableStateOf<UpdateChecker.UpdateInfo?>(null) }
+    var isBusy by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize().padding(48.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -159,6 +168,55 @@ private fun SettingsScreen(
                     "et réduire les échelles d'animation. Ces réglages ne peuvent pas être appliqués " +
                     "automatiquement par l'app (protection système Android), juste les ouvrir pour toi."
             )
+
+            Button(
+                enabled = !isBusy,
+                onClick = {
+                    isBusy = true
+                    updateStatus = "Vérification en cours…"
+                    pendingUpdate = null
+                    scope.launch {
+                        when (val result = UpdateChecker.checkForUpdate()) {
+                            is UpdateChecker.CheckResult.UpToDate -> {
+                                updateStatus = "À jour (v${BuildConfig.VERSION_NAME})"
+                            }
+                            is UpdateChecker.CheckResult.UpdateAvailable -> {
+                                pendingUpdate = result.info
+                                updateStatus = "Mise à jour disponible : ${result.info.versionTag}"
+                            }
+                            is UpdateChecker.CheckResult.Error -> {
+                                updateStatus = "Erreur : ${result.message}"
+                            }
+                        }
+                        isBusy = false
+                    }
+                }
+            ) {
+                Text("Vérifier les mises à jour")
+            }
+            Text(text = "Mises à jour : $updateStatus")
+            pendingUpdate?.let { info ->
+                Text(text = info.changelog.ifBlank { "(pas de notes de version)" })
+                Button(
+                    enabled = !isBusy,
+                    onClick = {
+                        isBusy = true
+                        updateStatus = "Téléchargement de ${info.versionTag}…"
+                        scope.launch {
+                            try {
+                                val file = UpdateChecker.downloadApk(context, info.apkDownloadUrl)
+                                updateStatus = "Installation…"
+                                UpdateChecker.installApk(context, file)
+                            } catch (e: Exception) {
+                                updateStatus = "Échec du téléchargement : ${e.message}"
+                            }
+                            isBusy = false
+                        }
+                    }
+                ) {
+                    Text("Installer ${info.versionTag}")
+                }
+            }
 
             Button(onClick = onBack) {
                 Text("Retour")
