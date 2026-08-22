@@ -1,12 +1,12 @@
 package com.mibox.launcher
 
+import android.app.role.RoleManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -28,10 +28,21 @@ import androidx.tv.material3.Text
 class MainActivity : ComponentActivity() {
 
     private var onNotificationResult: ((Boolean) -> Unit)? = null
+    private var onHomeRoleResult: ((Boolean) -> Unit)? = null
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted -> onNotificationResult?.invoke(granted) }
+
+    private val homeRoleLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result -> onHomeRoleResult?.invoke(isHomeRoleHeld()) }
+
+    private fun isHomeRoleHeld(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
+        val roleManager = getSystemService(RoleManager::class.java) ?: return false
+        return roleManager.isRoleHeld(RoleManager.ROLE_HOME)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +52,25 @@ class MainActivity : ComponentActivity() {
                 when (screen) {
                     Screen.HOME -> HomeScreen(onOpenSettings = { screen = Screen.SETTINGS })
                     Screen.SETTINGS -> SettingsScreen(
+                        isHomeRoleHeldInitially = isHomeRoleHeld(),
                         onBack = { screen = Screen.HOME },
+                        onRequestHomeRole = { callback ->
+                            val roleManager = getSystemService(RoleManager::class.java)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                                roleManager != null &&
+                                roleManager.isRoleAvailable(RoleManager.ROLE_HOME)
+                            ) {
+                                if (roleManager.isRoleHeld(RoleManager.ROLE_HOME)) {
+                                    callback(true)
+                                } else {
+                                    onHomeRoleResult = callback
+                                    homeRoleLauncher.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_HOME))
+                                }
+                            } else {
+                                // Rôle non disponible sur cet appareil : pas de raccourci propre possible.
+                                callback(false)
+                            }
+                        },
                         onRequestNotificationPermission = { callback ->
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 onNotificationResult = callback
@@ -55,6 +84,9 @@ class MainActivity : ComponentActivity() {
                                 data = Uri.parse("package:$packageName")
                             }
                             startActivity(intent)
+                        },
+                        onOpenDeveloperOptions = {
+                            startActivity(Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS))
                         }
                     )
                 }
@@ -84,15 +116,30 @@ private fun HomeScreen(onOpenSettings: () -> Unit) {
 
 @androidx.compose.runtime.Composable
 private fun SettingsScreen(
+    isHomeRoleHeldInitially: Boolean,
     onBack: () -> Unit,
+    onRequestHomeRole: ((Boolean) -> Unit) -> Unit,
     onRequestNotificationPermission: ((Boolean) -> Unit) -> Unit,
-    onOpenUnknownSourcesSettings: () -> Unit
+    onOpenUnknownSourcesSettings: () -> Unit,
+    onOpenDeveloperOptions: () -> Unit
 ) {
     var notificationsStatus by remember { mutableStateOf("Non demandé") }
+    var homeStatus by remember {
+        mutableStateOf(if (isHomeRoleHeldInitially) "Actif" else "Pas encore actif")
+    }
 
     Box(modifier = Modifier.fillMaxSize().padding(48.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(text = "Réglages & diagnostics")
+
+            Button(onClick = {
+                onRequestHomeRole { granted ->
+                    homeStatus = if (granted) "Actif" else "Refusé ou indisponible"
+                }
+            }) {
+                Text("Devenir le launcher par défaut")
+            }
+            Text(text = "Launcher par défaut : $homeStatus")
 
             Button(onClick = {
                 onRequestNotificationPermission { granted ->
@@ -100,11 +147,18 @@ private fun SettingsScreen(
                 }
                 onOpenUnknownSourcesSettings()
             }) {
-                Text("Tout configurer")
+                Text("Tout configurer (notifications + sources inconnues)")
             }
-
             Text(text = "Notifications : $notificationsStatus")
-            Text(text = "Après avoir coché \"Autoriser cette source\" sur l'écran qui s'ouvre, reviens ici avec le bouton retour de la télécommande.")
+
+            Button(onClick = onOpenDeveloperOptions) {
+                Text("Ouvrir les Options développeur (optimisation)")
+            }
+            Text(
+                text = "Une fois là-bas : \"Limite de processus en arrière-plan\" → 1 processus, " +
+                    "et réduire les échelles d'animation. Ces réglages ne peuvent pas être appliqués " +
+                    "automatiquement par l'app (protection système Android), juste les ouvrir pour toi."
+            )
 
             Button(onClick = onBack) {
                 Text("Retour")
