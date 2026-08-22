@@ -1,4 +1,4 @@
-package com.mibox.launcher
+package com.razorbill.launcher
 
 import android.content.Context
 import android.content.Intent

@@ -16,15 +16,15 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.mibox.launcher"
+    namespace = "com.razorbill.launcher"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.mibox.launcher"
+        applicationId = "com.razorbill.launcher"
         minSdk = 30
         targetSdk = 37
-        versionCode = 9
-        versionName = "0.2.1"
+        versionCode = 10
+        versionName = "0.3.0"
     }
 
     signingConfigs {
@@ -69,6 +69,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
     implementation("androidx.core:core-ktx:1.19.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
