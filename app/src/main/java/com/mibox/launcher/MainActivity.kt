@@ -110,6 +110,7 @@ private fun HomeScreen(onOpenSettings: () -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "MiBox Launcher v${BuildConfig.VERSION_NAME}")
+            Text(text = "Mise à jour automatique validée ✓")
             Button(onClick = onOpenSettings) {
                 Text("Réglages & diagnostics")
             }
