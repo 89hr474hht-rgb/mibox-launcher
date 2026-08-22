@@ -11,6 +11,8 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
@@ -65,6 +67,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -114,10 +120,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme(colorScheme = razorbillDarkColorScheme()) {
               Surface(modifier = Modifier.fillMaxSize()) {
+                var showSplash by remember { mutableStateOf(true) }
+                var homeEverShown by remember { mutableStateOf(false) }
                 var screen by remember { mutableStateOf(Screen.HOME) }
-                when (screen) {
+                if (showSplash) {
+                    SplashScreen(onFinished = { showSplash = false })
+                } else when (screen) {
                     Screen.HOME -> HomeScreen(
                         pinnedAppsStore = pinnedAppsStore,
+                        playEntrance = !homeEverShown,
+                        onEntranceShown = { homeEverShown = true },
                         onOpenSettings = { screen = Screen.SETTINGS_MENU },
                         onExitToSystem = { moveTaskToBack(true) }
                     )
@@ -179,6 +191,83 @@ private fun razorbillDarkColorScheme() = androidx.tv.material3.darkColorScheme(
 enum class Screen {
     HOME, SETTINGS_MENU, SETTINGS_UPDATE, SETTINGS_GENERAL,
     SETTINGS_APPEARANCE, SETTINGS_APPS, SETTINGS_SYSTEM, SETTINGS_DIAGNOSTICS, SETTINGS_ABOUT
+}
+
+@androidx.compose.runtime.Composable
+private fun RazorbillMark(progress: Float, modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier) {
+        val sx = size.width / 200f
+        val sy = size.height / 200f
+
+        val left = Path().apply {
+            moveTo(40f * sx, 95.7f * sy)
+            cubicTo(52.8f * sx, 96.3f * sy, 65.6f * sx, 104.3f * sy, 78.4f * sx, 123.5f * sy)
+        }
+        val right = Path().apply {
+            moveTo(99.2f * sx, 120.3f * sy)
+            cubicTo(113.6f * sx, 113.9f * sy, 129.6f * sx, 99.5f * sy, 160f * sx, 77.1f * sy)
+        }
+
+        val leftMeasure = PathMeasure().apply { setPath(left, false) }
+        val rightMeasure = PathMeasure().apply { setPath(right, false) }
+        val leftLen = leftMeasure.length
+        val rightLen = rightMeasure.length
+        val totalLen = leftLen + rightLen
+
+        val leftEnd = (progress * totalLen).coerceIn(0f, leftLen)
+        val rightEnd = (progress * totalLen - leftLen).coerceIn(0f, rightLen)
+
+        val leftPartial = Path()
+        leftMeasure.getSegment(0f, leftEnd, leftPartial, true)
+        val rightPartial = Path()
+        rightMeasure.getSegment(0f, rightEnd, rightPartial, true)
+
+        val strokeWidth = 9f * sx
+        for (i in 3 downTo 1) {
+            val glowStroke = Stroke(width = strokeWidth * (1 + i * 0.7f), cap = StrokeCap.Round)
+            drawPath(leftPartial, color = Color.White.copy(alpha = 0.12f * i), style = glowStroke)
+            drawPath(rightPartial, color = Color.White.copy(alpha = 0.12f * i), style = glowStroke)
+        }
+        val mainStroke = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+        drawPath(leftPartial, color = Color.White, style = mainStroke)
+        drawPath(rightPartial, color = Color.White, style = mainStroke)
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun SplashScreen(onFinished: () -> Unit) {
+    val pathProgress = remember { Animatable(0f) }
+    val textAlpha = remember { Animatable(0f) }
+    val screenAlpha = remember { Animatable(1f) }
+
+    LaunchedEffect(Unit) {
+        pathProgress.animateTo(1f, tween(750, easing = FastOutSlowInEasing))
+        textAlpha.animateTo(1f, tween(500))
+        delay(1000)
+        screenAlpha.animateTo(0f, tween(500))
+        onFinished()
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer { alpha = screenAlpha.value }
+            .background(Color(0xFF06070A)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            RazorbillMark(progress = pathProgress.value, modifier = Modifier.size(140.dp))
+            Spacer(Modifier.height(20.dp))
+            Text(
+                text = "Razorbill",
+                fontFamily = RazorbillFont,
+                fontWeight = FontWeight.Light,
+                fontSize = 26.sp,
+                letterSpacing = 6.sp,
+                color = Color.White.copy(alpha = textAlpha.value)
+            )
+        }
+    }
 }
 
 private fun currentTimeText(): String {
@@ -293,6 +382,7 @@ private fun AppCard(
     app: AppInfo,
     size: Dp,
     focusRequester: FocusRequester?,
+    entranceDelayMs: Long = 0,
     onLaunch: () -> Unit,
     onTogglePin: () -> Unit
 ) {
@@ -304,9 +394,23 @@ private fun AppCard(
     val shineOffset by animateDpAsState(if (focused) 0.dp else -size, tween(550), label = "shineOffset")
     val accent = Color(0xFF6FD3E8)
 
+    val entrance = remember { Animatable(if (entranceDelayMs > 0) 0f else 1f) }
+    LaunchedEffect(Unit) {
+        if (entranceDelayMs > 0) {
+            delay(entranceDelayMs)
+            entrance.animateTo(1f, tween(380, easing = FastOutSlowInEasing))
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(size + 24.dp)
+        modifier = Modifier
+            .width(size + 24.dp)
+            .graphicsLayer {
+                alpha = entrance.value
+                scaleX = 0.7f + 0.3f * entrance.value
+                scaleY = 0.7f + 0.3f * entrance.value
+            }
     ) {
         Box(
             modifier = Modifier
@@ -357,6 +461,8 @@ private fun AppCard(
 @androidx.compose.runtime.Composable
 private fun HomeScreen(
     pinnedAppsStore: PinnedAppsStore,
+    playEntrance: Boolean,
+    onEntranceShown: () -> Unit,
     onOpenSettings: () -> Unit,
     onExitToSystem: () -> Unit
 ) {
@@ -374,6 +480,7 @@ private fun HomeScreen(
     LaunchedEffect(allApps.size) {
         if (allApps.isNotEmpty()) firstFocusRequester.requestFocus()
     }
+    LaunchedEffect(Unit) { onEntranceShown() }
 
     BackHandler(onBack = onExitToSystem)
 
@@ -411,6 +518,7 @@ private fun HomeScreen(
                                 app = app,
                                 size = 96.dp,
                                 focusRequester = if (index == 0 && firstIsInShelf) firstFocusRequester else null,
+                                entranceDelayMs = if (playEntrance) index * 40L else 0,
                                 onLaunch = { context.startActivity(app.launchIntent) },
                                 onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
                             )
@@ -431,6 +539,7 @@ private fun HomeScreen(
                         app = app,
                         size = 88.dp,
                         focusRequester = if (index == 0 && !firstIsInShelf) firstFocusRequester else null,
+                        entranceDelayMs = if (playEntrance) (pinnedApps.size + index) * 40L else 0,
                         onLaunch = { context.startActivity(app.launchIntent) },
                         onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
                     )
