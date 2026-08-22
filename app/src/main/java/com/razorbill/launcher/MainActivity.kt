@@ -287,13 +287,14 @@ private fun SplashScreen(onFinished: () -> Unit) {
     }
 }
 
-private fun currentTimeText(withSeconds: Boolean): String {
+private fun currentHourMinuteText(): String {
     val cal = Calendar.getInstance()
-    return if (withSeconds) {
-        "%02d:%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND))
-    } else {
-        "%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
-    }
+    return "%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
+}
+
+private fun currentSecondText(): String {
+    val cal = Calendar.getInstance()
+    return "%02d".format(cal.get(Calendar.SECOND))
 }
 
 private data class Star(val x: Float, val y: Float, val radius: Float, val speed: Float, val phase: Float)
@@ -434,33 +435,58 @@ private fun currentDateText(): String {
 
 @androidx.compose.runtime.Composable
 private fun LiveClock(ambient: Boolean) {
-    var time by remember { mutableStateOf(currentTimeText(ambient)) }
+    var hourMinute by remember { mutableStateOf(currentHourMinuteText()) }
+    var second by remember { mutableStateOf(currentSecondText()) }
     var dateText by remember { mutableStateOf(currentDateText()) }
-    LaunchedEffect(ambient) {
+    LaunchedEffect(Unit) {
         while (true) {
-            time = currentTimeText(ambient)
+            val newHourMinute = currentHourMinuteText()
+            if (newHourMinute != hourMinute) hourMinute = newHourMinute
+            second = currentSecondText()
             dateText = currentDateText()
             delay(1000)
         }
     }
     val clockSizeSp by animateFloatAsState(if (ambient) 92f else 56f, tween(500), label = "clockSize")
     val dateSizeSp by animateFloatAsState(if (ambient) 20f else 15f, tween(500), label = "dateSize")
+
     Column {
-        AnimatedContent(
-            targetState = time,
-            transitionSpec = {
-                (slideInVertically(animationSpec = tween(450)) { h -> h } + fadeIn(tween(450))) togetherWith
-                    (slideOutVertically(animationSpec = tween(450)) { h -> -h } + fadeOut(tween(450)))
-            },
-            label = "clock"
-        ) { t ->
-            Text(
-                text = t,
-                fontFamily = RazorbillFont,
-                fontSize = clockSizeSp.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White.copy(alpha = 0.96f)
-            )
+        Row(verticalAlignment = Alignment.Bottom) {
+            AnimatedContent(
+                targetState = hourMinute,
+                transitionSpec = {
+                    (slideInVertically(animationSpec = tween(450)) { h -> h } + fadeIn(tween(450))) togetherWith
+                        (slideOutVertically(animationSpec = tween(450)) { h -> -h } + fadeOut(tween(450)))
+                },
+                label = "clockHourMinute"
+            ) { t ->
+                Text(
+                    text = t,
+                    fontFamily = RazorbillFont,
+                    fontSize = clockSizeSp.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White.copy(alpha = 0.96f)
+                )
+            }
+            if (ambient) {
+                AnimatedContent(
+                    targetState = second,
+                    transitionSpec = {
+                        (slideInVertically(animationSpec = tween(300)) { h -> h } + fadeIn(tween(300))) togetherWith
+                            (slideOutVertically(animationSpec = tween(300)) { h -> -h } + fadeOut(tween(300)))
+                    },
+                    label = "clockSecond"
+                ) { s ->
+                    Text(
+                        text = ":$s",
+                        fontFamily = RazorbillFont,
+                        fontSize = (clockSizeSp * 0.55f).sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(bottom = (clockSizeSp * 0.08f).dp)
+                    )
+                }
+            }
         }
         Text(
             text = dateText,
@@ -695,7 +721,6 @@ private fun HomeScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .shadow(20.dp, RoundedCornerShape(28.dp), ambientColor = accent, spotColor = accent)
                                 .clip(RoundedCornerShape(28.dp))
                                 .background(
                                     Brush.verticalGradient(
