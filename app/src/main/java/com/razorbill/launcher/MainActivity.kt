@@ -287,9 +287,13 @@ private fun SplashScreen(onFinished: () -> Unit) {
     }
 }
 
-private fun currentTimeText(): String {
+private fun currentTimeText(withSeconds: Boolean): String {
     val cal = Calendar.getInstance()
-    return "%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
+    return if (withSeconds) {
+        "%02d:%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND))
+    } else {
+        "%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
+    }
 }
 
 private data class Star(val x: Float, val y: Float, val radius: Float, val speed: Float, val phase: Float)
@@ -429,19 +433,18 @@ private fun currentDateText(): String {
 }
 
 @androidx.compose.runtime.Composable
-private fun LiveClock() {
-    var time by remember { mutableStateOf(currentTimeText()) }
+private fun LiveClock(ambient: Boolean) {
+    var time by remember { mutableStateOf(currentTimeText(ambient)) }
     var dateText by remember { mutableStateOf(currentDateText()) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(ambient) {
         while (true) {
+            time = currentTimeText(ambient)
+            dateText = currentDateText()
             delay(1000)
-            val now = currentTimeText()
-            if (now != time) {
-                time = now
-                dateText = currentDateText()
-            }
         }
     }
+    val clockSizeSp by animateFloatAsState(if (ambient) 92f else 56f, tween(500), label = "clockSize")
+    val dateSizeSp by animateFloatAsState(if (ambient) 20f else 15f, tween(500), label = "dateSize")
     Column {
         AnimatedContent(
             targetState = time,
@@ -454,7 +457,7 @@ private fun LiveClock() {
             Text(
                 text = t,
                 fontFamily = RazorbillFont,
-                fontSize = 56.sp,
+                fontSize = clockSizeSp.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White.copy(alpha = 0.96f)
             )
@@ -462,7 +465,7 @@ private fun LiveClock() {
         Text(
             text = dateText,
             fontFamily = RazorbillFont,
-            fontSize = 15.sp,
+            fontSize = dateSizeSp.sp,
             color = Color.White.copy(alpha = 0.55f)
         )
     }
@@ -671,7 +674,7 @@ private fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LiveClock()
+                LiveClock(ambient = !contentVisible)
                 AnimatedVisibility(
                     visible = contentVisible,
                     enter = slideInVertically(tween(380, easing = FastOutSlowInEasing)) { -it } + fadeIn(tween(380)),
