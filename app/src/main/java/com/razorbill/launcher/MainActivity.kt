@@ -26,6 +26,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -65,7 +66,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -81,7 +84,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -107,9 +109,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         pinnedAppsStore = PinnedAppsStore(applicationContext)
         setContent {
-            MaterialTheme {
+            MaterialTheme(colorScheme = razorbillDarkColorScheme()) {
               Surface(modifier = Modifier.fillMaxSize()) {
                 var screen by remember { mutableStateOf(Screen.HOME) }
                 when (screen) {
@@ -162,6 +165,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+private val RazorbillFont = FontFamily(Font(R.font.space_grotesk))
+
+@androidx.compose.runtime.Composable
+private fun razorbillDarkColorScheme() = androidx.tv.material3.darkColorScheme(
+    background = Color(0xFF0A0B0D),
+    surface = Color(0xFF0A0B0D),
+    onBackground = Color.White,
+    onSurface = Color.White
+)
 
 enum class Screen {
     HOME, SETTINGS_MENU, SETTINGS_UPDATE, SETTINGS_GENERAL,
@@ -229,30 +242,47 @@ private fun AnimatedBackground(modifier: Modifier = Modifier) {
     }
 }
 
+private fun currentDateText(): String {
+    val fmt = java.text.SimpleDateFormat("EEEE d MMMM", java.util.Locale.FRANCE)
+    return fmt.format(java.util.Date()).replaceFirstChar { it.uppercase() }
+}
+
 @androidx.compose.runtime.Composable
 private fun LiveClock() {
     var time by remember { mutableStateOf(currentTimeText()) }
+    var dateText by remember { mutableStateOf(currentDateText()) }
     LaunchedEffect(Unit) {
         while (true) {
             delay(1000)
             val now = currentTimeText()
-            if (now != time) time = now
+            if (now != time) {
+                time = now
+                dateText = currentDateText()
+            }
         }
     }
-    AnimatedContent(
-        targetState = time,
-        transitionSpec = {
-            (slideInVertically(animationSpec = tween(450)) { h -> h } + fadeIn(tween(450))) togetherWith
-                (slideOutVertically(animationSpec = tween(450)) { h -> -h } + fadeOut(tween(450)))
-        },
-        label = "clock"
-    ) { t ->
+    Column {
+        AnimatedContent(
+            targetState = time,
+            transitionSpec = {
+                (slideInVertically(animationSpec = tween(450)) { h -> h } + fadeIn(tween(450))) togetherWith
+                    (slideOutVertically(animationSpec = tween(450)) { h -> -h } + fadeOut(tween(450)))
+            },
+            label = "clock"
+        ) { t ->
+            Text(
+                text = t,
+                fontFamily = RazorbillFont,
+                fontSize = 56.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White.copy(alpha = 0.96f)
+            )
+        }
         Text(
-            text = t,
-            fontFamily = FontFamily.Serif,
-            fontSize = 44.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.White.copy(alpha = 0.94f)
+            text = dateText,
+            fontFamily = RazorbillFont,
+            fontSize = 15.sp,
+            color = Color.White.copy(alpha = 0.55f)
         )
     }
 }
@@ -269,12 +299,10 @@ private fun AppCard(
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     val scale by animateFloatAsState(if (focused) 1.1f else 1f, label = "cardScale")
-    val hue = remember(app.packageName) { (abs(app.packageName.hashCode()) % 360).toFloat() }
-    val base = remember(hue) { Color.hsv(hue, 0.5f, 0.55f) }
-    val lite = remember(hue) { Color.hsv(hue, 0.42f, 0.82f) }
-    val bgBrush = if (focused) Brush.linearGradient(listOf(base, lite)) else Brush.linearGradient(listOf(base, base))
+    val iconBitmap = remember(app.packageName) { app.icon.toBitmap(width = 256, height = 256).asImageBitmap() }
     val shineAlpha by animateFloatAsState(if (focused) 1f else 0f, tween(200), label = "shineAlpha")
     val shineOffset by animateDpAsState(if (focused) 0.dp else -size, tween(550), label = "shineOffset")
+    val accent = Color(0xFF6FD3E8)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -285,7 +313,10 @@ private fun AppCard(
                 .size(size)
                 .graphicsLayer { scaleX = scale; scaleY = scale }
                 .clip(RoundedCornerShape(18.dp))
-                .background(bgBrush)
+                .background(Color.White.copy(alpha = 0.05f))
+                .then(
+                    if (focused) Modifier.border(2.dp, accent, RoundedCornerShape(18.dp)) else Modifier
+                )
                 .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
                 .combinedClickable(
                     interactionSource = interaction,
@@ -295,12 +326,10 @@ private fun AppCard(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = app.label.take(1).uppercase(),
-                color = Color.White.copy(alpha = 0.92f),
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-                fontSize = (size.value / 3).sp
+            androidx.compose.foundation.Image(
+                bitmap = iconBitmap,
+                contentDescription = app.label,
+                modifier = Modifier.size(size * 0.62f)
             )
             Box(
                 modifier = Modifier
@@ -309,7 +338,7 @@ private fun AppCard(
                     .alpha(shineAlpha)
                     .background(
                         Brush.linearGradient(
-                            listOf(Color.Transparent, Color.White.copy(alpha = 0.4f), Color.Transparent)
+                            listOf(Color.Transparent, Color.White.copy(alpha = 0.35f), Color.Transparent)
                         )
                     )
             )
@@ -317,6 +346,7 @@ private fun AppCard(
         Spacer(Modifier.height(8.dp))
         Text(
             text = app.label,
+            fontFamily = RazorbillFont,
             fontSize = 13.sp,
             color = Color.White.copy(alpha = 0.85f),
             textAlign = TextAlign.Center
@@ -438,13 +468,7 @@ private fun SettingsArea(
 
     Box(modifier = Modifier.fillMaxSize().padding(56.dp, 44.dp)) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Button(onClick = {
-                    onNavigate(if (screen == Screen.SETTINGS_MENU) Screen.HOME else Screen.SETTINGS_MENU)
-                }) { Text("←") }
-                Spacer(Modifier.width(16.dp))
-                Text(text = title, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-            }
+            Text(text = title, fontFamily = RazorbillFont, fontSize = 30.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(28.dp))
 
             when (screen) {
