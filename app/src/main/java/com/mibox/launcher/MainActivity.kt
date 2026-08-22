@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -131,7 +133,8 @@ private fun SettingsScreen(
     var homeStatus by remember {
         mutableStateOf(if (isHomeRoleHeldInitially) "Actif" else "Pas encore actif")
     }
-    var updateStatus by remember { mutableStateOf("Jamais vérifié") }
+    var updateStatus by remember { mutableStateOf("(pas encore de résultat)") }
+    var lastCheckedAt by remember { mutableStateOf("jamais") }
     var pendingUpdate by remember { mutableStateOf<UpdateChecker.UpdateInfo?>(null) }
     var isBusy by remember { mutableStateOf(false) }
 
@@ -139,7 +142,10 @@ private fun SettingsScreen(
     val scope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize().padding(48.dp)) {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             Text(text = "Réglages & diagnostics")
 
             Button(onClick = {
@@ -177,6 +183,8 @@ private fun SettingsScreen(
                     updateStatus = "Vérification en cours…"
                     pendingUpdate = null
                     scope.launch {
+                        val now = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.FRANCE)
+                            .format(java.util.Date())
                         when (val result = UpdateChecker.checkForUpdate()) {
                             is UpdateChecker.CheckResult.UpToDate -> {
                                 updateStatus = "À jour (v${BuildConfig.VERSION_NAME})"
@@ -189,15 +197,17 @@ private fun SettingsScreen(
                                 updateStatus = "Erreur : ${result.message}"
                             }
                         }
+                        lastCheckedAt = now
                         isBusy = false
                     }
                 }
             ) {
                 Text("Vérifier les mises à jour")
             }
-            Text(text = "Mises à jour : $updateStatus")
+            Text(text = "Dernière vérification : $lastCheckedAt")
+            Text(text = "Résultat : $updateStatus")
+
             pendingUpdate?.let { info ->
-                Text(text = info.changelog.ifBlank { "(pas de notes de version)" })
                 Button(
                     enabled = !isBusy,
                     onClick = {
@@ -215,8 +225,9 @@ private fun SettingsScreen(
                         }
                     }
                 ) {
-                    Text("Installer ${info.versionTag}")
+                    Text("▶ Installer ${info.versionTag} maintenant")
                 }
+                Text(text = "Notes de version : " + info.changelog.ifBlank { "(aucune)" })
             }
 
             Button(onClick = onBack) {
