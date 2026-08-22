@@ -30,6 +30,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.focusable
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +44,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,6 +59,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -123,6 +131,7 @@ class MainActivity : ComponentActivity() {
                 var showSplash by remember { mutableStateOf(true) }
                 var homeEverShown by remember { mutableStateOf(false) }
                 var screen by remember { mutableStateOf(Screen.HOME) }
+                var settingsSection by remember { mutableStateOf(SettingsSection.UPDATE) }
                 if (showSplash) {
                     SplashScreen(onFinished = { showSplash = false })
                 } else when (screen) {
@@ -130,13 +139,14 @@ class MainActivity : ComponentActivity() {
                         pinnedAppsStore = pinnedAppsStore,
                         playEntrance = !homeEverShown,
                         onEntranceShown = { homeEverShown = true },
-                        onOpenSettings = { screen = Screen.SETTINGS_MENU },
+                        onOpenSettings = { screen = Screen.SETTINGS },
                         onExitToSystem = { moveTaskToBack(true) }
                     )
                     else -> SettingsArea(
-                        screen = screen,
+                        section = settingsSection,
                         isHomeRoleHeldInitially = isHomeRoleHeld(),
-                        onNavigate = { screen = it },
+                        onSelectSection = { settingsSection = it },
+                        onBackToHome = { screen = Screen.HOME },
                         onRequestHomeRole = { callback ->
                             val roleManager = getSystemService(RoleManager::class.java)
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
@@ -188,9 +198,11 @@ private fun razorbillDarkColorScheme() = androidx.tv.material3.darkColorScheme(
     onSurface = Color.White
 )
 
-enum class Screen {
-    HOME, SETTINGS_MENU, SETTINGS_UPDATE, SETTINGS_GENERAL,
-    SETTINGS_APPEARANCE, SETTINGS_APPS, SETTINGS_SYSTEM, SETTINGS_DIAGNOSTICS, SETTINGS_ABOUT
+enum class Screen { HOME, SETTINGS }
+
+enum class SettingsSection(val label: String) {
+    GENERAL("Général"), APPEARANCE("Apparence"), APPS("Applications"),
+    UPDATE("Mises à jour"), SYSTEM("Système"), DIAGNOSTICS("Diagnostics"), ABOUT("À propos")
 }
 
 @androidx.compose.runtime.Composable
@@ -275,56 +287,131 @@ private fun currentTimeText(): String {
     return "%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
 }
 
+private data class Star(val x: Float, val y: Float, val radius: Float, val speed: Float, val phase: Float)
+private data class Orb(val baseX: Float, val baseY: Float, val size: Float, val color: Color, val alpha: Float, val period: Float, val rangeX: Float, val rangeY: Float, val seed: Float)
+private data class ShootingStar(val startX: Float, val startY: Float, val angleDeg: Float, val length: Float, val period: Float, val phaseOffset: Float)
+
+private fun generateStars(n: Int): List<Star> {
+    var seed = 42
+    fun rand(): Float { seed = (seed * 9301 + 49297) % 233280; return seed / 233280f }
+    return List(n) {
+        Star(
+            x = rand(), y = rand(),
+            radius = 1f + rand() * 2.2f,
+            speed = 1.2f + rand() * 2.2f,
+            phase = rand() * 6.28f
+        )
+    }
+}
+
+private fun generateOrbs(n: Int): List<Orb> {
+    var seed = 7
+    fun rand(): Float { seed = (seed * 9301 + 49297) % 233280; return seed / 233280f }
+    val colors = listOf(Color(0xFF6FD3E8), Color(0xFF3A6FF0), Color(0xFF7A52D6))
+    return List(n) { i ->
+        Orb(
+            baseX = rand(), baseY = rand() * 0.85f,
+            size = 60f + rand() * 90f,
+            color = colors[i % colors.size],
+            alpha = 0.12f + rand() * 0.12f,
+            period = 26f + rand() * 26f,
+            rangeX = 60f + rand() * 120f,
+            rangeY = 40f + rand() * 90f,
+            seed = rand() * 6.28f
+        )
+    }
+}
+
+private fun generateShootingStars(): List<ShootingStar> = listOf(
+    ShootingStar(0.08f, 0.16f, 25f, 220f, 4.6f, 0f),
+    ShootingStar(0.72f, 0.6f, 20f, 260f, 5.4f, 2.4f),
+    ShootingStar(0.45f, 0.3f, 30f, 200f, 6.1f, 3.7f)
+)
+
 @androidx.compose.runtime.Composable
 private fun AnimatedBackground(modifier: Modifier = Modifier) {
-    val infinite = rememberInfiniteTransition(label = "bg")
-    val t by infinite.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(14000, easing = LinearEasing)),
-        label = "bgT"
-    )
+    val stars = remember { generateStars(55) }
+    val orbs = remember { generateOrbs(7) }
+    val shootingStars = remember { generateShootingStars() }
+    var timeSec by remember { mutableStateOf(0f) }
+
+    LaunchedEffect(Unit) {
+        var start = -1L
+        while (true) {
+            withFrameNanos { now ->
+                if (start < 0) start = now
+                timeSec = (now - start) / 1_000_000_000f
+            }
+        }
+    }
+
     Canvas(modifier = modifier.fillMaxSize()) {
         val w = size.width
         val h = size.height
-        val angle = t * 2f * PI.toFloat()
-        val dx = cos(angle) * w * 0.07f
-        val dy = sin(angle) * h * 0.07f
+        drawRect(color = Color(0xFF06070A))
 
-        drawRect(color = Color(0xFF0A0B0D))
+        // Nebula: slow, more pronounced drift.
+        val nebulaAngle = timeSec * 0.24f
+        val ndx = cos(nebulaAngle) * w * 0.08f
+        val ndy = sin(nebulaAngle) * h * 0.06f
         drawCircle(
-            brush = Brush.radialGradient(
-                listOf(Color(0xFF6FD3E8).copy(alpha = 0.55f), Color.Transparent),
-                center = Offset(w * 0.18f + dx, h * 0.22f + dy),
-                radius = w * 0.34f
-            ),
-            radius = w * 0.34f,
-            center = Offset(w * 0.18f + dx, h * 0.22f + dy)
+            brush = Brush.radialGradient(listOf(Color(0xFF6FD3E8).copy(alpha = 0.5f), Color.Transparent), center = Offset(w * 0.2f + ndx, h * 0.2f + ndy), radius = w * 0.38f),
+            radius = w * 0.38f, center = Offset(w * 0.2f + ndx, h * 0.2f + ndy)
         )
         drawCircle(
-            brush = Brush.radialGradient(
-                listOf(Color(0xFF3A6FF0).copy(alpha = 0.45f), Color.Transparent),
-                center = Offset(w * 0.82f - dx, h * 0.72f - dy),
-                radius = w * 0.3f
-            ),
-            radius = w * 0.3f,
-            center = Offset(w * 0.82f - dx, h * 0.72f - dy)
+            brush = Brush.radialGradient(listOf(Color(0xFF3A6FF0).copy(alpha = 0.4f), Color.Transparent), center = Offset(w * 0.8f - ndx, h * 0.75f - ndy), radius = w * 0.32f),
+            radius = w * 0.32f, center = Offset(w * 0.8f - ndx, h * 0.75f - ndy)
         )
-        drawCircle(
-            brush = Brush.radialGradient(
-                listOf(Color(0xFF7A52D6).copy(alpha = 0.4f), Color.Transparent),
-                center = Offset(w * 0.6f + dy, h * 0.1f + dx),
-                radius = w * 0.26f
-            ),
-            radius = w * 0.26f,
-            center = Offset(w * 0.6f + dy, h * 0.1f + dx)
-        )
+
+        // Orbs: soft particles slowly floating along their own loop.
+        orbs.forEach { orb ->
+            val angle = (timeSec / orb.period) * 2f * PI.toFloat() + orb.seed
+            val ox = orb.baseX * w + cos(angle) * orb.rangeX
+            val oy = orb.baseY * h + sin(angle) * orb.rangeY
+            drawCircle(
+                brush = Brush.radialGradient(listOf(orb.color.copy(alpha = orb.alpha), Color.Transparent), center = Offset(ox, oy), radius = orb.size),
+                radius = orb.size, center = Offset(ox, oy)
+            )
+        }
+
+        // Stars: twinkle + slow overall drift.
+        val driftX = sin(timeSec * 0.05f) * 26f
+        val driftY = cos(timeSec * 0.04f) * 18f
+        stars.forEach { star ->
+            val tw = (sin(timeSec * star.speed + star.phase) * 0.5f + 0.5f)
+            val a = 0.2f + tw * 0.8f
+            val r = star.radius * (0.7f + tw)
+            drawCircle(color = Color.White.copy(alpha = a), radius = r, center = Offset(star.x * w + driftX, star.y * h + driftY))
+        }
+
+        // Shooting stars: periodic streak with a fading tail.
+        shootingStars.forEach { s ->
+            val cycle = (timeSec + s.phaseOffset) % s.period
+            val active = cycle < 0.9f
+            if (active) {
+                val progress = cycle / 0.9f
+                val envelope = if (progress < 0.15f) progress / 0.15f else (1f - (progress - 0.15f) / 0.85f)
+                val rad = s.angleDeg * PI.toFloat() / 180f
+                val sx = s.startX * w + cos(rad) * s.length * progress
+                val sy = s.startY * h + sin(rad) * s.length * progress
+                val tx = sx - cos(rad) * s.length * 0.25f
+                val ty = sy - sin(rad) * s.length * 0.25f
+                drawLine(
+                    brush = Brush.linearGradient(listOf(Color.White.copy(alpha = envelope.coerceIn(0f, 1f)), Color.Transparent), start = Offset(sx, sy), end = Offset(tx, ty)),
+                    start = Offset(sx, sy),
+                    end = Offset(tx, ty),
+                    strokeWidth = 2f
+                )
+                drawCircle(color = Color.White.copy(alpha = envelope.coerceIn(0f, 1f)), radius = 2.4f, center = Offset(sx, sy))
+            }
+        }
+
         drawRect(
             brush = Brush.verticalGradient(
                 listOf(
-                    Color(0xFF0A0B0D).copy(alpha = 0.25f),
-                    Color(0xFF0A0B0D).copy(alpha = 0.55f),
-                    Color(0xFF0A0B0D).copy(alpha = 0.92f)
+                    Color(0xFF06070A).copy(alpha = 0.15f),
+                    Color(0xFF06070A).copy(alpha = 0.45f),
+                    Color(0xFF06070A).copy(alpha = 0.88f)
                 )
             )
         )
@@ -388,11 +475,18 @@ private fun AppCard(
 ) {
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
-    val scale by animateFloatAsState(if (focused) 1.1f else 1f, label = "cardScale")
     val iconBitmap = remember(app.packageName) { app.icon.toBitmap(width = 256, height = 256).asImageBitmap() }
     val shineAlpha by animateFloatAsState(if (focused) 1f else 0f, tween(200), label = "shineAlpha")
     val shineOffset by animateDpAsState(if (focused) 0.dp else -size, tween(550), label = "shineOffset")
     val accent = Color(0xFF6FD3E8)
+
+    val holdProgress = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    var holdJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    var justCompletedHold by remember { mutableStateOf(false) }
+
+    val focusScale by animateFloatAsState(if (focused) 1.1f else 1f, label = "cardFocusScale")
+    val scale = focusScale * (1f + holdProgress.value * 0.12f)
 
     val entrance = remember { Animatable(if (entranceDelayMs > 0) 0f else 1f) }
     LaunchedEffect(Unit) {
@@ -412,6 +506,31 @@ private fun AppCard(
                 scaleY = 0.7f + 0.3f * entrance.value
             }
     ) {
+      Box(modifier = Modifier.size(size + 16.dp), contentAlignment = Alignment.Center) {
+        if (holdProgress.value > 0f) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                val stroke = 4.dp.toPx()
+                val ringRadius = (this.size.minDimension - stroke) / 2f
+                drawArc(
+                    color = Color.White.copy(alpha = 0.15f),
+                    startAngle = -90f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    style = Stroke(width = stroke, cap = StrokeCap.Round),
+                    topLeft = Offset((this.size.width - ringRadius * 2) / 2f, (this.size.height - ringRadius * 2) / 2f),
+                    size = androidx.compose.ui.geometry.Size(ringRadius * 2, ringRadius * 2)
+                )
+                drawArc(
+                    color = accent,
+                    startAngle = -90f,
+                    sweepAngle = 360f * holdProgress.value,
+                    useCenter = false,
+                    style = Stroke(width = stroke, cap = StrokeCap.Round),
+                    topLeft = Offset((this.size.width - ringRadius * 2) / 2f, (this.size.height - ringRadius * 2) / 2f),
+                    size = androidx.compose.ui.geometry.Size(ringRadius * 2, ringRadius * 2)
+                )
+            }
+        }
         Box(
             modifier = Modifier
                 .size(size)
@@ -422,12 +541,44 @@ private fun AppCard(
                     if (focused) Modifier.border(2.dp, accent, RoundedCornerShape(18.dp)) else Modifier
                 )
                 .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
-                .combinedClickable(
-                    interactionSource = interaction,
-                    indication = null,
-                    onClick = onLaunch,
-                    onLongClick = onTogglePin
-                ),
+                .focusable(interactionSource = interaction)
+                .onKeyEvent { keyEvent ->
+                    if (keyEvent.key != Key.DirectionCenter && keyEvent.key != Key.Enter) return@onKeyEvent false
+                    when (keyEvent.type) {
+                        KeyEventType.KeyDown -> {
+                            if (holdJob?.isActive != true) {
+                                holdJob = scope.launch {
+                                    val remainingMs = ((1f - holdProgress.value) * 900).toInt().coerceAtLeast(1)
+                                    holdProgress.animateTo(1f, tween(remainingMs, easing = LinearEasing))
+                                    if (holdProgress.value >= 0.999f) {
+                                        justCompletedHold = true
+                                        onTogglePin()
+                                        delay(280)
+                                        holdProgress.snapTo(0f)
+                                    }
+                                }
+                            }
+                            true
+                        }
+                        KeyEventType.KeyUp -> {
+                            val wasCompleted = justCompletedHold
+                            justCompletedHold = false
+                            if (!wasCompleted) {
+                                holdJob?.cancel()
+                                if (holdProgress.value < 0.05f) {
+                                    onLaunch()
+                                } else {
+                                    val v = holdProgress.value
+                                    scope.launch {
+                                        holdProgress.animateTo(0f, tween((v * 500).toInt().coerceAtLeast(80)))
+                                    }
+                                }
+                            }
+                            true
+                        }
+                        else -> false
+                    }
+                },
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.foundation.Image(
@@ -447,6 +598,7 @@ private fun AppCard(
                     )
             )
         }
+      }
         Spacer(Modifier.height(8.dp))
         Text(
             text = app.label,
@@ -551,69 +703,80 @@ private fun HomeScreen(
 
 @androidx.compose.runtime.Composable
 private fun SettingsArea(
-    screen: Screen,
+    section: SettingsSection,
     isHomeRoleHeldInitially: Boolean,
-    onNavigate: (Screen) -> Unit,
+    onSelectSection: (SettingsSection) -> Unit,
+    onBackToHome: () -> Unit,
     onRequestHomeRole: ((Boolean) -> Unit) -> Unit,
     onRequestNotificationPermission: ((Boolean) -> Unit) -> Unit,
     onOpenUnknownSourcesSettings: () -> Unit,
     onOpenDeveloperOptions: () -> Unit
 ) {
-    BackHandler {
-        onNavigate(if (screen == Screen.SETTINGS_MENU) Screen.HOME else Screen.SETTINGS_MENU)
-    }
+    BackHandler(onBack = onBackToHome)
 
-    val title = when (screen) {
-        Screen.SETTINGS_MENU -> "Réglages"
-        Screen.SETTINGS_UPDATE -> "Mises à jour"
-        Screen.SETTINGS_GENERAL -> "Général"
-        Screen.SETTINGS_APPEARANCE -> "Apparence"
-        Screen.SETTINGS_APPS -> "Applications"
-        Screen.SETTINGS_SYSTEM -> "Système"
-        Screen.SETTINGS_DIAGNOSTICS -> "Diagnostics"
-        Screen.SETTINGS_ABOUT -> "À propos"
-        else -> "Réglages"
-    }
-
-    Box(modifier = Modifier.fillMaxSize().padding(56.dp, 44.dp)) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            Text(text = title, fontFamily = RazorbillFont, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(28.dp))
-
-            when (screen) {
-                Screen.SETTINGS_MENU -> SettingsMenuList(onNavigate)
-                Screen.SETTINGS_UPDATE -> UpdateSection()
-                Screen.SETTINGS_SYSTEM -> SystemSection(
-                    isHomeRoleHeldInitially,
-                    onRequestHomeRole,
-                    onRequestNotificationPermission,
-                    onOpenUnknownSourcesSettings,
-                    onOpenDeveloperOptions
+    Row(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .width(300.dp)
+                .fillMaxSize()
+                .padding(start = 48.dp, top = 48.dp, bottom = 48.dp)
+        ) {
+            Text(
+                text = "← Razorbill",
+                fontFamily = RazorbillFont,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 1.sp,
+                color = Color.White.copy(alpha = 0.4f),
+                modifier = Modifier
+                    .padding(bottom = 18.dp, start = 18.dp)
+                    .focusable()
+                    .onKeyEvent { e ->
+                        if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
+                            onBackToHome(); true
+                        } else false
+                    }
+            )
+            SettingsSection.entries.forEach { s ->
+                val active = s == section
+                Text(
+                    text = s.label,
+                    fontFamily = RazorbillFont,
+                    fontSize = 16.sp,
+                    fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
+                    color = if (active) Color.White else Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (active) Color.White.copy(alpha = 0.08f) else Color.Transparent)
+                        .focusable()
+                        .onKeyEvent { e ->
+                            if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
+                                onSelectSection(s); true
+                            } else false
+                        }
+                        .padding(horizontal = 18.dp, vertical = 13.dp)
                 )
-                Screen.SETTINGS_ABOUT -> AboutSection()
-                else -> Text("Contenu à définir.", color = Color.White.copy(alpha = 0.45f))
             }
         }
-    }
-}
 
-@androidx.compose.runtime.Composable
-private fun SettingsMenuList(onNavigate: (Screen) -> Unit) {
-    val items = listOf(
-        Triple("Général", "Paramètres divers", Screen.SETTINGS_GENERAL),
-        Triple("Apparence", "Couleur d'accent, fond d'écran", Screen.SETTINGS_APPEARANCE),
-        Triple("Applications", "Réorganiser, masquer", Screen.SETTINGS_APPS),
-        Triple("Mises à jour", "Vérifier, installer, historique", Screen.SETTINGS_UPDATE),
-        Triple("Système", "Launcher par défaut, permissions", Screen.SETTINGS_SYSTEM),
-        Triple("Diagnostics", "Logs, envoi de rapport de crash", Screen.SETTINGS_DIAGNOSTICS),
-        Triple("À propos", "Version, dépôt GitHub", Screen.SETTINGS_ABOUT)
-    )
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        items.forEach { (label, sub, target) ->
-            Button(onClick = { onNavigate(target) }, modifier = Modifier.fillMaxWidth()) {
-                Column {
-                    Text(label, fontSize = 18.sp)
-                    Text(sub, fontSize = 13.sp, color = Color.White.copy(alpha = 0.5f))
+        Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(56.dp)) {
+            AnimatedContent(targetState = section, label = "settingsDetail") { s ->
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    Text(text = s.label, fontFamily = RazorbillFont, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(26.dp))
+                    when (s) {
+                        SettingsSection.UPDATE -> UpdateSection()
+                        SettingsSection.SYSTEM -> SystemSection(
+                            isHomeRoleHeldInitially,
+                            onRequestHomeRole,
+                            onRequestNotificationPermission,
+                            onOpenUnknownSourcesSettings,
+                            onOpenDeveloperOptions
+                        )
+                        SettingsSection.ABOUT -> AboutSection()
+                        else -> Text("Contenu à définir.", color = Color.White.copy(alpha = 0.45f))
+                    }
                 }
             }
         }
