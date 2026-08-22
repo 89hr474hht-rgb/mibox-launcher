@@ -11,6 +11,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -470,11 +473,13 @@ private fun AppCard(
     size: Dp,
     focusRequester: FocusRequester?,
     entranceDelayMs: Long = 0,
+    onFocusChanged: ((Boolean) -> Unit)? = null,
     onLaunch: () -> Unit,
     onTogglePin: () -> Unit
 ) {
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
+    LaunchedEffect(focused) { onFocusChanged?.invoke(focused) }
     val iconBitmap = remember(app.packageName) { app.icon.toBitmap(width = 256, height = 256).asImageBitmap() }
     val shineAlpha by animateFloatAsState(if (focused) 1f else 0f, tween(200), label = "shineAlpha")
     val shineOffset by animateDpAsState(if (focused) 0.dp else -size, tween(550), label = "shineOffset")
@@ -626,13 +631,25 @@ private fun HomeScreen(
     val pinnedApps = allApps.filter { it.packageName in pinnedPackages }
     val unpinnedApps = allApps.filter { it.packageName !in pinnedPackages }
 
-    val firstFocusRequester = remember { FocusRequester() }
-    val firstIsInShelf = pinnedApps.isNotEmpty()
+    val shelfFirstFocusRequester = remember { FocusRequester() }
+    val gridFirstFocusRequester = remember { FocusRequester() }
+    var shelfVisible by remember { mutableStateOf(true) }
+    var idleTicket by remember { mutableStateOf(0) }
 
     LaunchedEffect(allApps.size) {
-        if (allApps.isNotEmpty()) firstFocusRequester.requestFocus()
+        if (allApps.isNotEmpty()) {
+            if (pinnedApps.isNotEmpty()) shelfFirstFocusRequester.requestFocus()
+            else gridFirstFocusRequester.requestFocus()
+        }
     }
     LaunchedEffect(Unit) { onEntranceShown() }
+    LaunchedEffect(idleTicket, shelfVisible) {
+        if (shelfVisible) {
+            delay(10_000)
+            shelfVisible = false
+            if (unpinnedApps.isNotEmpty()) gridFirstFocusRequester.requestFocus()
+        }
+    }
 
     BackHandler(onBack = onExitToSystem)
 
@@ -655,25 +672,39 @@ private fun HomeScreen(
             }
 
             if (pinnedApps.isNotEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Color.White.copy(alpha = 0.06f))
+                AnimatedVisibility(
+                    visible = shelfVisible,
+                    enter = expandVertically(tween(320)) + fadeIn(tween(320)),
+                    exit = shrinkVertically(tween(320)) + fadeOut(tween(220))
                 ) {
-                    Row(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(18.dp)
-                    ) {
-                        pinnedApps.forEachIndexed { index, app ->
-                            AppCard(
-                                app = app,
-                                size = 96.dp,
-                                focusRequester = if (index == 0 && firstIsInShelf) firstFocusRequester else null,
-                                entranceDelayMs = if (playEntrance) index * 40L else 0,
-                                onLaunch = { context.startActivity(app.launchIntent) },
-                                onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(28.dp))
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(Color.White.copy(alpha = 0.09f), Color.White.copy(alpha = 0.04f))
+                                )
                             )
+                            .border(1.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(28.dp))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(24.dp),
+                            horizontalArrangement = Arrangement.spacedBy(20.dp)
+                        ) {
+                            pinnedApps.forEachIndexed { index, app ->
+                                AppCard(
+                                    app = app,
+                                    size = 104.dp,
+                                    focusRequester = if (index == 0) shelfFirstFocusRequester else null,
+                                    entranceDelayMs = if (playEntrance) index * 40L else 0,
+                                    onFocusChanged = { isFocused ->
+                                        if (isFocused) { shelfVisible = true; idleTicket++ }
+                                    },
+                                    onLaunch = { context.startActivity(app.launchIntent) },
+                                    onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
+                                )
+                            }
                         }
                     }
                 }
@@ -690,8 +721,11 @@ private fun HomeScreen(
                     AppCard(
                         app = app,
                         size = 88.dp,
-                        focusRequester = if (index == 0 && !firstIsInShelf) firstFocusRequester else null,
+                        focusRequester = if (index == 0) gridFirstFocusRequester else null,
                         entranceDelayMs = if (playEntrance) (pinnedApps.size + index) * 40L else 0,
+                        onFocusChanged = { isFocused ->
+                            if (isFocused) { shelfVisible = false; idleTicket++ }
+                        },
                         onLaunch = { context.startActivity(app.launchIntent) },
                         onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
                     )
@@ -713,6 +747,9 @@ private fun SettingsArea(
     onOpenDeveloperOptions: () -> Unit
 ) {
     BackHandler(onBack = onBackToHome)
+    val accent = Color(0xFF6FD3E8)
+    val activeRowFocusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) { activeRowFocusRequester.requestFocus() }
 
     Row(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -721,35 +758,44 @@ private fun SettingsArea(
                 .fillMaxSize()
                 .padding(start = 48.dp, top = 48.dp, bottom = 48.dp)
         ) {
+            val logoInteraction = remember { MutableInteractionSource() }
+            val logoFocused by logoInteraction.collectIsFocusedAsState()
             Text(
                 text = "← Razorbill",
                 fontFamily = RazorbillFont,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = 1.sp,
-                color = Color.White.copy(alpha = 0.4f),
+                color = Color.White.copy(alpha = if (logoFocused) 0.9f else 0.4f),
                 modifier = Modifier
                     .padding(bottom = 18.dp, start = 18.dp)
-                    .focusable()
+                    .clip(RoundedCornerShape(10.dp))
+                    .then(if (logoFocused) Modifier.border(2.dp, accent, RoundedCornerShape(10.dp)) else Modifier)
+                    .focusable(interactionSource = logoInteraction)
                     .onKeyEvent { e ->
                         if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
                             onBackToHome(); true
                         } else false
                     }
+                    .padding(6.dp)
             )
             SettingsSection.entries.forEach { s ->
                 val active = s == section
+                val rowInteraction = remember(s) { MutableInteractionSource() }
+                val rowFocused by rowInteraction.collectIsFocusedAsState()
                 Text(
                     text = s.label,
                     fontFamily = RazorbillFont,
                     fontSize = 16.sp,
                     fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (active) Color.White else Color.White.copy(alpha = 0.6f),
+                    color = if (active || rowFocused) Color.White else Color.White.copy(alpha = 0.6f),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .background(if (active) Color.White.copy(alpha = 0.08f) else Color.Transparent)
-                        .focusable()
+                        .then(if (rowFocused) Modifier.border(2.dp, accent, RoundedCornerShape(12.dp)) else Modifier)
+                        .then(if (active) Modifier.focusRequester(activeRowFocusRequester) else Modifier)
+                        .focusable(interactionSource = rowInteraction)
                         .onKeyEvent { e ->
                             if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
                                 onSelectSection(s); true
