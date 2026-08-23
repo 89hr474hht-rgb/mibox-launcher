@@ -15,13 +15,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -44,6 +47,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.activity.compose.BackHandler
@@ -215,9 +219,44 @@ fun QuranPlayerScreen(
         )
     }
 
+    var translation by remember(surahNumber) { mutableStateOf<List<Ayah>?>(null) }
+    var translationLoading by remember(surahNumber) { mutableStateOf(true) }
+    val translationListState = rememberLazyListState()
+
     val mediaPlayer = remember { MediaPlayer() }
     val backButtonFocusRequester = remember { FocusRequester() }
     BackHandler(onBack = onBack)
+
+    LaunchedEffect(surahNumber) {
+        translationLoading = true
+        translation = QuranTranslationRepository.getTranslation(context, surahNumber)
+        translationLoading = false
+    }
+
+    val ayahBoundaries = remember(translation) {
+        translation?.let { ayahs ->
+            val totalChars = ayahs.sumOf { it.text.length }.coerceAtLeast(1)
+            var cumulative = 0
+            ayahs.map { ayah ->
+                cumulative += ayah.text.length
+                cumulative.toFloat() / totalChars
+            }
+        }
+    }
+    val currentAyahIndex = remember(positionMs, durationMs, ayahBoundaries) {
+        val boundaries = ayahBoundaries
+        if (boundaries.isNullOrEmpty()) 0
+        else {
+            val progress = (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f)
+            val idx = boundaries.indexOfFirst { it >= progress }
+            if (idx == -1) boundaries.size - 1 else idx
+        }
+    }
+    LaunchedEffect(currentAyahIndex) {
+        if (!translation.isNullOrEmpty()) {
+            translationListState.animateScrollToItem(maxOf(0, currentAyahIndex - 1))
+        }
+    }
 
     LaunchedEffect(surahNumber, trackFile) {
         if (trackFile == null) return@LaunchedEffect
@@ -282,78 +321,126 @@ fun QuranPlayerScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedBackground()
-        Column(
-            modifier = Modifier.fillMaxSize().padding(48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "${surah.number}".padStart(3, '0') + " · " + surah.nameTransliterated,
-                fontFamily = RazorbillFont,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(surah.nameArabic, color = Color.White.copy(alpha = 0.6f), fontSize = 18.sp)
-            Spacer(Modifier.height(28.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(96.dp)
-                    .clip(RoundedCornerShape(999.dp))
-                    .background(Color.White.copy(alpha = 0.08f))
-                    .border(2.dp, accent, RoundedCornerShape(999.dp))
-                    .focusRequester(backButtonFocusRequester)
-                    .focusable()
-                    .onKeyEvent { e ->
-                        if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
-                            togglePlay(); true
-                        } else false
-                    },
-                contentAlignment = Alignment.Center
+        Column(modifier = Modifier.fillMaxSize().padding(40.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(if (isPlaying) "❙❙" else "▶", fontSize = 28.sp, color = Color.White)
+                Column {
+                    Text(
+                        text = "${surah.number}".padStart(3, '0') + " · " + surah.nameTransliterated,
+                        fontFamily = RazorbillFont,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(surah.nameArabic, color = Color.White.copy(alpha = 0.6f), fontSize = 16.sp)
+                }
+                Button(onClick = onBack) { Text("Retour") }
             }
 
-            Spacer(Modifier.height(20.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(Color.White.copy(alpha = 0.12f))
-            ) {
-                Box(
+            Spacer(Modifier.height(28.dp))
+
+            Row(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.weight(0.42f).fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(96.dp)
+                            .clip(RoundedCornerShape(999.dp))
+                            .background(Color.White.copy(alpha = 0.08f))
+                            .border(2.dp, accent, RoundedCornerShape(999.dp))
+                            .focusRequester(backButtonFocusRequester)
+                            .focusable()
+                            .onKeyEvent { e ->
+                                if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
+                                    togglePlay(); true
+                                } else false
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(if (isPlaying) "❙❙" else "▶", fontSize = 28.sp, color = Color.White)
+                    }
+
+                    Spacer(Modifier.height(20.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(4.dp)
+                            .clip(RoundedCornerShape(2.dp))
+                            .background(Color.White.copy(alpha = 0.12f))
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(fraction = (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f))
+                                .height(4.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(accent)
+                        )
+                    }
+                    Spacer(Modifier.height(10.dp))
+                    Text("${formatMs(positionMs)} / ${formatMs(durationMs)}", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
+                    Spacer(Modifier.height(10.dp))
+                    Text(statusMessage, color = Color.White.copy(alpha = 0.5f), fontSize = 14.sp, textAlign = TextAlign.Center)
+                }
+
+                Spacer(Modifier.width(28.dp))
+
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(fraction = (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f))
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(accent)
-                )
+                        .weight(0.58f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White.copy(alpha = 0.04f))
+                        .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        "Traduction (français)",
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Défilement approximatif — pas de minutage verset par verset pour cet enregistrement.",
+                        color = Color.White.copy(alpha = 0.35f),
+                        fontSize = 11.sp
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    when {
+                        translationLoading -> Text(
+                            "Chargement…",
+                            color = Color.White.copy(alpha = 0.4f),
+                            fontSize = 13.sp
+                        )
+                        translation.isNullOrEmpty() -> Text(
+                            "Traduction indisponible — une connexion Internet est nécessaire au premier chargement.",
+                            color = Color.White.copy(alpha = 0.4f),
+                            fontSize = 13.sp
+                        )
+                        else -> LazyColumn(
+                            state = translationListState,
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            contentPadding = PaddingValues(bottom = 24.dp)
+                        ) {
+                            itemsIndexed(translation!!) { index, ayah ->
+                                val active = index == currentAyahIndex
+                                Text(
+                                    "${ayah.numberInSurah}. ${ayah.text}",
+                                    color = if (active) Color.White else Color.White.copy(alpha = 0.45f),
+                                    fontSize = if (active) 15.sp else 14.sp,
+                                    fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal
+                                )
+                            }
+                        }
+                    }
+                }
             }
-            Spacer(Modifier.height(10.dp))
-            Text("${formatMs(positionMs)} / ${formatMs(durationMs)}", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
-            Spacer(Modifier.height(10.dp))
-            Text(statusMessage, color = Color.White.copy(alpha = 0.5f), fontSize = 14.sp)
-
-            Spacer(Modifier.height(32.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White.copy(alpha = 0.04f))
-                    .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
-                    .padding(20.dp)
-            ) {
-                Text(
-                    "Traduction en direct : prochaine étape (API Quran Foundation).",
-                    color = Color.White.copy(alpha = 0.4f),
-                    fontSize = 13.sp
-                )
-            }
-
-            Spacer(Modifier.height(28.dp))
-            Button(onClick = onBack) { Text("Retour") }
         }
     }
 }

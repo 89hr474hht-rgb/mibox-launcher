@@ -23,8 +23,8 @@ android {
         applicationId = "com.razorbill.launcher"
         minSdk = 30
         targetSdk = 37
-        versionCode = 24
-        versionName = "0.10.0"
+        versionCode = 25
+        versionName = "0.11.0"
     }
 
     signingConfigs {
