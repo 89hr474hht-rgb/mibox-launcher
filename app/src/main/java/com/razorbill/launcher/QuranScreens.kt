@@ -1,5 +1,9 @@
 package com.razorbill.launcher
 
+import android.content.Intent
+import android.media.MediaPlayer
+import android.net.Uri
+import android.os.Environment
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
@@ -20,9 +24,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,12 +42,40 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.activity.compose.BackHandler
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.tv.material3.Button
 import androidx.tv.material3.Text
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+private fun hasAllFilesAccess(): Boolean =
+    android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R || Environment.isExternalStorageManager()
+
+@Composable
+private fun rememberAllFilesAccessGranted(): Boolean {
+    var granted by remember { mutableStateOf(hasAllFilesAccess()) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                granted = hasAllFilesAccess()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    return granted
+}
 
 @Composable
 fun QuranListScreen(
@@ -48,8 +83,54 @@ fun QuranListScreen(
     onBack: () -> Unit
 ) {
     val accent = LocalAccentColor.current
+    val context = LocalContext.current
+    val hasAccess = rememberAllFilesAccessGranted()
+    val availableTracks = remember(hasAccess) {
+        if (hasAccess) QuranLibrary.scanForTracks(context).keys else emptySet()
+    }
     val firstFocusRequester = remember { FocusRequester() }
+    val grantButtonFocusRequester = remember { FocusRequester() }
     BackHandler(onBack = onBack)
+
+    if (!hasAccess) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            AnimatedBackground()
+            Column(
+                modifier = Modifier.fillMaxSize().padding(48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "Autorisation nécessaire",
+                    fontFamily = RazorbillFont,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    "Razorbill a besoin d'accéder au stockage (clé USB) pour trouver tes pistes du Coran.",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 14.sp
+                )
+                Spacer(Modifier.height(24.dp))
+                Button(
+                    modifier = Modifier.focusRequester(grantButtonFocusRequester),
+                    onClick = {
+                        val intent = Intent(
+                            android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                            Uri.parse("package:${context.packageName}")
+                        )
+                        context.startActivity(intent)
+                    }
+                ) { Text("Autoriser l'accès aux fichiers") }
+                Spacer(Modifier.height(20.dp))
+                Button(onClick = onBack) { Text("Retour") }
+            }
+            LaunchedEffect(Unit) { grantButtonFocusRequester.requestFocus() }
+        }
+        return
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedBackground()
@@ -61,6 +142,13 @@ fun QuranListScreen(
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
+            Text(
+                text = if (availableTracks.isEmpty())
+                    "Aucune piste trouvée — branche une clé USB avec un dossier Coran."
+                else "${availableTracks.size} piste(s) trouvée(s)",
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 14.sp
+            )
             Spacer(Modifier.height(24.dp))
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -69,6 +157,7 @@ fun QuranListScreen(
                 itemsIndexed(SURAHS) { index, surah ->
                     val interaction = remember { MutableInteractionSource() }
                     val focused by interaction.collectIsFocusedAsState()
+                    val hasTrack = surah.number in availableTracks
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -87,7 +176,11 @@ fun QuranListScreen(
                     ) {
                         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                             Text("${surah.number}".padStart(3, '0'), color = Color.White.copy(alpha = 0.4f))
-                            Text(surah.nameTransliterated, color = Color.White, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                surah.nameTransliterated,
+                                color = if (hasTrack) Color.White else Color.White.copy(alpha = 0.35f),
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                             Text(surah.nameArabic, color = Color.White.copy(alpha = 0.6f))
@@ -103,13 +196,89 @@ fun QuranListScreen(
 @Composable
 fun QuranPlayerScreen(
     surahNumber: Int,
+    quranStore: QuranStore,
     onBack: () -> Unit
 ) {
     val accent = LocalAccentColor.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val surah = remember(surahNumber) { SURAHS.first { it.number == surahNumber } }
-    var statusMessage by remember { mutableStateOf("Aucune piste trouvée — branche ta clé USB avec les récitations.") }
+    val trackFile = remember(surahNumber) { QuranLibrary.scanForTracks(context)[surahNumber] }
+
+    var isPlaying by remember { mutableStateOf(false) }
+    var positionMs by remember { mutableStateOf(0) }
+    var durationMs by remember { mutableStateOf(1) }
+    var statusMessage by remember {
+        mutableStateOf(
+            if (trackFile != null) "Prêt à lire."
+            else "Aucune piste trouvée — branche ta clé USB avec les récitations."
+        )
+    }
+
+    val mediaPlayer = remember { MediaPlayer() }
     val backButtonFocusRequester = remember { FocusRequester() }
     BackHandler(onBack = onBack)
+
+    LaunchedEffect(surahNumber, trackFile) {
+        if (trackFile == null) return@LaunchedEffect
+        try {
+            val savedPositionMs = quranStore.positionFor(surahNumber).first()
+            withContext(Dispatchers.IO) {
+                mediaPlayer.reset()
+                mediaPlayer.setDataSource(trackFile.absolutePath)
+                mediaPlayer.prepare()
+            }
+            durationMs = mediaPlayer.duration.coerceAtLeast(1)
+            if (savedPositionMs > 0 && savedPositionMs < durationMs) {
+                mediaPlayer.seekTo(savedPositionMs.toInt())
+                positionMs = savedPositionMs.toInt()
+            }
+            statusMessage = "Prêt à lire."
+        } catch (e: Exception) {
+            statusMessage = "Impossible de lire ce fichier : ${e.message}"
+        }
+    }
+
+    LaunchedEffect(isPlaying) {
+        while (isPlaying) {
+            positionMs = try { mediaPlayer.currentPosition } catch (_: Exception) { positionMs }
+            if (!mediaPlayer.isPlaying) {
+                isPlaying = false
+            }
+            delay(500)
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            scope.launch {
+                if (trackFile != null) {
+                    quranStore.savePosition(surahNumber, positionMs.toLong())
+                }
+            }
+            mediaPlayer.release()
+        }
+    }
+
+    fun togglePlay() {
+        if (trackFile == null) {
+            statusMessage = "Aucune piste trouvée — branche ta clé USB avec les récitations."
+            return
+        }
+        if (isPlaying) {
+            mediaPlayer.pause()
+            isPlaying = false
+            scope.launch { quranStore.savePosition(surahNumber, positionMs.toLong()) }
+        } else {
+            mediaPlayer.start()
+            isPlaying = true
+        }
+    }
+
+    fun formatMs(ms: Int): String {
+        val totalSec = ms / 1000
+        return "%d:%02d".format(totalSec / 60, totalSec % 60)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedBackground()
@@ -138,13 +307,12 @@ fun QuranPlayerScreen(
                     .focusable()
                     .onKeyEvent { e ->
                         if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
-                            statusMessage = "Aucune piste trouvée — branche ta clé USB avec les récitations."
-                            true
+                            togglePlay(); true
                         } else false
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Text("▶", fontSize = 28.sp, color = Color.White)
+                Text(if (isPlaying) "❙❙" else "▶", fontSize = 28.sp, color = Color.White)
             }
 
             Spacer(Modifier.height(20.dp))
@@ -154,8 +322,18 @@ fun QuranPlayerScreen(
                     .height(4.dp)
                     .clip(RoundedCornerShape(2.dp))
                     .background(Color.White.copy(alpha = 0.12f))
-            )
-            Spacer(Modifier.height(16.dp))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f))
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(accent)
+                )
+            }
+            Spacer(Modifier.height(10.dp))
+            Text("${formatMs(positionMs)} / ${formatMs(durationMs)}", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
+            Spacer(Modifier.height(10.dp))
             Text(statusMessage, color = Color.White.copy(alpha = 0.5f), fontSize = 14.sp)
 
             Spacer(Modifier.height(32.dp))
@@ -168,7 +346,7 @@ fun QuranPlayerScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    "Traduction en direct : disponible une fois une piste réellement lue.",
+                    "Traduction en direct : prochaine étape (API Quran Foundation).",
                     color = Color.White.copy(alpha = 0.4f),
                     fontSize = 13.sp
                 )

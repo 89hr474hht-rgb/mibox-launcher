@@ -187,6 +187,7 @@ class MainActivity : ComponentActivity() {
                     )
                     Screen.QURAN_PLAYER -> QuranPlayerScreen(
                         surahNumber = quranSelectedSurah,
+                        quranStore = quranStore,
                         onBack = { screen = Screen.QURAN_LIST }
                     )
                     else -> SettingsArea(
