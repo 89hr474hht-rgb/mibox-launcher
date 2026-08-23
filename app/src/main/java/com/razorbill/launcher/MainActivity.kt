@@ -130,6 +130,7 @@ class MainActivity : ComponentActivity() {
     private var onNotificationResult: ((Boolean) -> Unit)? = null
     private var onHomeRoleResult: ((Boolean) -> Unit)? = null
     private lateinit var pinnedAppsStore: PinnedAppsStore
+    private lateinit var quranStore: QuranStore
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -149,6 +150,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         pinnedAppsStore = PinnedAppsStore(applicationContext)
+        quranStore = QuranStore(applicationContext)
         val jumpToSystemSettings = intent?.getBooleanExtra(EXTRA_OPEN_SYSTEM_SETTINGS, false) == true
         setContent {
             val accentHex by pinnedAppsStore.accentColorHex.collectAsState(initial = DEFAULT_ACCENT_COLOR)
@@ -159,15 +161,33 @@ class MainActivity : ComponentActivity() {
                 var homeEverShown by remember { mutableStateOf(jumpToSystemSettings) }
                 var screen by remember { mutableStateOf(if (jumpToSystemSettings) Screen.SETTINGS else Screen.HOME) }
                 var settingsSection by remember { mutableStateOf(if (jumpToSystemSettings) SettingsSection.SYSTEM else SettingsSection.UPDATE) }
+                var quranSelectedSurah by remember { mutableStateOf(1) }
                 if (showSplash) {
                     SplashScreen(onFinished = { showSplash = false })
                 } else when (screen) {
                     Screen.HOME -> HomeScreen(
                         pinnedAppsStore = pinnedAppsStore,
+                        quranStore = quranStore,
                         playEntrance = !homeEverShown,
                         onEntranceShown = { homeEverShown = true },
                         onOpenSettings = { screen = Screen.SETTINGS },
+                        onOpenQuran = { screen = Screen.QURAN_LIST },
+                        onResumeQuran = { surahNumber ->
+                            quranSelectedSurah = surahNumber
+                            screen = Screen.QURAN_PLAYER
+                        },
                         onExitToSystem = { moveTaskToBack(true) }
+                    )
+                    Screen.QURAN_LIST -> QuranListScreen(
+                        onSelectSurah = { number ->
+                            quranSelectedSurah = number
+                            screen = Screen.QURAN_PLAYER
+                        },
+                        onBack = { screen = Screen.HOME }
+                    )
+                    Screen.QURAN_PLAYER -> QuranPlayerScreen(
+                        surahNumber = quranSelectedSurah,
+                        onBack = { screen = Screen.QURAN_LIST }
                     )
                     else -> SettingsArea(
                         section = settingsSection,
@@ -217,7 +237,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private val RazorbillFont = FontFamily(Font(R.font.space_grotesk))
+val RazorbillFont = FontFamily(Font(R.font.space_grotesk))
 
 @androidx.compose.runtime.Composable
 private fun razorbillDarkColorScheme() = androidx.tv.material3.darkColorScheme(
@@ -227,7 +247,7 @@ private fun razorbillDarkColorScheme() = androidx.tv.material3.darkColorScheme(
     onSurface = Color.White
 )
 
-enum class Screen { HOME, SETTINGS }
+enum class Screen { HOME, SETTINGS, QURAN_LIST, QURAN_PLAYER }
 
 enum class SettingsSection(val label: String) {
     GENERAL("Général"), APPEARANCE("Apparence"), APPS("Applications"),
@@ -363,7 +383,7 @@ private fun generateShootingStars(): List<ShootingStar> = listOf(
 )
 
 @androidx.compose.runtime.Composable
-private fun AnimatedBackground(modifier: Modifier = Modifier) {
+fun AnimatedBackground(modifier: Modifier = Modifier) {
     val stars = remember { generateStars(55) }
     val orbs = remember { generateOrbs(7) }
     val shootingStars = remember { generateShootingStars() }
@@ -674,20 +694,38 @@ private fun AppCard(
 @androidx.compose.runtime.Composable
 private fun HomeScreen(
     pinnedAppsStore: PinnedAppsStore,
+    quranStore: QuranStore,
     playEntrance: Boolean,
     onEntranceShown: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenQuran: () -> Unit,
+    onResumeQuran: (Int) -> Unit,
     onExitToSystem: () -> Unit
 ) {
     val context = LocalContext.current
-    val allAppsRaw = remember { InstalledApps.query(context) }
+    val allAppsRaw = remember {
+        val quranIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_quran)!!
+        val quranTile = AppInfo(
+            label = "Coran",
+            packageName = QURAN_SENTINEL_PACKAGE,
+            icon = quranIcon,
+            launchIntent = Intent()
+        )
+        listOf(quranTile) + InstalledApps.query(context)
+    }
     val pinnedPackages by pinnedAppsStore.pinnedPackages.collectAsState(initial = emptySet())
     val hiddenPackages by pinnedAppsStore.hiddenPackages.collectAsState(initial = emptySet())
+    val lastQuranProgress by quranStore.lastProgress.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
 
     val allApps = allAppsRaw.filter { it.packageName !in hiddenPackages }
     val pinnedApps = allApps.filter { it.packageName in pinnedPackages }
     val unpinnedApps = allApps.filter { it.packageName !in pinnedPackages }
+
+    fun launchApp(app: AppInfo) {
+        if (app.packageName == QURAN_SENTINEL_PACKAGE) onOpenQuran()
+        else context.startActivity(app.launchIntent)
+    }
 
     val shelfFirstFocusRequester = remember { FocusRequester() }
     val gridFirstFocusRequester = remember { FocusRequester() }
@@ -757,6 +795,46 @@ private fun HomeScreen(
                 exit = slideOutVertically(tween(380, easing = FastOutSlowInEasing)) { it / 3 } + fadeOut(tween(280))
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(28.dp)) {
+                    lastQuranProgress?.let { progress ->
+                        val surah = SURAHS.first { it.number == progress.surahNumber }
+                        val accent = LocalAccentColor.current
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Text(
+                                text = "REPRENDRE",
+                                fontFamily = RazorbillFont,
+                                fontSize = 13.sp,
+                                letterSpacing = 1.5.sp,
+                                color = Color.White.copy(alpha = 0.4f)
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(Color.White.copy(alpha = 0.05f))
+                                    .border(1.dp, accent.copy(alpha = 0.25f), RoundedCornerShape(20.dp))
+                                    .focusable()
+                                    .onKeyEvent { e ->
+                                        if ((e.key == Key.DirectionCenter || e.key == Key.Enter) && e.type == KeyEventType.KeyUp) {
+                                            onResumeQuran(surah.number); true
+                                        } else false
+                                    }
+                                    .padding(20.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(surah.nameTransliterated, color = Color.White, fontWeight = FontWeight.SemiBold)
+                                    Text(
+                                        "Sourate ${surah.number} — reprendre la lecture",
+                                        color = Color.White.copy(alpha = 0.5f),
+                                        fontSize = 13.sp
+                                    )
+                                }
+                                Text(surah.nameArabic, color = Color.White.copy(alpha = 0.4f))
+                            }
+                        }
+                    }
+
                     if (pinnedApps.isNotEmpty()) {
                         val accent = LocalAccentColor.current
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -795,7 +873,7 @@ private fun HomeScreen(
                                                 size = 104.dp,
                                                 focusRequester = if (index == 0) shelfFirstFocusRequester else null,
                                                 entranceDelayMs = if (playEntrance) index * 40L else 0,
-                                                onLaunch = { context.startActivity(app.launchIntent) },
+                                                onLaunch = { launchApp(app) },
                                                 onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
                                             )
                                         }
@@ -826,7 +904,7 @@ private fun HomeScreen(
                                     size = 88.dp,
                                     focusRequester = if (index == 0) gridFirstFocusRequester else null,
                                     entranceDelayMs = if (playEntrance) (pinnedApps.size + index) * 40L else 0,
-                                    onLaunch = { context.startActivity(app.launchIntent) },
+                                    onLaunch = { launchApp(app) },
                                     onTogglePin = { scope.launch { pinnedAppsStore.togglePin(app.packageName) } }
                                 )
                             }
