@@ -19,8 +19,8 @@ import java.util.WeakHashMap;
 
 /**
  * Starts with the launcher's process (a provider is created before any activity) and wires the updater in
- * without changing the upstream code: the update prompt and the Bluetooth pill on the home screen, a row in the
- * launcher's settings, and the scheduled checks.
+ * without changing the upstream code: the update prompt and the home screen's extras (HomeExtras), the updates row
+ * of the launcher's settings, and the scheduled checks.
  */
 public final class MiboxInit extends ContentProvider {
     static final String HOME = "com.gathin.tvhome.MainActivity";
@@ -57,7 +57,7 @@ public final class MiboxInit extends ContentProvider {
         prompt = new WeakReference<>(null);
     }
 
-    private static final Map<Activity, BluetoothPill> PILLS = new WeakHashMap<>();
+    private static final Map<Activity, HomeExtras> EXTRAS = new WeakHashMap<>();
 
     private static final class Callbacks implements Application.ActivityLifecycleCallbacks {
         @Override
@@ -65,12 +65,12 @@ public final class MiboxInit extends ContentProvider {
             String name = activity.getClass().getName();
             if (HOME.equals(name)) {
                 resumedHome = new WeakReference<>(activity);
-                BluetoothPill pill = PILLS.get(activity);
-                if (pill == null && !PILLS.containsKey(activity)) {
-                    pill = BluetoothPill.attach(activity);
-                    PILLS.put(activity, pill);
+                HomeExtras extras = EXTRAS.get(activity);
+                if (extras == null) {
+                    extras = HomeExtras.attach(activity);
+                    EXTRAS.put(activity, extras);
                 }
-                if (pill != null) pill.resume();
+                extras.resume();
                 // After the home screen has drawn, so the prompt never delays the first frame.
                 activity.getWindow().getDecorView().postDelayed(MiboxInit::promptIfHomeVisible, 1500);
             } else if (SETTINGS.equals(name)) {
@@ -80,8 +80,8 @@ public final class MiboxInit extends ContentProvider {
 
         @Override
         public void onActivityPaused(Activity activity) {
-            BluetoothPill pill = PILLS.get(activity);
-            if (pill != null) pill.pause();
+            HomeExtras extras = EXTRAS.get(activity);
+            if (extras != null) extras.pause();
             if (resumedHome.get() == activity) {
                 resumedHome = new WeakReference<>(null);
                 dismissPrompt();
@@ -90,8 +90,8 @@ public final class MiboxInit extends ContentProvider {
 
         @Override
         public void onActivityDestroyed(Activity activity) {
-            BluetoothPill pill = PILLS.remove(activity);
-            if (pill != null) pill.destroy();
+            HomeExtras extras = EXTRAS.remove(activity);
+            if (extras != null) extras.destroy();
             UpdatePrompt p = prompt.get();
             if (p != null && p.owner() == activity) dismissPrompt();
         }
@@ -121,6 +121,18 @@ public final class MiboxInit extends ContentProvider {
     @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
     static void addSettingsRow(Activity activity) {
         String pkg = activity.getPackageName();
+        // The Mi Box settings page (mibox/app-res) has its own row and subtitle: fill those in.
+        int ownId = activity.getResources().getIdentifier("miboxUpdatesChoice", "id", pkg);
+        View own = ownId == 0 ? null : activity.findViewById(ownId);
+        if (own != null) {
+            own.setOnClickListener(v -> activity.startActivity(new Intent(activity, UpdatesActivity.class)));
+            int subId = activity.getResources().getIdentifier("miboxSettingsSubtitle", "id", pkg);
+            View sub = subId == 0 ? null : activity.findViewById(subId);
+            if (sub instanceof TextView) {
+                ((TextView) sub).setText(activity.getString(R.string.mibox_set_subtitle, BuildConfig.MIBOX_VERSION));
+            }
+            return;
+        }
         int anchorId = activity.getResources().getIdentifier("tvSettingsChoice", "id", pkg);
         int styleId = activity.getResources().getIdentifier("SettingsRow", "style", pkg);
         if (anchorId == 0 || styleId == 0) return;

@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Same look as the launcher's settings rows (app's settings_choice_bg), plus a disabled state. -->
+<!-- Buttons of the Mi Box pages: white when focused, like the launcher's menus and settings rows. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="false">
         <shape android:shape="rectangle">
-            <solid android:color="#FF1A1F26" />
+            <solid android:color="#0DFFFFFF" />
             <corners android:radius="14dp" />
         </shape>
     </item>
     <item android:state_focused="true">
         <shape android:shape="rectangle">
-            <solid android:color="#5574A987" />
+            <solid android:color="#F5FFFFFF" />
             <corners android:radius="14dp" />
-            <stroke android:width="2dp" android:color="#FFB9E7C7" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#FF242B34" />
+            <solid android:color="#1FFFFFFF" />
             <corners android:radius="14dp" />
         </shape>
     </item>

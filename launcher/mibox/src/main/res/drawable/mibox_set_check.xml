@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The tick at the end of an on/off row while it is on. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:drawable="@drawable/mibox_check_green" />
+    <item android:drawable="@drawable/mibox_check_none" />
+</selector>

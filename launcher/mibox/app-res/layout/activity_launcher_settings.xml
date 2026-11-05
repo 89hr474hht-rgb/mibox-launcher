@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mibox-launcher fork: the Mi Box edition's launcher settings page. It replaces the upstream layout of the same
+     name in release builds (mibox/app-res outranks main) and keeps every id LauncherSettingsActivity looks up, so
+     the upstream code runs unchanged: rows grouped in cards under small titles, each with an icon in a coloured
+     tile, white when focused like the launcher's menus. miboxUpdatesChoice and miboxSettingsSubtitle are filled in
+     by MiboxInit. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF0E0F12"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="760dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="40dp"
+        android:paddingBottom="48dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="18dp"
+            android:fontFamily="@font/outfit_light"
+            android:text="@string/launcher_settings"
+            android:textColor="#FFFFFFFF"
+            android:textSize="36sp" />
+
+        <TextView
+            android:id="@+id/miboxSettingsSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingStart="18dp"
+            android:fontFamily="@font/outfit_regular"
+            android:textColor="#80FFFFFF"
+            android:textSize="15sp" />
+
+        <TextView
+            style="@style/MiboxSetSection"
+            android:text="@string/mibox_set_section_general" />
+
+        <LinearLayout style="@style/MiboxSetGroup">
+            <TextView
+                android:id="@+id/miboxUpdatesChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_updates"
+                android:text="@string/mibox_settings_row" />
+            <View style="@style/MiboxSetDivider" />
+            <TextView
+                android:id="@+id/reorderChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_reorder"
+                android:text="@string/reorder"
+                android:visibility="gone" />
+            <View style="@style/MiboxSetDivider" />
+            <TextView
+                android:id="@+id/tvSettingsChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_device"
+                android:text="@string/tv_settings" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/MiboxSetSection"
+            android:text="@string/mibox_set_section_home" />
+
+        <LinearLayout style="@style/MiboxSetGroup">
+            <TextView
+                style="@style/MiboxSetLabel"
+                android:drawableStart="@drawable/mibox_tile_columns"
+                android:text="@string/columns_label" />
+            <LinearLayout style="@style/MiboxSetSegments">
+                <TextView android:id="@+id/columns4" style="@style/MiboxSetSegment" android:text="4" />
+                <TextView android:id="@+id/columns5" style="@style/MiboxSetSegment" android:text="5" />
+                <TextView android:id="@+id/columns6" style="@style/MiboxSetSegment" android:text="6" />
+                <TextView android:id="@+id/columns7" style="@style/MiboxSetSegment" android:text="7" />
+            </LinearLayout>
+            <View style="@style/MiboxSetDivider" />
+            <TextView
+                style="@style/MiboxSetLabel"
+                android:drawableStart="@drawable/mibox_tile_rows"
+                android:text="@string/rows_below_dock_label" />
+            <LinearLayout style="@style/MiboxSetSegments">
+                <TextView android:id="@+id/rows0" style="@style/MiboxSetSegment" android:text="0" />
+                <TextView android:id="@+id/rows1" style="@style/MiboxSetSegment" android:text="1" />
+                <TextView android:id="@+id/rows2" style="@style/MiboxSetSegment" android:text="2" />
+                <TextView android:id="@+id/rows3" style="@style/MiboxSetSegment" android:text="3" />
+            </LinearLayout>
+            <View style="@style/MiboxSetDivider" />
+            <TextView
+                style="@style/MiboxSetLabel"
+                android:drawableStart="@drawable/mibox_tile_dock"
+                android:text="@string/dock_opacity_label" />
+            <LinearLayout style="@style/MiboxSetSegments">
+                <TextView android:id="@+id/dock100" style="@style/MiboxSetSegment" android:text="100%" />
+                <TextView android:id="@+id/dock70" style="@style/MiboxSetSegment" android:text="70%" />
+                <TextView android:id="@+id/dock50" style="@style/MiboxSetSegment" android:text="50%" />
+                <TextView android:id="@+id/dock30" style="@style/MiboxSetSegment" android:text="30%" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            style="@style/MiboxSetSection"
+            android:text="@string/mibox_set_section_clock" />
+
+        <LinearLayout style="@style/MiboxSetGroup">
+            <TextView
+                style="@style/MiboxSetLabel"
+                android:drawableStart="@drawable/mibox_tile_clock"
+                android:text="@string/mibox_set_time_format" />
+            <LinearLayout style="@style/MiboxSetSegments">
+                <TextView android:id="@+id/clockSystem" style="@style/MiboxSetSegment" android:text="@string/clock_format_system" />
+                <TextView android:id="@+id/clock12" style="@style/MiboxSetSegment" android:text="@string/clock_format_12" />
+                <TextView android:id="@+id/clock24" style="@style/MiboxSetSegment" android:text="@string/clock_format_24" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            style="@style/MiboxSetSection"
+            android:text="@string/mibox_set_section_look" />
+
+        <LinearLayout style="@style/MiboxSetGroup">
+            <TextView
+                android:id="@+id/wallpaperChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_wallpaper" />
+            <View style="@style/MiboxSetDivider" />
+            <TextView
+                android:id="@+id/animationsChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_animations"
+                android:drawableEnd="@null" />
+            <View style="@style/MiboxSetDivider" />
+            <TextView
+                android:id="@+id/advancedChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_advanced"
+                android:drawableEnd="@null" />
+            <TextView
+                style="@style/MiboxSetHint"
+                android:text="@string/advanced_effects_warning" />
+            <View style="@style/MiboxSetDivider" />
+            <TextView
+                android:id="@+id/followThemeChoice"
+                style="@style/MiboxSetToggle"
+                android:drawableStart="@drawable/mibox_tile_theme"
+                android:text="@string/follow_theme" />
+            <TextView
+                style="@style/MiboxSetHint"
+                android:text="@string/follow_theme_hint" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/MiboxSetSection"
+            android:text="@string/mibox_set_section_start" />
+
+        <LinearLayout style="@style/MiboxSetGroup">
+            <TextView
+                android:id="@+id/openOnStartChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_start"
+                android:drawableEnd="@null"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/defaultHomeChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_home"
+                android:text="@string/home_settings" />
+            <TextView
+                style="@style/MiboxSetHint"
+                android:text="@string/home_settings_help" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

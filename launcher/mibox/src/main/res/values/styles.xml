@@ -5,6 +5,14 @@
         <item name="android:colorBackground">@color/mibox_page_bg</item>
     </style>
 
+    <!-- App info over the home screen: a see-through window; the activity draws its own backdrop and motion. -->
+    <style name="MiboxOverlayTheme" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
     <style name="MiboxButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">52dp</item>

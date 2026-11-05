@@ -72,7 +72,8 @@ Chaque modification est faite dans un **commit séparé**, avec un réglage `con
 | **F3** | **Système de mise à jour depuis GitHub Releases** (détail §5) | Interdit dans CleanYourTV (« no self-updaters ») ; possible dans votre fork |
 | **F4** | **Vérification du rôle HOME** : le launcher contrôle qu'il est toujours l'écran d'accueil par défaut et le signale sinon (risque R15 lié à SFR TV) | Absent de CleanYourTV |
 | **F5** | **Workflow `release.yml`** : APK signé, SHA-256, release GitHub automatique sur tag | Interdit dans CleanYourTV (« no prebuilt APKs ») |
-| F6 | Vos idées suivantes | — |
+| **F6** | **Écrans de l'édition Mi Box** (`launcher/mibox/`) : pastilles Bluetooth et réseau avec leur menu, réglages du launcher redessinés (`mibox/app-res/layout/activity_launcher_settings.xml` remplace la page d'origine en release, mêmes identifiants), infos sur l'app, fond animé (`mibox_living_glow`), horloge animée. Branchés par `MiboxInit` sans modifier le code d'origine, sauf `SystemSettings.appInfo` et `AppAdapter`, qui ouvrent l'écran d'infos de l'édition quand il existe | Choix de présentation propres à votre box |
+| F7 | Vos idées suivantes | — |
 
 ## 5. Système de mise à jour (F3)
 

@@ -47,7 +47,7 @@ Ensuite, pour chaque version :
 4. Le workflow vérifie, puis publie :
    - le tag est bien sur `main` et correspond au fichier `VERSION` et au CHANGELOG ;
    - les tests, le lint et la compilation signée réussissent ;
-   - la taille de l'APK est inférieure à 640 Ko ;
+   - la taille de l'APK est inférieure à 720 Ko ;
    - le package et les numéros de version sont les bons ;
    - **l'empreinte de la clé** est celle de votre clé ;
    - il publie alors l'APK, son `.sha256` et les notes.

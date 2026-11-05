@@ -23,8 +23,9 @@ env:
   # this check stops a release built with any other key before it is published.
   EXPECTED_CERT: ea3231bad936833e9f2b7d81e64b946b2c290a7e568d996391af57706fcb50e7
   BUILD_TOOLS: "34.0.0"
-  # The Mi Box edition carries the updater on top of the upstream launcher (576 KB gate in ci.yml).
-  MAX_APK_BYTES: "655360"
+  # The Mi Box edition carries the updater, its own screens and their icons on top of the upstream launcher
+  # (576 KB gate in ci.yml). 1.2.0 is about 670 KB.
+  MAX_APK_BYTES: "737280"
 
 jobs:
   release:

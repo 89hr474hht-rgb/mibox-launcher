@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mibox-launcher fork: the styles of the Mi Box edition's launcher settings page
+     (layout/activity_launcher_settings.xml here, which replaces the upstream page in release builds). In the
+     app's resources, not the module's, because they use the app's Outfit font. -->
+<resources>
+    <!-- A card that groups rows, like a grouped list on iOS. -->
+    <style name="MiboxSetGroup">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:background">@drawable/mibox_set_group_bg</item>
+    </style>
+
+    <!-- The small caps title above a card. -->
+    <style name="MiboxSetSection">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">30dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:textColor">#8CFFFFFF</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">@font/outfit_medium</item>
+    </style>
+
+    <!-- A row that opens something or switches something: icon tile, title, and an arrow or a tick. -->
+    <style name="MiboxSetRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:gravity">center_vertical|start</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:background">@drawable/mibox_set_row_bg</item>
+        <item name="android:textColor">@color/mibox_row_text</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/outfit_medium</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:drawableEnd">@drawable/mibox_set_chevron</item>
+    </style>
+
+    <!-- An on/off row: a green tick at the end while it is on (the page marks it selected). -->
+    <style name="MiboxSetToggle" parent="MiboxSetRow">
+        <item name="android:drawableEnd">@drawable/mibox_set_check</item>
+    </style>
+
+    <!-- The title of a segmented setting: its icon and name, not focusable; the choices follow below. -->
+    <style name="MiboxSetLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:gravity">center_vertical|start</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/outfit_medium</item>
+    </style>
+
+    <!-- The row of choices under a label, lined up with the label's text. -->
+    <style name="MiboxSetSegments">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">60dp</item>
+        <item name="android:paddingEnd">6dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <style name="MiboxSetSegment">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/mibox_set_segment_bg</item>
+        <item name="android:textColor">@color/mibox_row_text</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:fontFamily">@font/outfit_medium</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <!-- A line of help under a row, lined up with the row's text. -->
+    <style name="MiboxSetHint">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">60dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textColor">#80FFFFFF</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/outfit_regular</item>
+    </style>
+
+    <!-- Hairline between rows, from the text's start like on iOS. -->
+    <style name="MiboxSetDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">60dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:layout_marginBottom">2dp</item>
+        <item name="android:background">#12FFFFFF</item>
+    </style>
+</resources>

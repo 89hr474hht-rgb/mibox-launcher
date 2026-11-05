@@ -5,6 +5,18 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.2.0] - 2026-11-06
+
+### Ajouté
+- Pastille réseau : OK ouvre un menu sous la pastille. Il indique si le câble Ethernet est branché, si le Wi-Fi est activé et connecté, si Internet répond, l'adresse IP de la box et le DNS privé, et se met à jour pendant qu'il est ouvert. « Paramètres réseau… » ouvre les réglages d'Android. Un appui long sur la pastille ouvre toujours les réglages Wi-Fi.
+- Infos sur l'app : appui long sur une app, puis « Infos sur l'application ». Une fenêtre affiche la version, la date d'installation et de mise à jour, la provenance (Play Store, préinstallée, installée à la main), la version d'Android visée et la taille. « Ouvrir » lance l'app ; « Plus d'infos… » ouvre la page d'Android (forcer l'arrêt, stockage, autorisations).
+- Accueil : le fond aux couleurs de l'app sélectionnée s'anime doucement (trois halos qui dérivent lentement), puis glisse vers les couleurs de l'app suivante. Arrêté quand l'accueil n'est pas affiché, ou quand les animations d'Android sont désactivées.
+- Horloge : quand l'heure change, les chiffres qui changent roulent comme un compteur.
+
+### Modifié
+- Réglages du launcher : nouvelle présentation, avec une icône de couleur par réglage, des sections (Général, Écran d'accueil, Horloge, Apparence, Démarrage), des choix sous forme de boutons, et la version en titre.
+- Limite de taille de l'APK publié portée à 720 Ko (environ 670 Ko pour cette version, à cause des icônes et des nouveaux écrans).
+
 ## [1.1.1] - 2026-11-05
 
 ### Modifié

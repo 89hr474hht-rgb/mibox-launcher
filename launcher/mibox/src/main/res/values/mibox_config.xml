@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The home screen's glow in the focused app's colour drifts slowly (LivingGlow). false keeps upstream's
+         still glow. -->
+    <bool name="mibox_living_glow">true</bool>
+</resources>

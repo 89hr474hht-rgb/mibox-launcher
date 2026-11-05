@@ -134,6 +134,23 @@ Statuts possibles : Test réussi / Test partiel / Échec / Non testé / Validati
 | BTP-05 | Menu Bluetooth | OK sur la pastille | Un menu s'ouvre sous la pastille : appareils connectés en tête (disque bleu, point vert), puis les autres ; « Associer un appareil… » ouvre l'appairage de Google TV ; Retour ferme le menu | MANUEL | Non testé |
 | BTP-06 | Rien ne change | `pm list packages -d` et `dumpsys bluetooth_manager` avant et après | La page ne fait que lire : aucun changement | ADB | Non testé |
 
+## C sexies. Nouveautés 1.2.0
+
+Vérifié sur l'émulateur Android TV 12 (1920 × 1080, même densité que la box) avec l'APK de release : réglages, menu réseau, infos sur l'app, fond animé et horloge s'affichent et réagissent comme décrit ci-dessous. **Rien n'est encore testé sur la box.**
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| SET-01 | Nouvelle page de réglages | Accueil → Réglages du launcher | Titre, « Édition Mi Box · version 1.2.0 », sections avec icônes de couleur ; la sélection (fond blanc) suit la télécommande du haut en bas, sans ligne inaccessible | MANUEL | Non testé |
+| SET-02 | Réglages toujours actifs | Changer « Applis par ligne », puis revenir à l'accueil ; remettre la valeur d'origine | L'accueil suit le réglage ; le choix actif est encadré | MANUEL | Non testé |
+| NETM-01 | Menu réseau | OK sur la pastille réseau | Un menu s'ouvre sous la pastille : Ethernet, Wi-Fi, Internet, adresse IP, DNS privé, avec un point vert pour ce qui fonctionne | MANUEL | Non testé |
+| NETM-02 | Passage en Ethernet | Brancher le câble Ethernet, menu ouvert | La ligne Ethernet passe à « Connecté » et l'état en haut à « Ethernet » | MANUEL | Non testé |
+| NETM-03 | Réglages réseau | « Paramètres réseau… » ; appui long sur la pastille | Le premier ouvre « Réseau et Internet » d'Android ; l'appui long ouvre les réglages Wi-Fi comme avant | MANUEL | Non testé |
+| APPI-01 | Infos sur l'app | Appui long sur une app → « Infos sur l'application » | Fenêtre avec icône, nom, version, dates, provenance, Android visé, taille | MANUEL | Non testé |
+| APPI-02 | Boutons | « Ouvrir », puis « Plus d'infos… », puis Retour | L'app se lance ; la page d'Android s'ouvre ; Retour ferme la fenêtre et revient à l'accueil | MANUEL | Non testé |
+| GLOW-01 | Fond animé | Rester 30 s sur l'accueil, puis changer d'app | Le fond bouge doucement aux couleurs de l'app, puis glisse vers celles de la suivante ; la navigation reste fluide | MANUEL | Non testé |
+| GLOW-02 | Pas d'effet en arrière-plan | Lancer une vidéo, puis `dumpsys gfxinfo com.gathin.tvhome` | Aucune image dessinée par le launcher pendant la vidéo | ADB | Non testé |
+| CLK-01 | Animation de l'heure | Regarder l'horloge au changement de minute | Les chiffres qui changent roulent vers le haut, les autres ne bougent pas, rien ne reste en double | MANUEL | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

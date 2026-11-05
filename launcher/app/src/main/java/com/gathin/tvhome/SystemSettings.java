@@ -58,8 +58,17 @@ final class SystemSettings {
         return null;
     }
 
+    /**
+     * mibox-launcher fork: an App info screen of the launcher's own (ACTION_APP_INFO, with the package in
+     * EXTRA_PACKAGE) is used in place of the TV's page when the build has one; only the Mi Box edition does.
+     */
+    static final String ACTION_APP_INFO = "com.gathin.tvhome.action.APP_INFO";
+    static final String EXTRA_PACKAGE = "com.gathin.tvhome.extra.PACKAGE";
+
     /** The TV's App info page for pkg, or null where the firmware has none (CVTE's settings app, #1202). */
     static Intent appInfo(Context context, String pkg) {
+        Intent own = new Intent(ACTION_APP_INFO).setPackage(context.getPackageName()).putExtra(EXTRA_PACKAGE, pkg);
+        if (context.getPackageManager().resolveActivity(own, 0) != null) return own;
         Intent info = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg));
         return context.getPackageManager().resolveActivity(info, PackageManager.MATCH_DEFAULT_ONLY) != null ? info : null;
     }
