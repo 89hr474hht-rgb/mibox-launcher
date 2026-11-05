@@ -14,3 +14,9 @@ dependencyResolutionManagement {
 }
 rootProject.name = "tvhome"
 include ':app'
+// mibox-launcher fork: the updater module joins the build only for the Mi Box edition (-Pmibox), so the
+// core build stays the launcher app alone, as the upstream tests require.
+if (providers.gradleProperty('mibox').isPresent()) {
+    def miboxModule = ':mibox'
+    include miboxModule
+}

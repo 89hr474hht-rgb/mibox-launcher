@@ -2,6 +2,27 @@ plugins {
     id 'com.android.application'
 }
 
+// mibox-launcher fork: `-Pmibox` builds the Mi Box edition (updater module, the owner's release key,
+// SemVer from mibox/VERSION). Without it the build is upstream CleanYourTV, byte for byte.
+def mibox = providers.gradleProperty('mibox').isPresent()
+def miboxVersion = mibox ? rootProject.file('mibox/VERSION').text.trim() : null
+def miboxSigning = [:]
+if (mibox) {
+    if (!(miboxVersion ==~ /\d+\.\d+\.\d+/)) throw new GradleException("mibox/VERSION must be X.Y.Z, found '$miboxVersion'")
+    // CI passes the key through the environment; on the owner's Mac it sits outside the repo.
+    def env = System.getenv()
+    if (env.MIBOX_KEYSTORE_FILE) {
+        miboxSigning = [storeFile: env.MIBOX_KEYSTORE_FILE, storePassword: env.MIBOX_KEYSTORE_PASSWORD,
+                        keyAlias: env.MIBOX_KEY_ALIAS, keyPassword: env.MIBOX_KEY_PASSWORD]
+    } else {
+        def props = new Properties()
+        def f = new File(System.getProperty('user.home'), '.mibox-launcher/keystore.properties')
+        if (!f.exists()) throw new GradleException("-Pmibox needs the release key: $f or MIBOX_KEYSTORE_* variables")
+        f.withInputStream { props.load(it) }
+        miboxSigning = props
+    }
+}
+
 android {
     namespace 'com.gathin.tvhome'
     compileSdk 34
@@ -15,6 +36,22 @@ android {
         targetSdk 34
         versionCode 13
         versionName '3.4'
+        if (mibox) {
+            def (maj, min, pat) = miboxVersion.tokenize('.').collect { it as int }
+            versionCode maj * 10000 + min * 100 + pat
+            versionName miboxVersion
+        }
+    }
+
+    if (mibox) {
+        signingConfigs {
+            miboxRelease {
+                storeFile file(miboxSigning.storeFile)
+                storePassword miboxSigning.storePassword
+                keyAlias miboxSigning.keyAlias
+                keyPassword miboxSigning.keyPassword
+            }
+        }
     }
 
     buildTypes {
@@ -25,6 +62,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // Sideloaded over ADB, never published: sign with the debug key so it installs over a debug build.
             signingConfig signingConfigs.debug
+            if (mibox) signingConfig signingConfigs.miboxRelease
         }
     }
 
@@ -47,4 +85,6 @@ dependencies {
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
     // Test only (never in the APK): plain JVM tests for the module card validators, src/test.
     testImplementation 'junit:junit:4.13.2'
+    // mibox-launcher fork: the updater, only in the Mi Box edition (see the top of this file).
+    if (mibox) implementation project(':mibox')
 }

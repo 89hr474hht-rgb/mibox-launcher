@@ -1,0 +1,36 @@
+// mibox-launcher fork: GitHub Releases updater for the Mi Box edition of the launcher.
+// Plain Java and the platform's own APIs (HttpURLConnection, org.json, JobScheduler, PackageInstaller):
+// no library, so the APK stays small on a 2 GB box.
+plugins {
+    id 'com.android.library'
+}
+
+def miboxVersion = rootProject.file('mibox/VERSION').text.trim()
+
+android {
+    namespace 'com.gathin.tvhome.mibox'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 26
+        // Read by the updater: the installed edition's SemVer and where its releases are published.
+        buildConfigField 'String', 'MIBOX_VERSION', "\"$miboxVersion\""
+        buildConfigField 'String', 'RELEASES_REPO', '"89hr474hht-rgb/mibox-launcher"'
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    // android.jar's org.json is a stub in plain JVM tests; the real one is test-only.
+    testImplementation 'org.json:json:20240303'
+}

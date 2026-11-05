@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mibox_updates_title">Mises à jour du launcher</string>
+    <string name="mibox_settings_row">Mises à jour du launcher</string>
+    <string name="mibox_prompt_title">Mise à jour disponible</string>
+    <string name="mibox_prompt_version">Version %1$s</string>
+    <string name="mibox_update_now">Mettre à jour</string>
+    <string name="mibox_later">Plus tard</string>
+    <string name="mibox_installed_version">Version installée : %1$s</string>
+    <string name="mibox_last_check">Dernière vérification : %1$s</string>
+    <string name="mibox_never_checked">Pas encore vérifié.</string>
+    <string name="mibox_up_to_date">Le launcher est à jour.</string>
+    <string name="mibox_available">Version %1$s disponible (%2$d Ko)</string>
+    <string name="mibox_notes">Nouveautés</string>
+    <string name="mibox_install">Installer</string>
+    <string name="mibox_ignore">Ignorer cette version</string>
+    <string name="mibox_ignored">La version %1$s est ignorée.</string>
+    <string name="mibox_unignore">La proposer à nouveau</string>
+    <string name="mibox_check_now">Vérifier maintenant</string>
+    <string name="mibox_checking">Recherche de mises à jour…</string>
+    <string name="mibox_downloading">Téléchargement… %1$d %%</string>
+    <string name="mibox_verifying">Vérification de l\'intégrité et de la signature…</string>
+    <string name="mibox_waiting_user">Confirmez l\'installation dans la fenêtre d\'Android.</string>
+    <string name="mibox_history">Historique</string>
+    <string name="mibox_history_empty">Aucune mise à jour pour l\'instant.</string>
+    <string name="mibox_r_installed">installée</string>
+    <string name="mibox_r_cancelled">annulée</string>
+    <string name="mibox_r_failed">échec</string>
+    <string name="mibox_r_ignored">ignorée</string>
+    <string name="mibox_updated_toast">Launcher mis à jour : version %1$s</string>
+    <string name="mibox_permission_open">Ouvrir les réglages</string>
+    <string name="mibox_permission_no_screen">Ce téléviseur n\'a pas d\'écran pour ce réglage. Accordez-le une fois depuis un ordinateur : adb shell appops set com.gathin.tvhome REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="mibox_err_network">Impossible de joindre GitHub (%1$s).</string>
+    <string name="mibox_err_http">GitHub a répondu %1$d.</string>
+    <string name="mibox_err_rate">Trop de vérifications : GitHub en autorise 60 par heure. Réessayez plus tard.</string>
+    <string name="mibox_err_format">Réponse de GitHub illisible.</string>
+    <string name="mibox_err_space">Espace insuffisant : %1$d Mo nécessaires.</string>
+    <string name="mibox_err_size">Le fichier n\'a pas la taille annoncée.</string>
+    <string name="mibox_err_checksum">L\'empreinte SHA-256 ne correspond pas : fichier refusé.</string>
+    <string name="mibox_err_not_apk">Le fichier téléchargé n\'est pas un APK valide.</string>
+    <string name="mibox_err_package">Cet APK n\'est pas ce launcher.</string>
+    <string name="mibox_err_version">La version de l\'APK ne correspond pas à la release.</string>
+    <string name="mibox_err_not_newer">Cette version n\'est pas plus récente que celle installée.</string>
+    <string name="mibox_err_signature">L\'APK n\'est pas signé avec la clé du launcher installé : fichier refusé.</string>
+    <string name="mibox_err_permission">Android n\'autorise pas encore ce launcher à installer ses mises à jour.</string>
+    <string name="mibox_err_install">Android a refusé l\'installation : %1$s</string>
+</resources>

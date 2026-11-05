@@ -17,7 +17,7 @@ Fork de **[CleanYourTV](https://github.com/Gathin23/cleanyourtv)** (licence MIT,
 - **Sans root, sans flash** : les composants Google TV sont *désactivés* (`pm disable-user`), jamais supprimés.
 - **Une étape à la fois**, avec l'enregistrement de restauration des outils CleanYourTV.
 - **Les applications d'abord** : Netflix, YouTube, Prime Video, SFR TV, la télécommande Bluetooth, le CEC et l'audio Bluetooth doivent continuer à fonctionner.
-- **Mises à jour du launcher** via GitHub Releases, vérifiées (SHA-256 + certificat de signature épinglé), installées avec la confirmation d'Android.
+- **Mises à jour du launcher** via GitHub Releases, vérifiées (SHA-256 + même certificat de signature que le launcher installé), installées avec la confirmation d'Android.
 
 ## Documentation du fork
 
@@ -27,6 +27,7 @@ Fork de **[CleanYourTV](https://github.com/Gathin23/cleanyourtv)** (licence MIT,
 | [02 — Plan de tests](../mibox/docs/02-plan-de-tests.md) | Tests avant/après chaque étape |
 | [03 — Audit de la box](../mibox/docs/03-audit-mi-box.md) | État de référence, inventaire classé des packages, décisions |
 | [04 — Architecture](../mibox/docs/04-architecture.md) | Organisation du fork, modifications, mises à jour, étapes |
+| [05 — Mises à jour](../mibox/docs/05-mises-a-jour.md) | Publier une version, vérifications avant installation, clé de signature |
 
 ## Récupérer les nouveautés de CleanYourTV
 

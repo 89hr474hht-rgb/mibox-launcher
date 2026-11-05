@@ -27,6 +27,8 @@ Gathin23/cleanyourtv (upstream, MIT)  ──git fetch/merge──▶  89hr474hht
 | Chemin | Origine | Rôle |
 |---|---|---|
 | `launcher/` | CleanYourTV, **modifié par vous** | Le launcher (Java, `com.gathin.tvhome`) |
+| `launcher/mibox/` | **Vous** | Le module de mise à jour (F2 + F3), ajouté au launcher seulement avec `-Pmibox` (§5) |
+| `.github/workflows/release.yml` | **Vous** | Publie une release signée à chaque tag `vX.Y.Z` |
 | `tools/` | CleanYourTV | `disable.sh`, `restore.sh`, `check.py`, `tv.py`… : désactivation, restauration, dérive |
 | `examples/xiaomi-mi-box-s-2nd-gen/` | CleanYourTV | Liste validée pour votre box (builds 683/737/772) : **référence, non modifiée** |
 | `themes/`, `addons/`, `docs/` | CleanYourTV | Thèmes, modules, documentation d'origine |
@@ -37,7 +39,7 @@ Gathin23/cleanyourtv (upstream, MIT)  ──git fetch/merge──▶  89hr474hht
 | `mibox/docs/` | **Vous** | Rapports, plan de tests, audit, cette architecture |
 | `mibox/lists/` | **Vous** | Vos listes de désactivation, **une par étape** (E3, E4…), au format de `tools/disable.sh` |
 | `mibox/config/` | **Vous** | Réglages du launcher pour votre box (favoris, boutons, applis masquées) |
-| `mibox/scripts/` | **Vous** | Audit en lecture seule, maintenance (Razorbill), et plus tard la vérification du rôle HOME |
+| `mibox/scripts/` | **Vous** | Audit en lecture seule, maintenance (Razorbill), installation de l'édition Mi Box, et plus tard la vérification du rôle HOME |
 | `mibox/AGENTS.md` | **Vous** | Règles du fork pour les agents (priment sur `AGENTS.md`) |
 
 ## 3. Le launcher CleanYourTV sur votre box
@@ -76,13 +78,17 @@ Chaque modification est faite dans un **commit séparé**, avec un réglage `con
 
 Le flux et les règles de sécurité sont ceux déjà définis. Les adaptations au code Java de CleanYourTV sont les suivantes :
 
-1. **Vérification** au démarrage du launcher et **toutes les 24 h**, via l'API publique `releases/latest`, en HTTPS et **sans jeton**.
+1. **Vérification** au démarrage du launcher (au plus une fois par heure) et **toutes les 24 h**, via l'API publique `releases`, en HTTPS et **sans jeton**.
 2. **Comparaison SemVer**. Les versions ignorées par l'utilisateur ne sont plus proposées.
-3. **Pastille en haut à droite** : version, résumé, [Mettre à jour] [Plus tard]. Une page « Mises à jour » dans les réglages du launcher regroupe l'historique, les notes, la progression, les erreurs et l'option « Ignorer cette version ».
+3. **Pastille en haut à droite** de l'accueil : version, résumé, [Mettre à jour] [Plus tard]. « Plus tard » la masque 24 h. La page « Mises à jour du launcher » (dernière ligne des réglages du launcher) regroupe l'historique, les notes, la progression, les erreurs et l'option « Ignorer cette version ».
 4. **Contrôle de l'espace libre** avant le téléchargement : il ne reste qu'environ 870 Mo libres sur la box.
-5. **Vérifications** : ① SHA-256 = fichier `.sha256` = `digest` de l'API ; ② package `com.gathin.tvhome` ; ③ `versionCode` supérieur ; ④ **certificat de signature = empreinte épinglée dans le launcher**. Si une seule échoue, le fichier est supprimé et rien n'est installé.
+5. **Vérifications** : ① SHA-256 = fichier `.sha256` = `digest` de l'API ; ② package `com.gathin.tvhome` ; ③ `versionCode` supérieur ; ④ `versionName` = version de la release ; ⑤ **certificat de signature = celui du launcher installé**. L'empreinte de la clé est aussi épinglée dans `release.yml` et dans le script d'installation, qui refusent tout APK signé autrement. Si une seule échoue, le fichier est supprimé et rien n'est installé.
 6. **Installation via `PackageInstaller`**, avec l'écran de confirmation d'Android (obligatoire sur Android 11).
 7. **Une mise à jour du launcher ne désactive jamais rien** sur la box.
+
+**Réalisation (Phase 3).** Tout le code du système de mise à jour est dans `launcher/mibox/` : un module Gradle à part, en Java, sans aucune bibliothèque. Il n'est ajouté au launcher que si l'on compile avec `-Pmibox`. Il s'accroche au launcher **sans modifier le code de CleanYourTV** : un `ContentProvider` démarre avec l'application, surveille l'écran d'accueil pour y afficher la pastille et ajoute la ligne « Mises à jour du launcher » aux réglages.
+
+Conséquence : la compilation CleanYourTV normale ne change pas, à l'octet près (588 185 octets, sans permission `INTERNET`, sous la limite de 576 Ko). Les 2935 tests de CleanYourTV passent. L'édition Mi Box pèse 619 870 octets, avec les permissions `INTERNET`, `REQUEST_INSTALL_PACKAGES` et `RECEIVE_BOOT_COMPLETED`. Publication et sécurité : [05-mises-a-jour.md](05-mises-a-jour.md).
 
 **Écart assumé par rapport à votre cahier des charges : JobScheduler au lieu de WorkManager.**
 - WorkManager est une bibliothèque écrite en Kotlin, qui ajouterait environ 1 Mo et la bibliothèque standard Kotlin à un launcher qui a aujourd'hui 2 dépendances.
@@ -110,6 +116,7 @@ On utilise **les outils de CleanYourTV**, et non des scripts réécrits :
 | Outil | Usage |
 |---|---|
 | `launcher/build-and-install.sh` | Compile et installe le launcher, puis le définit comme accueil. **Lancé avec `STOCK_LAUNCHER=none`** pour E1/E2, pour qu'il ne désactive pas Google TV lui-même |
+| `mibox/scripts/install/install-launcher.sh` | Compile l'édition Mi Box signée, vérifie l'APK (version, clé, module présent), puis appelle `build-and-install.sh` (`SKIP_BUILD=1 STOCK_LAUNCHER=none`) et autorise le launcher à installer ses mises à jour. Sans `--execute`, ne touche pas la box |
 | `tools/disable.sh mibox/lists/E3-…txt` | Applique **une** étape, avec tous ses garde-fous : enregistrement de restauration, protection de HOME, du Wi-Fi/setupwraith et du cœur Android |
 | `tools/restore.sh` | Annule une étape à partir de son enregistrement |
 | `tools/check.py` | Détecte une dérive (après une mise à jour firmware, par exemple) |
@@ -122,7 +129,7 @@ Prérequis : un environnement Python pour `tools/` (`python3 -m venv tools/venv`
 
 | Étape | Contenu | Outil | Visible à l'écran ? |
 |---|---|---|---|
-| **E1+E2** | Installer le launcher, lui donner le rôle HOME, **sans** désactiver Google TV | `build-and-install.sh` (`STOCK_LAUNCHER=none`) | Une tuile apparaît. L'accueil ne change pas : Google TV garde la priorité 2 |
+| **E1+E2** | Installer le launcher (édition Mi Box 1.0.0, avec mises à jour), lui donner le rôle HOME, **sans** désactiver Google TV | `install-launcher.sh --execute` | Une tuile apparaît. L'accueil ne change pas : Google TV garde la priorité 2 |
 | **E3** | `com.google.android.apps.tv.launcherx` | `disable.sh mibox/lists/E3-google-tv.txt` | **Oui : l'accueil change.** Créneau convenu |
 | **E4** | `com.google.android.tungsten.setupwraith` | `disable.sh mibox/lists/E4-setup-wizard.txt` | Oui. Le Wi-Fi est à surveiller (risque réduit d'après l'audit) |
 | E5 | Télémétrie (4 packages) | `disable.sh` | Non |

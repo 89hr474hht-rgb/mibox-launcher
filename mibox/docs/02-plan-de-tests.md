@@ -102,6 +102,25 @@ Observation : l'adresse physique CEC reste invalide après le redémarrage (R17)
 
 Exécution : 5 novembre 2026, 21 h 16. Une seule commande de modification envoyée (`pm uninstall com.razorbill.launcher` → `Success`). Journal : `audits/20261105-211617-razorbill/log.txt`.
 
+## C quater. Mises à jour du launcher (F2 + F3)
+
+Statuts possibles : Test réussi / Test partiel / Échec / Non testé / Validation manuelle nécessaire. Côté Mac, les vérifications automatiques ont déjà tourné (tests unitaires, lint, contrôle de l'APK). Elles ne remplacent aucun test ci-dessous.
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| UPD-01 | Version installée | Réglages du launcher → « Mises à jour du launcher » | La page affiche `1.0.0` | MANUEL | Non testé |
+| UPD-02 | Autorisation d'installer | `appops get com.gathin.tvhome REQUEST_INSTALL_PACKAGES` | `allow` ; la page n'affiche pas l'avertissement orange | ADB + MANUEL | Non testé |
+| UPD-03 | Vérification manuelle | « Vérifier maintenant », sans release plus récente | « Le launcher est à jour », sans erreur | MANUEL | Non testé |
+| UPD-04 | Pastille | Publier `1.0.1`, puis revenir à l'accueil | Pastille en haut à droite, version et résumé ; la télécommande navigue entre les deux boutons | MANUEL | Non testé |
+| UPD-05 | Plus tard | « Plus tard » ou Retour | La pastille disparaît et ne revient pas avant 24 h ; l'accueil reste utilisable | MANUEL | Non testé |
+| UPD-06 | Installation | « Mettre à jour » | Progression, puis vérification, puis confirmation Android ; après « Installer » : retour à l'accueil, message « Launcher mis à jour : version 1.0.1 », historique « installée » | MANUEL | Non testé |
+| UPD-07 | Annulation | Refuser la confirmation Android | Historique « annulée », la version 1.0.0 reste installée et fonctionne | MANUEL | Non testé |
+| UPD-08 | Ignorer | « Ignorer cette version » | Plus de pastille pour cette version ; « La proposer à nouveau » la fait revenir | MANUEL | Non testé |
+| UPD-09 | Refus d'un APK modifié | Release de test avec un fichier `.sha256` faux | « Empreinte SHA-256 différente : fichier refusé », rien n'est installé | MANUEL | Non testé |
+| UPD-10 | Pas de réseau | Wi-Fi coupé, « Vérifier maintenant » | Message « Impossible de joindre GitHub », aucun plantage | MANUEL | Non testé |
+| UPD-11 | Vérification quotidienne | `dumpsys jobscheduler \| grep -A3 com.gathin.tvhome` | Une tâche périodique de 24 h, contrainte réseau, persistante | ADB | Non testé |
+| UPD-12 | Rien d'autre ne change | `pm list packages -d` avant et après une mise à jour | Liste identique : une mise à jour ne désactive rien | ADB | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

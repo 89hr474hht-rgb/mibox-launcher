@@ -29,3 +29,4 @@ audits/
 *.jks
 *.keystore
 keystore.properties
+launcher/mibox/build/

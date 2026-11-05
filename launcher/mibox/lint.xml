@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Lint for the mibox updater library. It is merged into the launcher, whose manifest has the banner. -->
+<lint>
+    <issue id="MissingTvBanner" severity="ignore" />
+    <issue id="MissingTranslation" severity="informational" />
+</lint>
