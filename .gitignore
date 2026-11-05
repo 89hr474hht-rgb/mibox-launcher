@@ -1,16 +1,8 @@
-*.iml
-.gradle/
-/local.properties
-/.idea/
-.DS_Store
-build/
-/captures
-.externalNativeBuild/
-.cxx/
-.kotlin/
-local.properties
-
-# Secrets — never commit tokens/keys
-*.secrets.properties
-secrets.properties
+# Audit output: serial numbers, MAC addresses, Wi-Fi/Bluetooth names, Netflix ESN. Never commit.
+audits/
+# Signing material
+*.jks
+*.keystore
 keystore.properties
+local.properties
+.DS_Store
