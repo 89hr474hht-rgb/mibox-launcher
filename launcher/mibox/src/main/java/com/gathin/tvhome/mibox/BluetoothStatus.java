@@ -183,19 +183,29 @@ final class BluetoothStatus implements BluetoothProfile.ServiceListener {
         return n == null || n.trim().isEmpty() ? "?" : n.trim();
     }
 
-    /** A string resource for what the device is: audio, remote or input, or another device. */
-    static int kind(BluetoothDevice d) {
+    /** The icon for what the device is: speaker, headphones, remote or controller, phone, or another device. */
+    static int icon(BluetoothDevice d) {
         try {
             BluetoothClass c = d.getBluetoothClass();
             if (c != null) {
-                int major = c.getMajorDeviceClass();
-                if (major == BluetoothClass.Device.Major.AUDIO_VIDEO) return R.string.mibox_bt_kind_audio;
-                if (major == BluetoothClass.Device.Major.PERIPHERAL) return R.string.mibox_bt_kind_input;
-                if (major == BluetoothClass.Device.Major.PHONE) return R.string.mibox_bt_kind_phone;
+                switch (c.getDeviceClass()) {
+                    case BluetoothClass.Device.AUDIO_VIDEO_HEADPHONES:
+                    case BluetoothClass.Device.AUDIO_VIDEO_WEARABLE_HEADSET:
+                    case BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE:
+                        return R.drawable.mibox_ic_bt_headphones;
+                    default:
+                        break;
+                }
+                switch (c.getMajorDeviceClass()) {
+                    case BluetoothClass.Device.Major.AUDIO_VIDEO: return R.drawable.mibox_ic_bt_speaker;
+                    case BluetoothClass.Device.Major.PERIPHERAL: return R.drawable.mibox_ic_bt_remote;
+                    case BluetoothClass.Device.Major.PHONE: return R.drawable.mibox_ic_bt_phone;
+                    default: break;
+                }
             }
         } catch (RuntimeException ignored) {
             // See name.
         }
-        return R.string.mibox_bt_kind_other;
+        return R.drawable.mibox_ic_bt_device;
     }
 }

@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Keeps the 24 h update check scheduled across reboots (JobInfo.setPersisted). -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- The Bluetooth pill and page only read the adapter state, the paired devices and their connections.
+    <!-- The Bluetooth pill and its menu only read the adapter state, the paired devices and their connections.
          BLUETOOTH covers that up to Android 11; from Android 12 it needs BLUETOOTH_CONNECT, which is not asked
          for, so the pill then just reads "Bluetooth". -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
@@ -43,12 +43,6 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".BluetoothActivity"
-            android:exported="false"
-            android:label="@string/mibox_bluetooth"
-            android:theme="@style/MiboxUpdatesTheme" />
 
         <receiver
             android:name=".InstallResultReceiver"

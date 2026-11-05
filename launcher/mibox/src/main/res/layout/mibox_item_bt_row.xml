@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One row of the Bluetooth menu, the launcher's popup row (app's item_input) with the icon in a disc. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="46dp"
+    android:background="@drawable/mibox_row_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingEnd="12dp">
+
+    <FrameLayout
+        android:id="@+id/mibox_bt_disc"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/mibox_bt_circle_off">
+
+        <ImageView
+            android:id="@+id/mibox_bt_icon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/mibox_bt_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/mibox_row_text"
+        android:textSize="15sp" />
+
+    <View
+        android:id="@+id/mibox_bt_dot"
+        android:layout_width="7dp"
+        android:layout_height="7dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/mibox_dot"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/mibox_bt_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:textColor="@color/mibox_row_text_dim"
+        android:textSize="11sp" />
+</LinearLayout>

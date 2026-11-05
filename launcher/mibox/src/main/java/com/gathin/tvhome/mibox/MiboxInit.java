@@ -19,7 +19,7 @@ import java.util.WeakHashMap;
 
 /**
  * Starts with the launcher's process (a provider is created before any activity) and wires the updater in
- * without changing the upstream code: the update prompt and the Bluetooth pill on the home screen, two rows in the
+ * without changing the upstream code: the update prompt and the Bluetooth pill on the home screen, a row in the
  * launcher's settings, and the scheduled checks.
  */
 public final class MiboxInit extends ContentProvider {
@@ -74,7 +74,7 @@ public final class MiboxInit extends ContentProvider {
                 // After the home screen has drawn, so the prompt never delays the first frame.
                 activity.getWindow().getDecorView().postDelayed(MiboxInit::promptIfHomeVisible, 1500);
             } else if (SETTINGS.equals(name)) {
-                addSettingsRows(activity);
+                addSettingsRow(activity);
             }
         }
 
@@ -114,13 +114,12 @@ public final class MiboxInit extends ContentProvider {
     }
 
     /**
-     * Adds two rows to the launcher's settings, styled like their neighbours: "Launcher updates" at the top, and
-     * "Bluetooth" just above the device settings row, which stays last. The launcher hides its own package from its
-     * app library, so these rows and the prompt are the way in. When the upstream layout changes and the rows'
-     * anchor is not found, nothing is added.
+     * Adds "Launcher updates" at the top of the launcher's settings, styled like its neighbours; the device
+     * settings row stays last. The launcher hides its own package from its app library, so this row and the prompt
+     * are the way in. When the upstream layout changes and the anchor row is not found, nothing is added.
      */
     @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
-    static void addSettingsRows(Activity activity) {
+    static void addSettingsRow(Activity activity) {
         String pkg = activity.getPackageName();
         int anchorId = activity.getResources().getIdentifier("tvSettingsChoice", "id", pkg);
         int styleId = activity.getResources().getIdentifier("SettingsRow", "style", pkg);
@@ -136,9 +135,6 @@ public final class MiboxInit extends ContentProvider {
         top.topMargin = Math.round(28 * activity.getResources().getDisplayMetrics().density);
         // Right under the page title, the first child.
         parent.addView(updates, Math.min(1, parent.getChildCount()), top);
-
-        TextView bluetooth = settingsRow(activity, styleId, R.string.mibox_bluetooth, BluetoothActivity.class);
-        parent.addView(bluetooth, parent.indexOfChild(anchor), rowParams(anchor));
     }
 
     private static TextView settingsRow(Activity activity, int styleId, int text, Class<? extends Activity> target) {

@@ -2,7 +2,6 @@ package com.gathin.tvhome.mibox;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
-import android.content.Intent;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,7 +14,7 @@ import java.util.List;
 /**
  * A Bluetooth pill in the home screen's top bar, right of the network pill, in the launcher's own pill style.
  * It reads "Bluetooth", or the connected speaker or headphones by name, scrolling when the name is longer than
- * the pill. The remote is always connected, so it is not named. OK opens the Bluetooth page.
+ * the pill. The remote is always connected, so it is not named. OK drops the Bluetooth menu from it.
  */
 final class BluetoothPill implements BluetoothStatus.Listener {
     private static final int MAX_WIDTH_DP = 210;
@@ -24,6 +23,7 @@ final class BluetoothPill implements BluetoothStatus.Listener {
 
     private final TextView view;
     private final BluetoothStatus status;
+    private BluetoothPopover menu;
 
     private BluetoothPill(TextView view, BluetoothStatus status) {
         this.view = view;
@@ -50,7 +50,6 @@ final class BluetoothPill implements BluetoothStatus.Listener {
         pill.setHorizontalFadingEdgeEnabled(true);
         pill.setMaxWidth(Math.round(MAX_WIDTH_DP * home.getResources().getDisplayMetrics().density));
         pill.setText(R.string.mibox_bluetooth);
-        pill.setOnClickListener(v -> home.startActivity(new Intent(home, BluetoothActivity.class)));
         // Same keys as the other pills: Up stays in the bar, Down goes back to the tile Up came from (the network
         // pill's own handler does that, so it is asked to).
         pill.setOnKeyListener((v, keyCode, event) -> {
@@ -71,6 +70,7 @@ final class BluetoothPill implements BluetoothStatus.Listener {
         self[0] = new BluetoothPill(pill, new BluetoothStatus(home, () -> {
             if (self[0] != null) self[0].onBluetoothChanged();
         }));
+        pill.setOnClickListener(v -> self[0].toggleMenu(home));
         return self[0];
     }
 
@@ -81,10 +81,17 @@ final class BluetoothPill implements BluetoothStatus.Listener {
 
     void pause() {
         status.stop();
+        if (menu != null) menu.dismiss();
     }
 
     void destroy() {
+        if (menu != null) menu.dismiss();
         status.close();
+    }
+
+    private void toggleMenu(Activity home) {
+        if (menu != null && menu.isShowing()) menu.dismiss();
+        else menu = BluetoothPopover.show(home, view);
     }
 
     @Override

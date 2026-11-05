@@ -5,6 +5,11 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.1.1] - 2026-11-05
+
+### Modifié
+- Bluetooth : un petit menu s'ouvre directement sous la pastille, comme les autres menus du launcher, au lieu d'une page à part. Les appareils connectés sont en tête, avec leur icône dans un disque bleu. En bas : « Associer un appareil… » et « Réglages Bluetooth… ».
+
 ## [1.1.0] - 2026-11-05
 
 ### Ajouté
