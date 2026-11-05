@@ -14,7 +14,7 @@ case "$HOST" in *:*) SERIAL="$HOST" ;; *) SERIAL="$HOST:5555" ;; esac
 
 command -v adb >/dev/null || { echo "adb introuvable (brew install --cask android-platform-tools)" >&2; exit 1; }
 
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 OUT="$ROOT/audits/$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$OUT"
 LOG="$OUT/commands.log"

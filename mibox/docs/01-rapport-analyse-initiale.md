@@ -135,7 +135,7 @@ Chaque garde peut être contournée par une variable d'environnement (`FORCE_HOM
 - **Pas d'APK publiés** : chacun compile soi-même.
 - **Une seule voie d'installation** : `build-and-install.sh`.
 
-→ Votre projet doit donc être **un dépôt indépendant**, pas une contribution à CleanYourTV. La licence MIT le permet, à condition de conserver la mention de copyright pour tout code repris.
+→ Votre projet sera donc **un fork** de CleanYourTV dans votre propre dépôt, pas une contribution au projet d'origine. La licence MIT le permet, à condition de conserver la mention de copyright (voir §5).
 
 ### 2.7 Le launcher CleanYourTV : points techniques utiles
 
@@ -214,11 +214,14 @@ Si votre télévision est elle-même une Smart TV, elle a **son propre système*
 
 ---
 
-## 5. Orientation préliminaire (à valider en Phase 2)
+## 5. Orientation (corrigée le 5 novembre 2026)
 
-- **Je recommande de ne pas forker CleanYourTV tel quel.** Plus de 90 % de son code vise d'autres appareils ou des fonctions décoratives, et sa philosophie (pas de mise à jour automatique, signature de debug) contredit vos exigences. Il vaut mieux **écrire votre propre launcher**, plus petit, et **reprendre les mécanismes éprouvés** (filtre HOME, gardes de désactivation, enregistrement de restauration, service de touches) en citant leur origine MIT.
-- **Scripts** : réutiliser la logique des gardes de CleanYourTV, adaptée à un seul appareil (le vôtre), avec des journaux horodatés.
-- **Ordre des phases** : comme dans votre cahier des charges. Une seule modification sensible à la fois, avec un test entre chaque.
+> ⚠️ **Correction.** Ce rapport recommandait d'abord d'écrire un launcher neuf. **Ce n'était pas votre demande** : vous voulez utiliser CleanYourTV lui-même et le modifier avec vos idées.
+> Décision retenue : **un fork de CleanYourTV**, importé avec son historique dans `mibox-launcher`, avec vos ajouts dans `mibox/` et vos modifications du launcher isolées. Voir [04-architecture.md](04-architecture.md).
+
+- **Launcher et outils** : ceux de CleanYourTV (`launcher/`, `tools/disable.sh`, `restore.sh`, `check.py`), avec leurs garde-fous éprouvés sur ce boîtier.
+- **Ce que CleanYourTV refuse** (mise à jour automatique, signature de release, APK publiés) devient une **modification de votre fork**, ce que la licence MIT permet.
+- **Ordre des phases** : inchangé. Une seule modification sensible à la fois, avec un test entre chaque.
 
 ---
 

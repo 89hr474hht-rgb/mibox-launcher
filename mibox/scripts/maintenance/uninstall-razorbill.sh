@@ -15,7 +15,7 @@ MODE="${2:-dry-run}"
 case "$HOST" in *:*) SERIAL="$HOST" ;; *) SERIAL="$HOST:5555" ;; esac
 PKG=com.razorbill.launcher
 
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 OUT="$ROOT/audits/$(date +%Y%m%d-%H%M%S)-razorbill"
 mkdir -p "$OUT"
 LOG="$OUT/log.txt"
