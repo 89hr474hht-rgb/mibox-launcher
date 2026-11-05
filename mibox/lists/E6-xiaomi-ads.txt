@@ -1,0 +1,13 @@
+# Xiaomi Mi Box S 2nd gen (MiTV-AFKR0, jaws), Google TV 11, build RTT0.211222.001.773.
+# Derived from examples/xiaomi-mi-box-s-2nd-gen/debloat.txt (validated upstream on 683/737/772) and the
+# fork audit of 2026-11-05 (mibox/docs/03-audit-mi-box.md). One step per list: apply it alone, run the
+# test plan, get the owner's approval, then the next step. Everything is DISABLED for user 0, never
+# uninstalled.
+#
+# STEP E6 - Xiaomi ad rows, promos and partner auto-installs.
+com.mitv.tvhome.oemtab                 # Xiaomi ad row
+com.mitv.tvhome.michannel              # Mi content rows
+com.mitv.tvhome.mitvplus               # Mi TV+ ad-funded channels
+com.mitv.tvhome.atv                    # PatchWall
+com.xm.webcontent                      # Xiaomi web promos
+android.autoinstalls.config.xioami.mibox3   # Play auto-install of partner apps (sic, "xioami")

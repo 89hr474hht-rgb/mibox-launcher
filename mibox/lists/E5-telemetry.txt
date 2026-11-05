@@ -1,0 +1,12 @@
+# Xiaomi Mi Box S 2nd gen (MiTV-AFKR0, jaws), Google TV 11, build RTT0.211222.001.773.
+# Derived from examples/xiaomi-mi-box-s-2nd-gen/debloat.txt (validated upstream on 683/737/772) and the
+# fork audit of 2026-11-05 (mibox/docs/03-audit-mi-box.md). One step per list: apply it alone, run the
+# test plan, get the owner's approval, then the next step. Everything is DISABLED for user 0, never
+# uninstalled.
+#
+# STEP E5 - Telemetry and attribution. Apply/undo with tools/disable.sh / tools/restore.sh and this file.
+com.miui.tv.analytics                  # Mi analytics
+com.xiaomi.statistic                   # Xiaomi usage stats uploader
+com.google.android.feedback            # Google feedback reports
+com.google.android.partnersetup        # Google RLZ attribution pings
+# com.xiaomi.tvqs.overseas             # log and crash uploader: never tested disabled upstream, kept

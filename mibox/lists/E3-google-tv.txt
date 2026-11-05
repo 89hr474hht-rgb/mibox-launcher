@@ -1,0 +1,13 @@
+# Xiaomi Mi Box S 2nd gen (MiTV-AFKR0, jaws), Google TV 11, build RTT0.211222.001.773.
+# Derived from examples/xiaomi-mi-box-s-2nd-gen/debloat.txt (validated upstream on 683/737/772) and the
+# fork audit of 2026-11-05 (mibox/docs/03-audit-mi-box.md). One step per list: apply it alone, run the
+# test plan, get the owner's approval, then the next step. Everything is DISABLED for user 0, never
+# uninstalled.
+#
+# STEP E3 - Google TV home screen.
+# Apply:  TV_HOST=<box> tools/disable.sh mibox/lists/E3-google-tv.txt
+# Undo:   TV_HOST=<box> tools/restore.sh mibox/lists/E3-google-tv.txt com.google.android.apps.tv.launcherx
+# ONLY AFTER com.gathin.tvhome is installed and holds the HOME role (step E1+E2). launcherx has HOME
+# priority 2, so it wins over any preference while enabled. Once it is off, setupwraith (priority 1)
+# still answers Home until step E4. The remote's Netflix/YouTube/Prime buttons stop working here.
+com.google.android.apps.tv.launcherx                # Google TV home
