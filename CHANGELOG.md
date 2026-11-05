@@ -5,6 +5,17 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.0.1] - 2026-11-05
+
+### Modifié
+- Première version publiée sur GitHub, pour tester les mises à jour automatiques. Rien ne change à l'écran.
+- Script d'installation : contrôle lui-même l'installation quand Google TV reste l'accueil.
+
+### Ajouté
+- Script d'envoi de la clé de signature dans les secrets GitHub, à lancer depuis le Terminal.
+
+## [1.0.0] - 2026-11-05
+
 ### Ajouté
 - Import de CleanYourTV (upstream `Gathin23/cleanyourtv`) avec son historique complet.
 - `mibox/` : rapport d'analyse, audit de la Mi Box S 2e gén. (build 773), inventaire classé des 119 packages, plan de tests avant/après, architecture du fork.

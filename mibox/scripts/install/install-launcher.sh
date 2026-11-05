@@ -48,9 +48,16 @@ if [ "${1:-}" != --execute ]; then
   exit 0
 fi
 
-SKIP_BUILD=1 STOCK_LAUNCHER=none ./build-and-install.sh
+# On Google TV, launcherx (priority 2) keeps Home while it is enabled, so build-and-install.sh ends with
+# "Home resolves to ...launcherx, not to the new launcher" and, with STOCK_LAUNCHER=none, has nothing to roll
+# back. That is the expected state for E1+E2: check the install here instead of trusting its exit status.
+SKIP_BUILD=1 STOCK_LAUNCHER=none ./build-and-install.sh \
+  || echo "build-and-install.sh stopped (expected while Google TV keeps Home); checking the install..."
+TV() { "$ROOT/tools/venv/bin/python" -I "$ROOT/tools/tv.py" "$1"; }
+TV "pm list packages --show-versioncode com.gathin.tvhome" | grep -q "package:com.gathin.tvhome versionCode:$code" \
+  || { echo "ERROR: com.gathin.tvhome $version is not installed on the box." >&2; exit 1; }
+echo "Installed on the box: com.gathin.tvhome $version ($code)."
 # Android 8+ asks each installer app for "install unknown apps". Google TV has no screen for it, so it is granted
 # here once; the update itself still needs the user's confirmation on the box every time.
-"$ROOT/tools/venv/bin/python" -I "$ROOT/tools/tv.py" \
-  "appops set com.gathin.tvhome REQUEST_INSTALL_PACKAGES allow; appops get com.gathin.tvhome REQUEST_INSTALL_PACKAGES"
+TV "appops set com.gathin.tvhome REQUEST_INSTALL_PACKAGES allow; appops get com.gathin.tvhome REQUEST_INSTALL_PACKAGES"
 echo "Installed. Next: the E1+E2 tests in mibox/docs/02-plan-de-tests.md."
