@@ -66,6 +66,12 @@ android {
         }
     }
 
+    // mibox-launcher fork: the Mi Box edition's values for upstream keys (config.xml switches, a few labels),
+    // from mibox/app-res. The release source set outranks main, so only the keys listed there change.
+    if (mibox) {
+        sourceSets.release.res.srcDirs += rootProject.file('mibox/app-res')
+    }
+
     packagingOptions {
         resources {
             // Kotlin metadata pulled in by AndroidX's dependencies. This launcher is plain Java and never reads it;

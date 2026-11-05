@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mibox-launcher fork: labels that differ on a streaming box, which has no TV of its own. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="tv_settings">Device settings</string>
+</resources>

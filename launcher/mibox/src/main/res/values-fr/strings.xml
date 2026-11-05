@@ -44,4 +44,20 @@
     <string name="mibox_err_signature">L\'APK n\'est pas signé avec la clé du launcher installé : fichier refusé.</string>
     <string name="mibox_err_permission">Android n\'autorise pas encore ce launcher à installer ses mises à jour.</string>
     <string name="mibox_err_install">Android a refusé l\'installation : %1$s</string>
+    <string name="mibox_bluetooth">Bluetooth</string>
+    <string name="mibox_bt_on">Le Bluetooth est activé.</string>
+    <string name="mibox_bt_off">Le Bluetooth est désactivé.</string>
+    <string name="mibox_bt_unavailable">Le Bluetooth ne peut pas être lu sur cet appareil.</string>
+    <string name="mibox_bt_pair">Associer un appareil</string>
+    <string name="mibox_bt_paired">Appareils associés</string>
+    <string name="mibox_bt_none">Aucun appareil associé.</string>
+    <string name="mibox_bt_connected">Connecté</string>
+    <string name="mibox_bt_not_connected">Non connecté</string>
+    <string name="mibox_bt_kind_audio">Enceinte ou casque</string>
+    <string name="mibox_bt_kind_input">Télécommande ou manette</string>
+    <string name="mibox_bt_kind_phone">Téléphone</string>
+    <string name="mibox_bt_kind_other">Appareil</string>
+    <string name="mibox_bt_manage_hint">Pour connecter, renommer ou oublier un appareil : Paramètres de l\'appareil, puis Télécommandes et accessoires.</string>
+    <string name="mibox_device_settings">Paramètres de l\'appareil</string>
+    <string name="mibox_screen_unavailable">Cet écran n\'existe pas sur cet appareil.</string>
 </resources>

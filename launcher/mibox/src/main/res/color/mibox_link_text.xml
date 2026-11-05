@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Connected (enabled) in the launcher's green, not connected in grey. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false" android:color="#FF8A96A1" />
+    <item android:color="#FFB9E7C7" />
+</selector>

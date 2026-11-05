@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="72dp"
+        android:paddingEnd="72dp"
+        android:paddingTop="38dp"
+        android:paddingBottom="38dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mibox_bluetooth"
+            android:textColor="#FFFFFFFF"
+            android:textSize="34sp" />
+
+        <TextView
+            android:id="@+id/mibox_bt_state"
+            style="@style/MiboxText"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/mibox_bt_pair"
+            style="@style/MiboxRow"
+            android:layout_marginTop="24dp"
+            android:text="@string/mibox_bt_pair" />
+
+        <TextView
+            style="@style/MiboxHeading"
+            android:text="@string/mibox_bt_paired" />
+
+        <LinearLayout
+            android:id="@+id/mibox_bt_devices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            style="@style/MiboxText"
+            android:layout_marginTop="14dp"
+            android:text="@string/mibox_bt_manage_hint"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/mibox_bt_device_settings"
+            style="@style/MiboxRow"
+            android:layout_marginTop="24dp"
+            android:text="@string/mibox_device_settings" />
+    </LinearLayout>
+</ScrollView>

@@ -14,11 +14,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Starts with the launcher's process (a provider is created before any activity) and wires the updater in
- * without changing the upstream code: the prompt on the home screen, a row in the launcher's settings, and the
- * scheduled checks.
+ * without changing the upstream code: the update prompt and the Bluetooth pill on the home screen, two rows in the
+ * launcher's settings, and the scheduled checks.
  */
 public final class MiboxInit extends ContentProvider {
     static final String HOME = "com.gathin.tvhome.MainActivity";
@@ -55,21 +57,31 @@ public final class MiboxInit extends ContentProvider {
         prompt = new WeakReference<>(null);
     }
 
+    private static final Map<Activity, BluetoothPill> PILLS = new WeakHashMap<>();
+
     private static final class Callbacks implements Application.ActivityLifecycleCallbacks {
         @Override
         public void onActivityResumed(Activity activity) {
             String name = activity.getClass().getName();
             if (HOME.equals(name)) {
                 resumedHome = new WeakReference<>(activity);
+                BluetoothPill pill = PILLS.get(activity);
+                if (pill == null && !PILLS.containsKey(activity)) {
+                    pill = BluetoothPill.attach(activity);
+                    PILLS.put(activity, pill);
+                }
+                if (pill != null) pill.resume();
                 // After the home screen has drawn, so the prompt never delays the first frame.
                 activity.getWindow().getDecorView().postDelayed(MiboxInit::promptIfHomeVisible, 1500);
             } else if (SETTINGS.equals(name)) {
-                addSettingsRow(activity);
+                addSettingsRows(activity);
             }
         }
 
         @Override
         public void onActivityPaused(Activity activity) {
+            BluetoothPill pill = PILLS.get(activity);
+            if (pill != null) pill.pause();
             if (resumedHome.get() == activity) {
                 resumedHome = new WeakReference<>(null);
                 dismissPrompt();
@@ -78,6 +90,8 @@ public final class MiboxInit extends ContentProvider {
 
         @Override
         public void onActivityDestroyed(Activity activity) {
+            BluetoothPill pill = PILLS.remove(activity);
+            if (pill != null) pill.destroy();
             UpdatePrompt p = prompt.get();
             if (p != null && p.owner() == activity) dismissPrompt();
         }
@@ -100,31 +114,47 @@ public final class MiboxInit extends ContentProvider {
     }
 
     /**
-     * Adds "Launcher updates" under the TV settings row of the launcher's settings, styled like its neighbours.
-     * The launcher hides its own package from its app library, so this row and the prompt are the way in.
-     * When the upstream layout changes and the row is not found, nothing is added.
+     * Adds two rows to the launcher's settings, styled like their neighbours: "Launcher updates" at the top, and
+     * "Bluetooth" just above the device settings row, which stays last. The launcher hides its own package from its
+     * app library, so these rows and the prompt are the way in. When the upstream layout changes and the rows'
+     * anchor is not found, nothing is added.
      */
     @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
-    static void addSettingsRow(Activity activity) {
+    static void addSettingsRows(Activity activity) {
         String pkg = activity.getPackageName();
         int anchorId = activity.getResources().getIdentifier("tvSettingsChoice", "id", pkg);
         int styleId = activity.getResources().getIdentifier("SettingsRow", "style", pkg);
-        if (anchorId == 0) return;
+        if (anchorId == 0 || styleId == 0) return;
         View anchor = activity.findViewById(anchorId);
         if (anchor == null || !(anchor.getParent() instanceof LinearLayout)) return;
         LinearLayout parent = (LinearLayout) anchor.getParent();
         if (parent.findViewWithTag(SETTINGS_ROW_TAG) != null) return;
+
+        TextView updates = settingsRow(activity, styleId, R.string.mibox_settings_row, UpdatesActivity.class);
+        updates.setTag(SETTINGS_ROW_TAG);
+        LinearLayout.LayoutParams top = rowParams(anchor);
+        top.topMargin = Math.round(28 * activity.getResources().getDisplayMetrics().density);
+        // Right under the page title, the first child.
+        parent.addView(updates, Math.min(1, parent.getChildCount()), top);
+
+        TextView bluetooth = settingsRow(activity, styleId, R.string.mibox_bluetooth, BluetoothActivity.class);
+        parent.addView(bluetooth, parent.indexOfChild(anchor), rowParams(anchor));
+    }
+
+    private static TextView settingsRow(Activity activity, int styleId, int text, Class<? extends Activity> target) {
         TextView row = new TextView(activity, null, 0, styleId);
-        row.setTag(SETTINGS_ROW_TAG);
-        row.setText(R.string.mibox_settings_row);
+        row.setText(text);
         row.setFocusable(true);
         row.setClickable(true);
-        row.setOnClickListener(v -> activity.startActivity(new Intent(activity, UpdatesActivity.class)));
+        row.setOnClickListener(v -> activity.startActivity(new Intent(activity, target)));
+        return row;
+    }
+
+    private static LinearLayout.LayoutParams rowParams(View anchor) {
         ViewGroup.LayoutParams base = anchor.getLayoutParams();
-        LinearLayout.LayoutParams lp = base instanceof LinearLayout.LayoutParams
+        return base instanceof LinearLayout.LayoutParams
                 ? new LinearLayout.LayoutParams((LinearLayout.LayoutParams) base)
                 : new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        parent.addView(row, parent.indexOfChild(anchor) + 1, lp);
     }
 
     private static final String SETTINGS_ROW_TAG = "mibox_updates_row";

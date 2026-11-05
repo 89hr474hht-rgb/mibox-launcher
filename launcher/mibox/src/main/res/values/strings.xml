@@ -45,4 +45,20 @@
     <string name="mibox_err_signature">The APK is not signed with the installed launcher\'s key: file refused.</string>
     <string name="mibox_err_permission">Android does not yet allow this launcher to install its updates.</string>
     <string name="mibox_err_install">Android refused the installation: %1$s</string>
+    <string name="mibox_bluetooth">Bluetooth</string>
+    <string name="mibox_bt_on">Bluetooth is on.</string>
+    <string name="mibox_bt_off">Bluetooth is off.</string>
+    <string name="mibox_bt_unavailable">Bluetooth cannot be read on this device.</string>
+    <string name="mibox_bt_pair">Pair a device</string>
+    <string name="mibox_bt_paired">Paired devices</string>
+    <string name="mibox_bt_none">No paired device.</string>
+    <string name="mibox_bt_connected">Connected</string>
+    <string name="mibox_bt_not_connected">Not connected</string>
+    <string name="mibox_bt_kind_audio">Speaker or headphones</string>
+    <string name="mibox_bt_kind_input">Remote or controller</string>
+    <string name="mibox_bt_kind_phone">Phone</string>
+    <string name="mibox_bt_kind_other">Device</string>
+    <string name="mibox_bt_manage_hint">To connect, rename or forget a device: Device settings, then Remotes and accessories.</string>
+    <string name="mibox_device_settings">Device settings</string>
+    <string name="mibox_screen_unavailable">This screen does not exist on this device.</string>
 </resources>

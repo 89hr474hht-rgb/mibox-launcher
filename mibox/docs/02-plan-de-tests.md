@@ -121,6 +121,19 @@ Statuts possibles : Test réussi / Test partiel / Échec / Non testé / Validati
 | UPD-11 | Vérification quotidienne | `dumpsys jobscheduler \| grep -A3 com.gathin.tvhome` | Une tâche périodique de 24 h, contrainte réseau, persistante | ADB | Non testé |
 | UPD-12 | Rien d'autre ne change | `pm list packages -d` avant et après une mise à jour | Liste identique : une mise à jour ne désactive rien | ADB | Non testé |
 
+## C quinquies. Réglages et Bluetooth du launcher (1.1.0)
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| LST-01 | Bouton Paramètres | Accueil → Paramètres | Les réglages du launcher s'ouvrent : « Mises à jour du launcher » en tête, puis « Bluetooth », et « Paramètres de l'appareil » en dernier | MANUEL | Non testé |
+| LST-02 | Paramètres de l'appareil | Dernière ligne | Les paramètres d'Android TV s'ouvrent | MANUEL | Non testé |
+| BTP-01 | Pastille sans audio | Aucune enceinte connectée | La pastille affiche « Bluetooth » | MANUEL | Non testé |
+| BTP-02 | Pastille avec la JBL | Allumer la JBL Go 3 | Après quelques secondes : « JBL Go 3 » | MANUEL | Non testé |
+| BTP-03 | Nom long | Connecter un appareil au nom long (AirPods) | Le nom défile, puis s'arrête ; il redéfile quand la pastille est sélectionnée | MANUEL | Non testé |
+| BTP-04 | Navigation | Haut, Bas, Gauche et Droite depuis la pastille | Bas revient sur la tuile d'origine, Haut reste dans la barre | MANUEL | Non testé |
+| BTP-05 | Page Bluetooth | OK sur la pastille | Liste des 4 appareils associés et leur état ; « Associer un appareil » ouvre l'appairage de Google TV | MANUEL | Non testé |
+| BTP-06 | Rien ne change | `pm list packages -d` et `dumpsys bluetooth_manager` avant et après | La page ne fait que lire : aucun changement | ADB | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mibox-launcher fork: the Mi Box edition's values for upstream config.xml keys. Only the keys listed here
+     differ from app/src/main/res/values/config.xml; a theme can still override them. -->
+<resources>
+    <!-- The Settings pill opens the launcher's own settings (updates, Bluetooth, then the device's settings). -->
+    <bool name="launcher_settings_button">true</bool>
+</resources>

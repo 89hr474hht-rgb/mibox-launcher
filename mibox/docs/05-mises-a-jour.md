@@ -11,7 +11,7 @@ Cette fiche complète la §5 de [04-architecture.md](04-architecture.md). Le cod
 3. [Mettre à jour] ouvre la page « Mises à jour du launcher ». Le launcher y télécharge l'APK, le vérifie, puis Android affiche **sa fenêtre de confirmation**, obligatoire sur Android 11.
 4. Après « Installer », l'accueil revient avec le message « Launcher mis à jour : version X ».
 
-La page s'ouvre aussi depuis **Réglages du launcher → Mises à jour du launcher**, sur la dernière ligne. Elle affiche :
+La page s'ouvre aussi depuis le bouton **Paramètres** de l'accueil → **Mises à jour du launcher** (première ligne), ou depuis la liste des applis de Google TV. Elle affiche :
 - la version installée et la dernière vérification ;
 - les nouveautés et l'avancement ;
 - les erreurs et l'historique ;

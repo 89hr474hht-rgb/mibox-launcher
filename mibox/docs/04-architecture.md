@@ -90,6 +90,12 @@ Le flux et les règles de sécurité sont ceux déjà définis. Les adaptations 
 
 Conséquence : la compilation CleanYourTV normale ne change pas, à l'octet près (588 185 octets, sans permission `INTERNET`, sous la limite de 576 Ko). Les 2935 tests de CleanYourTV passent. L'édition Mi Box pèse 619 870 octets, avec les permissions `INTERNET`, `REQUEST_INSTALL_PACKAGES` et `RECEIVE_BOOT_COMPLETED`. Publication et sécurité : [05-mises-a-jour.md](05-mises-a-jour.md).
 
+**Ajouts de la 1.1.0 (même méthode, sans toucher au code de CleanYourTV).**
+- **Bouton Paramètres :** il ouvre les réglages du launcher, grâce à la clé `launcher_settings_button` de CleanYourTV, activée dans `launcher/mibox/app-res/`. Ce dossier contient les valeurs propres à l'édition Mi Box. La ligne « Paramètres du téléviseur » y devient « Paramètres de l'appareil » et reste la dernière. « Mises à jour du launcher » est ajoutée en tête, « Bluetooth » juste avant.
+- **Pastille Bluetooth :** elle se place à droite de la pastille réseau. Elle affiche « Bluetooth », ou l'enceinte ou le casque connecté ; la télécommande, toujours connectée, n'est pas nommée. Un nom trop long défile 3 fois, puis s'arrête, pour ne pas redessiner l'écran sans fin.
+- **Page Bluetooth :** elle se contente de **lire** l'état : appareils associés, type, connecté ou non. Associer, connecter et oublier un appareil passent par les écrans d'Android : « Associer un appareil » ouvre l'écran d'appairage de Google TV.
+- **Wi-Fi :** CleanYourTV affiche déjà le nom du réseau en Wi-Fi, et « Ethernet » en filaire. Android 11 ne donne ce nom qu'avec la localisation activée ; elle est coupée sur la box, d'où « Wi-Fi ». Se connecter à un réseau depuis une appli ordinaire n'est plus possible depuis Android 10 : le bouton ouvre donc l'écran Wi-Fi d'Android.
+
 **Écart assumé par rapport à votre cahier des charges : JobScheduler au lieu de WorkManager.**
 - WorkManager est une bibliothèque écrite en Kotlin, qui ajouterait environ 1 Mo et la bibliothèque standard Kotlin à un launcher qui a aujourd'hui 2 dépendances.
 - CleanYourTV impose une limite de taille d'APK, et la mémoire de la box est comptée.

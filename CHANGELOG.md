@@ -5,14 +5,16 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
-## [1.0.1] - 2026-11-05
-
-### Modifié
-- Première version publiée sur GitHub, pour tester les mises à jour automatiques. Rien ne change à l'écran.
-- Script d'installation : contrôle lui-même l'installation quand Google TV reste l'accueil.
+## [1.1.0] - 2026-11-05
 
 ### Ajouté
-- Script d'envoi de la clé de signature dans les secrets GitHub, à lancer depuis le Terminal.
+- Pastille Bluetooth en haut de l'accueil : affiche l'enceinte ou le casque connecté, et défile si le nom est long.
+- Page Bluetooth : appareils associés et leur état, « Associer un appareil », « Paramètres de l'appareil ».
+- Le bouton Paramètres ouvre les réglages du launcher : mises à jour en tête, Bluetooth, puis Paramètres de l'appareil.
+
+### Modifié
+- Première mise à jour publiée sur GitHub.
+- Côté Mac : le script d'installation contrôle lui-même l'installation ; nouveau script d'envoi de la clé dans les secrets GitHub.
 
 ## [1.0.0] - 2026-11-05
 
