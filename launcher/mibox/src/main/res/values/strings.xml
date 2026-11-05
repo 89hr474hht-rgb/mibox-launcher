@@ -54,4 +54,6 @@
     <string name="mibox_screen_unavailable">This screen does not exist on this device.</string>
     <string name="mibox_bt_more">Bluetooth settings…</string>
     <string name="mibox_bt_pair_more">Pair a device…</string>
+    <string name="mibox_volume_hud_name">Volume bar</string>
+    <string name="mibox_volume_hud_description">Shows the launcher\'s volume bar when sound plays on a Bluetooth speaker or headphones. It only handles the volume keys and reads nothing on screen.</string>
 </resources>

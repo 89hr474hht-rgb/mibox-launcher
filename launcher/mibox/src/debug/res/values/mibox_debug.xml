@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Debug builds only: the volume bar on every output, so it can be tried on an emulator. -->
+    <bool name="mibox_volume_hud_any_output">true</bool>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Keys only, like the launcher's other key helpers: no accessibility event types, so nothing on screen is
+     ever read. Key filtering needs only flagRequestFilterKeyEvents and canRequestFilterKeyEvents. -->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagRequestFilterKeyEvents"
+    android:canRequestFilterKeyEvents="true"
+    android:description="@string/mibox_volume_hud_description" />

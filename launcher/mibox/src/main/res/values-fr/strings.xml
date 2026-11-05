@@ -53,4 +53,6 @@
     <string name="mibox_screen_unavailable">Cet écran n\'existe pas sur cet appareil.</string>
     <string name="mibox_bt_more">Réglages Bluetooth…</string>
     <string name="mibox_bt_pair_more">Associer un appareil…</string>
+    <string name="mibox_volume_hud_name">Barre de volume</string>
+    <string name="mibox_volume_hud_description">Affiche la barre de volume du launcher quand le son passe par une enceinte ou un casque Bluetooth. Elle ne gère que les touches de volume et ne lit rien à l\'écran.</string>
 </resources>

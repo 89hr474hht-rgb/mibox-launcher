@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The launcher's volume bar for Bluetooth speakers and headphones (VolumeHudService). Off: the service,
+         if turned on, lets every key through, and Android shows its own panel. -->
+    <bool name="mibox_volume_hud">true</bool>
+    <!-- Also on other outputs than Bluetooth. Only debug builds turn it on, so the bar can be tried on an
+         emulator, which has no Bluetooth audio. Never on the box: there the TV's own bar is the right one. -->
+    <bool name="mibox_volume_hud_any_output">false</bool>
+</resources>
