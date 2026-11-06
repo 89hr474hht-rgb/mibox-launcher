@@ -5,4 +5,18 @@
     <string name="tv_settings">Paramètres de l\'appareil</string>
     <string name="launcher_settings">Réglages de LaunchOS</string>
     <string name="dream_name">Horloge LaunchOS</string>
+    <!-- Upstream strings its French file does not have yet, so that LaunchOS is French throughout. -->
+    <string name="good_forenoon">Bonjour</string>
+    <string name="quick_apps">Applications</string>
+    <string name="quick_apps_hint">Réactiver</string>
+    <string name="quick_network">Réseau</string>
+    <string name="quick_picture">Affichage</string>
+    <string name="rows_below_dock_label">Rangées sous le dock</string>
+    <string name="storage_gb_decimal">%1$.1f Go</string>
+    <string name="storage_gb_whole">%1$.0f Go</string>
+    <string name="wallpaper_applied">Fond d\'écran modifié</string>
+    <string name="wallpaper_label">Fond d\'écran</string>
+    <string name="wallpaper_none">Aucun</string>
+    <string name="wallpaper_state">Fond d\'écran : %1$s</string>
+    <string name="wallpaper_theme_default">Celui du thème</string>
 </resources>

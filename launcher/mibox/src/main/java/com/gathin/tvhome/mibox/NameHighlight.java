@@ -44,7 +44,7 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
         hero = (TextView) v;
         Typeface medium = UiFonts.medium(home);
         if (medium != null) hero.setTypeface(medium);
-        hero.setShadowLayer(22 * dp, 0, 0, 0x8CFFFFFF);
+        hero.setShadowLayer(9 * dp, 0, 0, 0x66FFFFFF);   // wider gets cut off at the view's edges
         if (android.provider.Settings.Global.getFloat(home.getContentResolver(),
                 android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f) return;
         heroWatcher = new android.text.TextWatcher() {

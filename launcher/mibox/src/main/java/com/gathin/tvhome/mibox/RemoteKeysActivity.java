@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -105,14 +104,7 @@ public final class RemoteKeysActivity extends Activity {
         for (int key : RemoteRemap.KEYS) {
             LinearLayout row = row();
             row.setTag(key);
-            TextView chip = new TextView(this);
-            chip.setBackgroundResource(R.drawable.mibox_key_chip);
-            chip.setGravity(Gravity.CENTER);
-            chip.setTextSize(13);
-            chip.setText(chipLabel(key));
-            chip.setTextColor(chipColor(key));
-            if (semibold != null) chip.setTypeface(semibold);
-            row.addView(chip, new LinearLayout.LayoutParams(px(104), px(34)));
+            row.addView(new RemoteView.Chip(this, key), new LinearLayout.LayoutParams(px(104), px(44)));
             LinearLayout texts = texts(row, getString(buttonName(key)), "");
             texts.setPadding(px(16), 0, 0, 0);
             ImageView icon = new ImageView(this);
@@ -328,14 +320,5 @@ public final class RemoteKeysActivity extends Activity {
     private static int buttonName(int key) {
         return key == RemoteRemap.NETFLIX ? R.string.mibox_rk_btn_netflix
                 : key == RemoteRemap.YOUTUBE ? R.string.mibox_rk_btn_youtube : R.string.mibox_rk_btn_prime;
-    }
-
-    private static String chipLabel(int key) {
-        return key == RemoteRemap.NETFLIX ? "NETFLIX" : key == RemoteRemap.YOUTUBE ? "▶ YouTube" : "prime video";
-    }
-
-    private static ColorStateList chipColor(int key) {
-        return ColorStateList.valueOf(key == RemoteRemap.NETFLIX ? 0xFFE50914 : key == RemoteRemap.YOUTUBE ? 0xFFFFFFFF
-                : 0xFF5EC8F2);
     }
 }

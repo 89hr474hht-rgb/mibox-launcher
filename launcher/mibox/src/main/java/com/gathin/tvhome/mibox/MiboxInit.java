@@ -32,10 +32,26 @@ public final class MiboxInit extends ContentProvider {
     @Override
     public boolean onCreate() {
         Application app = (Application) getContext().getApplicationContext();
+        french(app.getResources());
         app.registerActivityLifecycleCallbacks(new Callbacks());
         UpdateScheduler.schedule(app);
         UpdateScheduler.checkSoon(app);
         return true;
+    }
+
+    /**
+     * LaunchOS in French whatever the device's language (mibox_french): the app's resources, and each activity's
+     * before it builds its views, are switched to French. Android's own screens keep the device's language.
+     */
+    @SuppressWarnings("deprecation") // updateConfiguration is the only way without changing upstream's activities
+    static void french(android.content.res.Resources res) {
+        if (!res.getBoolean(R.bool.mibox_french)) return;
+        android.content.res.Configuration cfg = res.getConfiguration();
+        if ("fr".equals(cfg.getLocales().get(0).getLanguage())) return;
+        android.content.res.Configuration fr = new android.content.res.Configuration(cfg);
+        fr.setLocale(java.util.Locale.FRANCE);
+        java.util.Locale.setDefault(java.util.Locale.FRANCE);
+        res.updateConfiguration(fr, res.getDisplayMetrics());
     }
 
     /** Shows the prompt when the home screen is in front and there is a release to offer. */
@@ -98,6 +114,11 @@ public final class MiboxInit extends ContentProvider {
             if (extras != null) extras.destroy();
             UpdatePrompt p = prompt.get();
             if (p != null && p.owner() == activity) dismissPrompt();
+        }
+
+        @Override
+        public void onActivityPreCreated(Activity activity, Bundle state) {
+            french(activity.getResources());
         }
 
         @Override

@@ -3,4 +3,7 @@
     <!-- The home screen's glow in the focused app's colour drifts slowly (LivingGlow). false keeps upstream's
          still glow. -->
     <bool name="mibox_living_glow">true</bool>
+    <!-- LaunchOS shows its screens in French whatever the device's language (MiboxInit.french). false follows the
+         device's language. -->
+    <bool name="mibox_french">true</bool>
 </resources>
