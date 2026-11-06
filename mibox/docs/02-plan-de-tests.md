@@ -261,7 +261,7 @@ sur la box (lu par ADB), et HDMI-CEC aussi (`hdmi_control_enabled` et `hdmi_cont
 | L14-03 | Menu Minuteur | OK sur Minuteur | 15 min à 2 h ; « Arrêter le minuteur » quand il tourne ; le bouton dit « Veille dans … » | MANUEL | Test partiel (émulateur) |
 | L14-04 | Dernière minute | Minuteur lancé, regarder une appli | À 60 s, pastille en haut et écran « Ajouter 30 min » par-dessus l'appli | MANUEL | Test partiel (émulateur, par-dessus LaunchOS TV) |
 | L14-05 | Ajouter 30 min | OK sur l'écran de la dernière minute | L'écran part, le bouton dit « Veille dans 31 min » | MANUEL | Test partiel (émulateur) |
-| L14-06 | Retour | Retour sur l'écran de la dernière minute | Minuteur arrêté, la box ne se met pas en veille | MANUEL | Voir ci-dessous |
+| L14-06 | Retour | Retour sur l'écran de la dernière minute | Minuteur arrêté, la box ne se met pas en veille | MANUEL | Test partiel (émulateur : les deux alarmes sont supprimées ; la suite n'a pas pu être observée, un autre minuteur ayant été lancé juste après) |
 | L14-07 | Mise en veille | Laisser finir | La box passe en veille, la Samsung s'éteint (CEC), la JBL se coupe | MANUEL | Test partiel (émulateur : veille « Asleep ») ; télé et JBL non testées |
 | L14-08 | Par-dessus Netflix / SFR TV | Minuteur pendant une vidéo | L'écran de la dernière minute s'affiche, la vidéo reprend après « Ajouter 30 min » | MANUEL | Non testé |
 | L14-09 | Réveil | Réveiller la box après la veille | Accueil normal, minuteur arrêté, BT et CEC comme avant (BT-05, CEC-03) | MANUEL | Non testé |
