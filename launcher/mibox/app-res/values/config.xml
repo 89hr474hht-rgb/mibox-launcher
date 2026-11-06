@@ -4,4 +4,11 @@
 <resources>
     <!-- The Settings pill opens the launcher's own settings (updates, Bluetooth, then the device's settings). -->
     <bool name="launcher_settings_button">true</bool>
+    <!-- Step E9: the Xiaomi remote's YouTube button sends KEYCODE_BUTTON_3 (190) on build 773
+         (/vendor/usr/keylayout/Vendor_2717_Product_32b9.kl). Google TV's home handled it; once that is
+         disabled, InputKeyService (an accessibility service, switched on over adb) opens YouTube instead.
+         Netflix (193) and Prime Video (194) stay unmapped, as the owner chose. -->
+    <string-array name="app_keys" translatable="false">
+        <item>190:com.google.android.youtube.tv</item>
+    </string-array>
 </resources>

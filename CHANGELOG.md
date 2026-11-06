@@ -5,6 +5,11 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.2.1] - 2026-11-06
+
+### Ajouté
+- Bouton YouTube de la télécommande : il ouvre de nouveau YouTube, même sans l'accueil Google TV. C'est le service « touches de la télécommande » du launcher qui s'en charge ; il s'active une fois depuis l'ordinateur. Les boutons Netflix et Prime Video restent sans action.
+
 ## [1.2.0] - 2026-11-06
 
 ### Ajouté
