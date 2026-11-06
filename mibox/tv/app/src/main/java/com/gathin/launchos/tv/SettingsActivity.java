@@ -3,50 +3,58 @@ package com.gathin.launchos.tv;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 /** Réglages: the groups of each section, the mini player, the next episode, tidy names, and clearing history. */
 public final class SettingsActivity extends Activity {
     private ViewGroup column;
-    private TextView mini, next, tidy;
+    private Rows.Row mini, next, tidy;
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_refresh);
-        ((TextView) findViewById(R.id.page_title)).setText(R.string.settings_title);
-        ((TextView) findViewById(R.id.page_hint)).setText(R.string.settings_hint);
+        Rows.header(this, R.drawable.ic_settings, R.string.settings_title, R.string.settings_hint);
         column = findViewById(R.id.column);
-        View first = row(R.string.settings_groups_live, R.string.settings_groups_sub, v -> groups(Xtream.Section.LIVE)).view;
-        row(R.string.settings_groups_movies, R.string.settings_groups_sub, v -> groups(Xtream.Section.MOVIES));
-        row(R.string.settings_groups_series, R.string.settings_groups_sub, v -> groups(Xtream.Section.SERIES));
-        mini = row(R.string.settings_mini, R.string.settings_mini_sub, v -> {
+
+        Rows.section(column, R.string.settings_section_groups);
+        View first = Rows.add(column, R.drawable.ic_live, R.string.settings_groups_live).sub(R.string.settings_groups_sub)
+                .opens().click(v -> groups(Xtream.Section.LIVE)).view;
+        Rows.add(column, R.drawable.ic_movie, R.string.settings_groups_movies).sub(R.string.settings_groups_sub)
+                .opens().click(v -> groups(Xtream.Section.MOVIES));
+        Rows.add(column, R.drawable.ic_series, R.string.settings_groups_series).sub(R.string.settings_groups_sub)
+                .opens().click(v -> groups(Xtream.Section.SERIES));
+
+        Rows.section(column, R.string.settings_section_play);
+        mini = Rows.add(column, R.drawable.ic_mini, R.string.settings_mini).sub(R.string.settings_mini_sub).click(v -> {
             Options.setMiniPlayer(this, !Options.miniPlayer(this));
             states();
-        }).state;
-        next = row(R.string.settings_next, R.string.settings_next_sub, v -> {
+        });
+        next = Rows.add(column, R.drawable.ic_next, R.string.settings_next).sub(R.string.settings_next_sub).click(v -> {
             Options.setNextEpisode(this, !Options.nextEpisode(this));
             states();
-        }).state;
-        tidy = row(R.string.settings_tidy, R.string.settings_tidy_sub, v -> {
+        });
+        tidy = Rows.add(column, R.drawable.ic_text, R.string.settings_tidy).sub(R.string.settings_tidy_sub).click(v -> {
             Options.setTidyNames(this, !Options.tidyNames(this));
             Groups.touch();
             states();
-        }).state;
-        Row fav = row(R.string.settings_clear_fav, R.string.settings_clear_fav_sub, null);
-        fav.view.setOnClickListener(v -> {
+        });
+
+        Rows.section(column, R.string.settings_section_history);
+        Rows.Row fav = Rows.add(column, R.drawable.ic_star_line, R.string.settings_clear_fav)
+                .sub(R.string.settings_clear_fav_sub);
+        fav.click(v -> {
             History h = History.get(this);
             if (h != null) h.clearWatched();
-            fav.state.setText(R.string.cleared);
+            fav.state(getString(R.string.cleared), Rows.Tone.OK);
         });
-        Row resume = row(R.string.settings_clear_resume, R.string.settings_clear_resume_sub, null);
-        resume.view.setOnClickListener(v -> {
+        Rows.Row resume = Rows.add(column, R.drawable.ic_history, R.string.settings_clear_resume)
+                .sub(R.string.settings_clear_resume_sub);
+        resume.click(v -> {
             History h = History.get(this);
             if (h != null) h.clearPlayback();
-            resume.state.setText(R.string.cleared);
+            resume.state(getString(R.string.cleared), Rows.Tone.OK);
         });
         states();
         first.requestFocus();
@@ -57,28 +65,8 @@ public final class SettingsActivity extends Activity {
     }
 
     private void states() {
-        mini.setText(Options.miniPlayer(this) ? R.string.on : R.string.off);
-        next.setText(Options.nextEpisode(this) ? R.string.on : R.string.off);
-        tidy.setText(Options.tidyNames(this) ? R.string.on : R.string.off);
-    }
-
-    private static final class Row {
-        final View view;
-        final TextView state;
-
-        Row(View view) {
-            this.view = view;
-            state = view.findViewById(R.id.state);
-        }
-    }
-
-    private Row row(int title, int sub, View.OnClickListener click) {
-        View v = LayoutInflater.from(this).inflate(R.layout.item_refresh, column, false);
-        ((TextView) v.findViewById(R.id.title)).setText(title);
-        ((TextView) v.findViewById(R.id.sub)).setText(sub);
-        Ui.lift(v, 1.02f);
-        if (click != null) v.setOnClickListener(click);
-        column.addView(v);
-        return new Row(v);
+        mini.toggle(Options.miniPlayer(this));
+        next.toggle(Options.nextEpisode(this));
+        tidy.toggle(Options.tidyNames(this));
     }
 }

@@ -44,6 +44,8 @@
         <item name="android:fontFamily">@font/launchos_semibold</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/button_text</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:drawableTint">@color/button_text</item>
     </style>
 
     <style name="RailItem">

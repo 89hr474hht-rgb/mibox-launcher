@@ -42,7 +42,7 @@
     <string name="search_movies">Films</string>
     <string name="search_series">Séries</string>
 
-    <string name="detail_play">Lecture</string>
+    <string name="detail_play">Regarder</string>
     <string name="detail_resume">Reprendre à %1$s</string>
     <string name="detail_restart">Depuis le début</string>
     <string name="detail_director">Réalisation : %1$s</string>
@@ -53,6 +53,12 @@
     <string name="next_episode">Épisode suivant : %1$s</string>
 
     <string name="settings_title">Réglages</string>
+    <string name="settings_section_groups">Groupes</string>
+    <string name="settings_section_play">Lecture et affichage</string>
+    <string name="settings_section_history">Historique</string>
+    <string name="refresh_section_lists">Listes du fournisseur</string>
+    <string name="refresh_section_memory">Gardé sur la box</string>
+    <string name="account_section">Identifiants</string>
     <string name="settings_hint">Les réglages restent sur cette box, pour ce compte.</string>
     <string name="settings_groups_live">Groupes des chaînes</string>
     <string name="settings_groups_movies">Groupes des films</string>

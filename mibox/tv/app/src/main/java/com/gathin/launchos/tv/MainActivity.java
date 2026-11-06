@@ -285,7 +285,10 @@ public final class MainActivity extends Activity {
                 return v != null ? v : focused;
             }
             if (direction == View.FOCUS_LEFT) return focused;
-            return Root.inside(proposed, rail) ? proposed : focused;
+            if (direction == View.FOCUS_UP || direction == View.FOCUS_DOWN) {
+                return railStep(focused, direction == View.FOCUS_DOWN ? 1 : -1);
+            }
+            return focused;
         }
         View r;
         if (section == Xtream.Section.LIVE) r = live.route(focused, direction, proposed);
@@ -295,6 +298,20 @@ public final class MainActivity extends Activity {
             return direction == View.FOCUS_LEFT ? sectionItems[section.ordinal()] : focused;
         }
         return r;
+    }
+
+    /**
+     * Up and Down in the rail go to the next item shown, in order. Android's own search looks for the nearest view
+     * and, across the gap under Séries, finds the page instead: Actualiser, Réglages and Compte were out of reach.
+     */
+    private View railStep(View focused, int step) {
+        int at = -1;
+        for (int i = 0; i < railItems.length; i++) if (Root.inside(focused, railItems[i])) at = i;
+        if (at < 0) return focused;
+        for (int i = at + step; i >= 0 && i < railItems.length; i += step) {
+            if (railItems[i].getVisibility() == View.VISIBLE && railItems[i].isFocusable()) return railItems[i];
+        }
+        return focused;
     }
 
     private void focusMoved(View now) {

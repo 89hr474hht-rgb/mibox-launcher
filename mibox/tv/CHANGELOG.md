@@ -6,6 +6,20 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.4.0] - 2026-11-06
+
+### Corrigé
+- Menu de gauche : Bas ne s'arrêtait plus à Séries. Actualiser, Réglages, Mises à jour et Compte sont de nouveau joignables à la télécommande.
+- Films et Séries : en entrant depuis le menu pendant que le catalogue charge, la sélection arrive sur « Regarder » et non plus sur « Rechercher ».
+
+### Modifié
+- Nouvelle apparence des écrans Actualiser, Réglages, Mises à jour, Compte et Groupes : en-tête avec icône, lignes avec icône rangées par sections, la ligne choisie en blanc comme dans le menu.
+- Réglages : de vrais interrupteurs pour le mini-lecteur, l'épisode suivant et les noms nettoyés.
+- Mises à jour : l'état dans un encadré avec icône (à jour, nouvelle version, erreur) et l'historique ligne par ligne.
+- Compte : icônes dans les champs et les boutons, résultat du test dans un encadré.
+- Tout voir : les tris ont leur icône. Recherche : en-tête avec icône.
+- Fiche film : le bouton s'appelle « Regarder », comme sur l'affiche. Le résumé d'un film apparaît en fondu.
+
 ## [0.3.0] - 2026-11-06
 
 ### Ajouté

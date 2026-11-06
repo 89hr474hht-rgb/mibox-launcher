@@ -35,5 +35,5 @@ reaches it at `http://10.0.2.2:8080`. `--redirect`, `--episodes-as-list` and `--
 Updates: the same updater as LaunchOS, reading this repository's `tv-vX.Y.Z` releases (published by
 `.github/workflows/release-tv.yml`; notes from `CHANGELOG.md`). Bump `VERSION` and the changelog, then push the tag.
 
-Study and decisions: [mibox/docs/09-appli-tv-xtream.md](../docs/09-appli-tv-xtream.md). Tests: sections C decies
-and C duodecies of [mibox/docs/02-plan-de-tests.md](../docs/02-plan-de-tests.md).
+Study and decisions: [mibox/docs/09-appli-tv-xtream.md](../docs/09-appli-tv-xtream.md). Tests: sections C decies,
+C duodecies and C quaterdecies of [mibox/docs/02-plan-de-tests.md](../docs/02-plan-de-tests.md).

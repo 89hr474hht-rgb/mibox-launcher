@@ -6,4 +6,5 @@
     <color name="accent">#FF4F7BFF</color>
     <color name="accent_light">#FF8FB0FF</color>
     <color name="danger">#FFFF6B6B</color>
+    <color name="ok">#FF4ADE80</color>
 </resources>

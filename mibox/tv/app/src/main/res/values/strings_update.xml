@@ -5,7 +5,8 @@
     <string name="upd_title">Mises à jour de LaunchOS TV</string>
     <string name="upd_installed">Version installée : %1$s</string>
     <string name="upd_never_checked">Pas encore vérifié.</string>
-    <string name="upd_up_to_date_at">LaunchOS TV est à jour.\nDernière vérification : %1$s</string>
+    <string name="upd_up_to_date">LaunchOS TV est à jour</string>
+    <string name="upd_last_check">Dernière vérification : %1$s</string>
     <string name="upd_available">Version %1$s disponible</string>
     <string name="upd_check">Rechercher maintenant</string>
     <string name="upd_checking">Recherche en cours…</string>

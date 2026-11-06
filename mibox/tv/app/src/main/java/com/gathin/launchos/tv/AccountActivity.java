@@ -2,7 +2,9 @@ package com.gathin.launchos.tv;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -22,6 +24,7 @@ public final class AccountActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_account);
+        Rows.header(this, R.drawable.ic_account, R.string.account_title, R.string.account_hint);
         server = findViewById(R.id.server);
         user = findViewById(R.id.user);
         password = findViewById(R.id.password);
@@ -86,7 +89,12 @@ public final class AccountActivity extends Activity {
     }
 
     private void show(String text, boolean error) {
+        boolean waiting = text.equals(getString(R.string.testing));
+        findViewById(R.id.result_box).setVisibility(View.VISIBLE);
         result.setText(text);
         result.setTextColor(getColor(error ? R.color.danger : R.color.text));
+        ImageView icon = findViewById(R.id.result_icon);
+        icon.setImageResource(error ? R.drawable.ic_alert : waiting ? R.drawable.ic_refresh : R.drawable.ic_check_circle);
+        icon.setImageTintList(getColorStateList(error ? R.color.danger : waiting ? R.color.accent_light : R.color.ok));
     }
 }

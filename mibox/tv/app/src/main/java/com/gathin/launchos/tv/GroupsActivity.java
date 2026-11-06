@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,8 +28,11 @@ public final class GroupsActivity extends Activity {
         super.onCreate(state);
         setContentView(R.layout.activity_groups);
         section = Xtream.Section.valueOf(getIntent().getStringExtra(EXTRA_SECTION));
-        ((TextView) findViewById(R.id.title)).setText(section == Xtream.Section.LIVE ? R.string.settings_groups_live
-                : section == Xtream.Section.MOVIES ? R.string.settings_groups_movies : R.string.settings_groups_series);
+        Rows.header(this, section == Xtream.Section.LIVE ? R.drawable.ic_live
+                        : section == Xtream.Section.MOVIES ? R.drawable.ic_movie : R.drawable.ic_series,
+                section == Xtream.Section.LIVE ? R.string.settings_groups_live
+                        : section == Xtream.Section.MOVIES ? R.string.settings_groups_movies : R.string.settings_groups_series,
+                R.string.groups_hint);
         list = findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(this));
         list.setAdapter(adapter);
@@ -84,6 +88,7 @@ public final class GroupsActivity extends Activity {
             TextView name = v.findViewById(R.id.name), sub = v.findViewById(R.id.sub);
             View pinned = v.findViewById(R.id.pinned), hidden = v.findViewById(R.id.hidden);
             if (position == 0) {
+                ((ImageView) v.findViewById(R.id.icon)).setImageResource(R.drawable.ic_restart);
                 name.setText(R.string.groups_reset);
                 sub.setText(R.string.groups_reset_sub);
                 pinned.setVisibility(View.GONE);
@@ -109,6 +114,10 @@ public final class GroupsActivity extends Activity {
             pinned.setVisibility(g != null && g.pinned(section, c.id) ? View.VISIBLE : View.GONE);
             hidden.setVisibility(isHidden ? View.VISIBLE : View.GONE);
             v.setAlpha(isHidden ? 0.55f : 1f);
+            ((ImageView) v.findViewById(R.id.icon)).setImageResource(isHidden ? R.drawable.ic_hide
+                    : g != null && g.pinned(section, c.id) ? R.drawable.ic_pin
+                    : section == Xtream.Section.LIVE ? R.drawable.ic_live
+                    : section == Xtream.Section.MOVIES ? R.drawable.ic_movie : R.drawable.ic_series);
             v.setOnClickListener(x -> GroupOptions.show(GroupsActivity.this, section, c, () -> {
                 // The group may move (pinned, renamed): the focus follows it.
                 Groups now = Groups.get(GroupsActivity.this);

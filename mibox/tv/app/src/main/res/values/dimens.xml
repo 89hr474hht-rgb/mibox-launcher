@@ -16,4 +16,7 @@
     <dimen name="logo_height">104dp</dimen>
     <dimen name="wide_width">236dp</dimen>
     <dimen name="wide_height">134dp</dimen>
+    <!-- Réglages, Actualiser, Mises à jour, Compte and the groups: one column, at the same place. -->
+    <dimen name="screen_width">680dp</dimen>
+    <dimen name="screen_top">40dp</dimen>
 </resources>

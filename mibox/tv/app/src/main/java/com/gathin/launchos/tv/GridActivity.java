@@ -63,9 +63,11 @@ public final class GridActivity extends Activity {
         }
         LinearLayout sorts = findViewById(R.id.sorts);
         int[] names = {R.string.sort_recent, R.string.sort_az, R.string.sort_rating, R.string.sort_year};
+        int[] icons = {R.drawable.ic_history, R.drawable.ic_text, R.drawable.ic_star_line, R.drawable.ic_guide};
         for (Sort s : Sort.values()) {
             TextView t = (TextView) LayoutInflater.from(this).inflate(R.layout.item_sort_pill, sorts, false);
             t.setText(names[s.ordinal()]);
+            t.setCompoundDrawablesRelativeWithIntrinsicBounds(icons[s.ordinal()], 0, 0, 0);
             t.setOnClickListener(v -> {
                 sort = s;
                 getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString("sort", s.name()).apply();

@@ -9,7 +9,7 @@
     <string name="empty">Rien dans cette catégorie.</string>
     <string name="no_account">Aucun compte enregistré.\nOuvre « Compte » pour entrer ton serveur et tes identifiants.</string>
     <string name="account_title">Compte Xtream</string>
-    <string name="account_hint">Les identifiants restent sur cette box, chiffrés. Tu peux aussi coller un lien M3U (get.php?username=…&amp;password=…) dans le champ Serveur : l\'identifiant et le mot de passe seront repris.</string>
+    <string name="account_hint">Gardé sur cette box, chiffré. Astuce : un lien M3U complet collé dans Serveur remplit aussi l\'identifiant et le mot de passe.</string>
     <string name="field_server">Serveur (http://adresse:port)</string>
     <string name="field_user">Identifiant</string>
     <string name="field_password">Mot de passe</string>
@@ -26,7 +26,7 @@
     <string name="retry_hint">OK pour réessayer, Retour pour quitter.</string>
     <string name="nav_refresh">Actualiser</string>
     <string name="refresh_title">Actualiser</string>
-    <string name="refresh_hint">Recharge les listes quand ton fournisseur a ajouté des chaînes, des films ou des épisodes. Elles se rechargent aussi seules après 6 heures, et le guide à la fin de chaque programme.</string>
+    <string name="refresh_hint">Quand ton fournisseur ajoute des chaînes, des films ou des épisodes. Les listes se rechargent aussi seules toutes les 6 heures.</string>
     <string name="refresh_all">Tout actualiser</string>
     <string name="refresh_all_sub">Chaînes, films, séries et guide des programmes</string>
     <string name="refresh_live">Chaînes en direct</string>

@@ -316,6 +316,25 @@ sonde qui porte le nom de paquet de SFR TV et fait le même contrôle `isEnabled
 | A15-09 | Redémarrage pendant SFR TV | Redémarrer la box SFR TV ouvert | À l'accueil LaunchOS, les 3 services reviennent | ADB | Non testé |
 | A15-10 | Autres applis | Ouvrir Netflix, YouTube, LaunchOS TV | Les 3 services restent actifs | ADB | Non testé |
 
+## C quaterdecies. LaunchOS TV 0.4.0 : menu complet et nouvelle apparence
+
+Vérifié sur l'émulateur Android TV (1920 × 1080) avec l'APK de release signé, contre le faux serveur
+`mibox/tv/mock/xtream_mock.py`. Animations filmées avec `screenrecord` sur l'émulateur, puis regardées image par
+image. **Rien sur la box.** Planches : `audits/launchos-tv-0.4.0-*.png` (dossier non versionné).
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| TV4-01 | Menu jusqu'en bas | Gauche, puis Bas jusqu'à Compte, puis Haut jusqu'à Rechercher ; OK sur chaque entrée | Bas passe Séries et va à Actualiser, Réglages, Mises à jour, Compte ; OK ouvre chaque écran | MANUEL | Test partiel (émulateur) |
+| TV4-02 | Entrée dans Films et Séries | Depuis le menu, Bas sur Films puis Droite | La sélection arrive sur « Regarder », même si le catalogue charge encore | MANUEL | Test partiel (émulateur) |
+| TV4-03 | Écrans secondaires | Actualiser, Réglages, Mises à jour, Compte, Groupes | Même en-tête (icône, titre, une ligne) ; lignes avec icône et sections ; la ligne choisie devient blanche, coins arrondis entiers | MANUEL | Test partiel (émulateur) |
+| TV4-04 | Interrupteurs | Réglages → Mini-lecteur, OK deux fois | L'interrupteur passe à gauche (gris) puis à droite (bleu), en fondu ; le réglage suit | MANUEL | Test partiel (émulateur) |
+| TV4-05 | Mises à jour | Ouvrir l'écran | Encadré avec icône (coche verte si à jour) et la date de la dernière vérification ; historique ligne par ligne avec icône | MANUEL | Test partiel (émulateur) |
+| TV4-06 | Compte | Ouvrir l'écran, Enregistrer et tester | Icônes dans les champs et les boutons ; résultat dans un encadré avec icône | MANUEL | Test partiel (émulateur : écran vu ; Enregistrer et tester non refait) |
+| TV4-07 | Tris de la grille | Tout voir | Récents, A → Z, Mieux notés, Année avec leur icône | MANUEL | Test partiel (émulateur) |
+| TV4-08 | Animations | Menu, changement de section, affiche ↔ rangées, cartes, fond, fenêtre d'options, plein écran ↔ mini-lecteur | Pas d'à-coup ni d'élément coupé | MANUEL | Test partiel (émulateur, filmé) |
+| TV4-09 | Résumé d'un film | Parcourir « Récemment ajoutés » | Le résumé arrivé avec la fiche apparaît en fondu, pas d'un coup | MANUEL | Test partiel (émulateur) |
+| TV4-10 | Télécommande réelle | Toute l'appli avec la télécommande Xiaomi, sur la Samsung | Mêmes déplacements qu'à l'émulateur ; lisible à distance | MANUEL | Validation manuelle nécessaire |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

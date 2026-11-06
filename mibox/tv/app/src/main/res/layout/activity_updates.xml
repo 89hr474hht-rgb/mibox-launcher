@@ -6,59 +6,85 @@
     android:fillViewport="true">
 
     <LinearLayout
-        android:layout_width="620dp"
+        android:layout_width="@dimen/screen_width"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingTop="44dp"
+        android:paddingTop="@dimen/screen_top"
         android:paddingBottom="40dp">
 
-        <TextView
-            style="@style/Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/upd_title"
-            android:textSize="28sp" />
+        <include layout="@layout/view_header" />
 
-        <TextView
-            android:id="@+id/installed"
+        <!-- Where things stand: up to date, a new version, a download, an error. -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/text_dim"
-            android:textSize="15sp" />
+            android:background="@drawable/panel_bg"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:padding="20dp">
 
-        <TextView
-            android:id="@+id/status"
-            style="@style/Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:textSize="19sp" />
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/icon_tile_bg">
 
-        <TextView
-            android:id="@+id/notes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:lineSpacingMultiplier="1.25"
-            android:textColor="@color/text_dim"
-            android:textSize="14sp"
-            android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/status_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no" />
+            </FrameLayout>
 
-        <TextView
-            android:id="@+id/progress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:lineSpacingMultiplier="1.2"
-            android:textSize="15sp"
-            android:visibility="gone" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/status"
+                    style="@style/Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/status_sub"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:textColor="@color/text_dim"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/notes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:lineSpacingMultiplier="1.25"
+                    android:textColor="@color/text_dim"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:lineSpacingMultiplier="1.2"
+                    android:textSize="15sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
+            android:layout_marginTop="18dp"
             android:orientation="horizontal">
 
             <TextView
@@ -66,6 +92,7 @@
                 style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_marginEnd="12dp"
+                android:drawableStart="@drawable/ic_update"
                 android:visibility="gone" />
 
             <TextView
@@ -73,12 +100,14 @@
                 style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_marginEnd="12dp"
+                android:drawableStart="@drawable/ic_refresh"
                 android:text="@string/upd_check" />
 
             <TextView
                 android:id="@+id/later"
                 style="@style/Button"
                 android:layout_width="wrap_content"
+                android:drawableStart="@drawable/ic_history"
                 android:text="@string/upd_later"
                 android:visibility="gone" />
         </LinearLayout>
@@ -87,15 +116,19 @@
             android:id="@+id/permission_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:background="@drawable/clip_round"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/panel_bg"
             android:orientation="vertical"
-            android:padding="18dp"
+            android:padding="20dp"
             android:visibility="gone">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_alert"
+                android:drawablePadding="12dp"
+                android:drawableTint="@color/danger"
+                android:gravity="center_vertical"
                 android:text="@string/upd_err_permission"
                 android:textColor="@color/danger"
                 android:textSize="15sp" />
@@ -104,27 +137,32 @@
                 android:id="@+id/permission_open"
                 style="@style/Button"
                 android:layout_width="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
+                android:drawableStart="@drawable/ic_settings"
                 android:text="@string/upd_permission_open" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/history_title"
-            style="@style/Title"
-            android:layout_width="wrap_content"
+            style="@style/Label"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="26dp"
+            android:layout_marginBottom="10dp"
+            android:paddingStart="4dp"
             android:text="@string/upd_history"
-            android:textSize="16sp"
             android:visibility="gone" />
 
-        <TextView
+        <LinearLayout
             android:id="@+id/history"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:lineSpacingMultiplier="1.3"
-            android:textColor="@color/text_dim"
-            android:textSize="14sp" />
+            android:background="@drawable/panel_bg"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="8dp"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

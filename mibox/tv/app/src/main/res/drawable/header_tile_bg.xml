@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The icon at the top of a screen: the same blue-to-violet as the app's logo. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient android:angle="315" android:startColor="#FF4F7BFF" android:endColor="#FF9A5CFF" />
+    <corners android:radius="16dp" />
+</shape>

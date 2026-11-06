@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,15 +25,19 @@ import java.util.Locale;
 public final class UpdatesActivity extends Activity implements Updater.Listener {
     private static final int HISTORY_LINES = 6;
 
-    private TextView installed, status, notes, progress, install, history, historyTitle;
+    private TextView status, statusSub, notes, progress, install, historyTitle;
+    private ImageView statusIcon;
+    private ViewGroup history;
     private View later, permissionBox;
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_updates);
-        installed = findViewById(R.id.installed);
+        Rows.header(this, R.drawable.ic_update, R.string.upd_title, 0);
         status = findViewById(R.id.status);
+        statusSub = findViewById(R.id.status_sub);
+        statusIcon = findViewById(R.id.status_icon);
         notes = findViewById(R.id.notes);
         progress = findViewById(R.id.progress);
         install = findViewById(R.id.install);
@@ -81,26 +88,44 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
     private void refresh() {
         UpdateState state = new UpdateState(this);
         SemVer now = UpdateState.installed(this);
-        installed.setText(getString(R.string.upd_installed, String.valueOf(now)));
+        TextView hint = findViewById(R.id.page_hint);
+        hint.setVisibility(View.VISIBLE);
+        hint.setText(getString(R.string.upd_installed, String.valueOf(now)));
         Updater u = Updater.get();
         Release r = state.available();
         boolean newer = r != null && r.version.isNewerThan(now);
 
+        String sub = null;
+        int icon = R.drawable.ic_check_circle, tint = R.color.ok;
         status.setTextColor(getColor(R.color.text));
         if (u.phase() == Updater.Phase.CHECKING) {
             status.setText(R.string.upd_checking);
+            icon = R.drawable.ic_refresh;
+            tint = R.color.accent_light;
         } else if (state.lastError() != null) {
             status.setText(state.lastError());
             status.setTextColor(getColor(R.color.danger));
+            icon = R.drawable.ic_alert;
+            tint = R.color.danger;
         } else if (newer) {
             status.setText(getString(R.string.upd_available, String.valueOf(r.version)));
+            icon = R.drawable.ic_update;
+            tint = R.color.accent_light;
         } else if (state.lastCheck() <= 0) {
             status.setText(R.string.upd_never_checked);
+            icon = R.drawable.ic_history;
+            tint = R.color.text_dim;
         } else {
-            status.setText(getString(R.string.upd_up_to_date_at,
-                    DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, Locale.FRANCE)
-                            .format(new Date(state.lastCheck()))));
+            status.setText(R.string.upd_up_to_date);
         }
+        if (state.lastCheck() > 0 && u.phase() != Updater.Phase.CHECKING) {
+            sub = getString(R.string.upd_last_check, DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT,
+                    Locale.FRANCE).format(new Date(state.lastCheck())));
+        }
+        statusIcon.setImageResource(icon);
+        statusIcon.setImageTintList(getColorStateList(tint));
+        statusSub.setVisibility(sub == null ? View.GONE : View.VISIBLE);
+        statusSub.setText(sub);
 
         notes.setVisibility(newer && !r.notes.isEmpty() ? View.VISIBLE : View.GONE);
         if (newer) notes.setText(plainNotes(r.notes));
@@ -138,15 +163,23 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
 
         List<UpdateState.Entry> entries = state.entries();
         historyTitle.setVisibility(entries.isEmpty() ? View.GONE : View.VISIBLE);
-        StringBuilder sb = new StringBuilder();
+        history.setVisibility(entries.isEmpty() ? View.GONE : View.VISIBLE);
+        history.removeAllViews();
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.FRANCE);
         for (int i = 0; i < entries.size() && i < HISTORY_LINES; i++) {
             UpdateState.Entry e = entries.get(i);
-            if (sb.length() > 0) sb.append('\n');
-            sb.append(df.format(new Date(e.time))).append("  ·  ").append(e.version).append("  ·  ").append(result(e.result));
-            if (e.detail != null && !e.detail.isEmpty()) sb.append(" (").append(e.detail).append(')');
+            View line = LayoutInflater.from(this).inflate(R.layout.item_history, history, false);
+            boolean ok = UpdateState.R_INSTALLED.equals(e.result);
+            boolean failed = !ok && !UpdateState.R_CANCELLED.equals(e.result) && !UpdateState.R_IGNORED.equals(e.result);
+            ImageView i1 = line.findViewById(R.id.icon);
+            i1.setImageResource(ok ? R.drawable.ic_check : failed ? R.drawable.ic_alert : R.drawable.ic_history);
+            i1.setImageTintList(getColorStateList(ok ? R.color.ok : failed ? R.color.danger : R.color.text_dim));
+            String what = e.version + "  ·  " + result(e.result);
+            if (e.detail != null && !e.detail.isEmpty()) what += " (" + e.detail + ")";
+            ((TextView) line.findViewById(R.id.what)).setText(what);
+            ((TextView) line.findViewById(R.id.when)).setText(df.format(new Date(e.time)));
+            history.addView(line);
         }
-        history.setText(sb.toString());
     }
 
     private String result(String r) {

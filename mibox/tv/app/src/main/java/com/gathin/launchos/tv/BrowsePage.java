@@ -1,6 +1,7 @@
 package com.gathin.launchos.tv;
 
 import android.content.Intent;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +69,9 @@ final class BrowsePage {
 
     private Xtream api;
     private List<Item> hero = new ArrayList<>();
+    /** When the focus was put on Rechercher because the lists were not there yet. */
+    private long waitedAt;
+    private static final long WAIT_MS = 4000;
     private int heroIndex;
     private boolean heroMode = true;
     private Item spotItem;
@@ -213,6 +217,13 @@ final class BrowsePage {
         if (rows.isEmpty()) status(activity.getString(R.string.empty));
         rowsLayout.scrollToPositionWithOffset(0, 0);
         if (heroMode || hero.isEmpty()) showHero(false);
+        // Entered before the lists came: the focus waited on Rechercher, it goes to Regarder now.
+        View search = root.findViewById(R.id.action_search);
+        if (!hero.isEmpty() && search.isFocused() && SystemClock.uptimeMillis() - waitedAt < WAIT_MS) {
+            setHeroMode(true);
+            heroPlay.requestFocus();
+        }
+        waitedAt = 0;
     }
 
     private Row continueRow() {
@@ -353,8 +364,14 @@ final class BrowsePage {
         String length = vi != null && vi.seconds > 0 ? Players.duration(vi.seconds * 1000L) : "";
         meta.setText(Ui.meta(year > 0 ? String.valueOf(year) : "", length, firstGenre(genre), Ui.rating(rating), i.tag));
         String p = vi != null && !vi.plot.isEmpty() ? vi.plot : i.plot;
+        boolean appears = plot.getVisibility() != View.VISIBLE && !p.isEmpty();
         plot.setText(p);
         plot.setVisibility(p.isEmpty() ? View.INVISIBLE : View.VISIBLE);
+        // A film's summary often comes a moment later, with its sheet: it fades in instead of popping up.
+        if (appears) {
+            plot.setAlpha(0f);
+            plot.animate().alpha(1f).setDuration(240).start();
+        }
     }
 
     private static String firstGenre(String genre) {
@@ -471,7 +488,9 @@ final class BrowsePage {
     View defaultFocus() {
         if (!hero.isEmpty()) return heroPlay;
         View card = cardIn(0, -1);
-        return card != null ? card : root.findViewById(R.id.action_search);
+        if (card != null) return card;
+        waitedAt = SystemClock.uptimeMillis();
+        return root.findViewById(R.id.action_search);
     }
 
     /** Where an arrow goes inside the page; null hands it to the main screen (the rail). */

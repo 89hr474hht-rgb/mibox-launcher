@@ -3,36 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/page_bg"
+    android:clipChildren="false"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingTop="30dp">
+    android:paddingTop="@dimen/screen_top">
 
     <LinearLayout
-        android:layout_width="680dp"
+        android:layout_width="@dimen/screen_width"
         android:layout_height="match_parent"
+        android:clipChildren="false"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/title"
-            style="@style/Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="28sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="14dp"
-            android:lineSpacingMultiplier="1.2"
-            android:text="@string/groups_hint"
-            android:textColor="@color/text_dim"
-            android:textSize="14sp" />
+        <include layout="@layout/view_header" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipChildren="false"
             android:clipToPadding="false"
             android:paddingBottom="30dp" />
     </LinearLayout>
