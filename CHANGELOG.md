@@ -5,6 +5,11 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.5.0] - 2026-11-06
+
+### Corrigé
+- SFR TV : plus de message « L'interface n'est pas encore compatible avec le mode Accessibilité », et la touche OK refonctionne. SFR TV refuse tout service d'accessibilité actif ; LaunchOS retire donc les siens tant que SFR TV est à l'écran, et les remet dès qu'on revient sur LaunchOS (Accueil, Retour). Pendant ce temps, les boutons Netflix, YouTube et Prime Video de la télécommande ne font rien. Le minuteur de veille marche toujours par-dessus SFR TV. Il faut avoir accordé une fois à LaunchOS l'autorisation de modifier les réglages d'accessibilité (par ADB) ; sans elle, rien ne change.
+
 ## [1.4.0] - 2026-11-06
 
 ### Ajouté
