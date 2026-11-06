@@ -11,11 +11,41 @@ import android.view.accessibility.AccessibilityEvent;
  * Makes the remote's Netflix, YouTube and Prime Video buttons open the app chosen for each in LaunchOS's settings
  * (RemoteRemap), from any screen. Google TV's home used to answer them; with it disabled, they reach no one. Every
  * other key, volume included, passes through untouched. It listens to keys only, never to what is on screen.
+ * It also puts the box to sleep at the end of the sleep timer (SleepTimer), the one way an app can do that.
  * Switched on once: Settings, Accessibility, "LaunchOS remote buttons", or
  * {@code settings put secure enabled_accessibility_services com.gathin.tvhome/com.gathin.tvhome.mibox.RemoteKeysService}.
  */
 public final class RemoteKeysService extends AccessibilityService {
+    /** The running service, while Android has it bound; main thread only. */
+    private static RemoteKeysService running;
     private int downKey = -1;
+
+    @Override
+    protected void onServiceConnected() {
+        running = this;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        if (running == this) running = null;
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (running == this) running = null;
+        super.onDestroy();
+    }
+
+    /**
+     * Puts the box to sleep, as its power button does; with HDMI-CEC the TV follows. False when the service is off.
+     * Android's lock-screen action sends the device to sleep before it locks; a TV has no lock screen to show.
+     */
+    static boolean sleep() {
+        RemoteKeysService s = running;
+        if (s == null || android.os.Build.VERSION.SDK_INT < 28) return false;   // the action came with Android 9
+        return s.performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN);
+    }
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {

@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Keeps the 24 h update check scheduled across reboots (JobInfo.setPersisted). -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- The sleep timer's alarms on time (granted at install up to Android 12; the box runs Android 11, which needs
+         nothing). Without it the alarms come within half a minute. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!-- The Bluetooth pill and its menu only read the adapter state, the paired devices and their connections.
          BLUETOOTH covers that up to Android 11; from Android 12 it needs BLUETOOTH_CONNECT, which is not asked
          for, so the pill then just reads "Bluetooth". -->
@@ -79,6 +82,23 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/mibox_remote_keys_service" />
         </service>
+
+        <!-- The sleep timer: its alarms, and its last minute shown over whatever app is in front. -->
+        <receiver
+            android:name=".SleepAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".SleepWarningActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.gathin.tvhome.sleep"
+            android:theme="@style/MiboxOverlayTheme" />
 
         <receiver
             android:name=".InstallResultReceiver"

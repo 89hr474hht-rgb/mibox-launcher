@@ -5,6 +5,16 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.4.0] - 2026-11-06
+
+### Ajouté
+- Minuteur de veille : un nouveau bouton en haut de l'accueil. OK propose 15 min, 30 min, 45 min, 1 h, 1 h 30 ou 2 h (et « Arrêter le minuteur » quand il tourne). Aucun compte à rebours à l'écran ; seul le bouton, quand il est sélectionné, indique « Veille dans 42 min ». Une minute avant la fin, même dans une autre appli, une pastille en haut compte les secondes et un écran propose « Ajouter 30 min » (déjà sélectionné) ou « Mettre en veille » ; Retour arrête le minuteur. À zéro, la box se met en veille et HDMI-CEC éteint la télé. Il utilise « Boutons de la télécommande LaunchOS » dans Accessibilité, déjà activé. Éteindre la télé ou redémarrer la box arrête le minuteur.
+
+### Modifié
+- Boutons du haut de l'accueil (Wi-Fi, Bluetooth, Minuteur, Réglages) : de simples ronds avec leur icône. Celui qui est sélectionné s'allonge et affiche son nom, et se referme quand on passe au suivant. La date a de nouveau la place de s'afficher en entier.
+- Réglages de LaunchOS : icône de curseurs de réglage à la place de la maison.
+- APK plus léger (environ 530 Ko au lieu de 735 Ko) : seules les traductions française et anglaise sont gardées, LaunchOS étant toujours en français.
+
 ## [1.3.2] - 2026-11-06
 
 ### Modifié

@@ -119,5 +119,20 @@
     <string name="mibox_rk_service_off">The buttons\' service is off, so they do nothing yet. Turn on “LaunchOS remote buttons” in Accessibility.</string>
     <string name="mibox_rk_service_open">Accessibility</string>
     <string name="mibox_rk_service_name">LaunchOS remote buttons</string>
-    <string name="mibox_rk_service_description">Opens the app chosen in LaunchOS when you press the remote\'s Netflix, YouTube or Prime Video button. Reads only those buttons, never the screen.</string>
+    <string name="mibox_rk_service_description">Opens the app chosen in LaunchOS when you press the remote\'s Netflix, YouTube or Prime Video button. Also puts the box to sleep at the end of the sleep timer. Reads only those buttons, never the screen.</string>
+    <!-- Sleep timer (SleepTimer, TimerPill, SleepWarningActivity). -->
+    <string name="mibox_timer">Sleep timer</string>
+    <string name="mibox_timer_in">Sleep in %1$s</string>
+    <string name="mibox_timer_title">Sleep timer</string>
+    <string name="mibox_timer_off">Off</string>
+    <string name="mibox_timer_at">Sleep at %1$s</string>
+    <string name="mibox_timer_stop">Stop the timer</string>
+    <string name="mibox_timer_set">Set for %1$s</string>
+    <string name="mibox_sleep_title">The TV is about to sleep</string>
+    <string name="mibox_sleep_sub">Still watching? Add 30 minutes.</string>
+    <string name="mibox_sleep_add">Add 30 min</string>
+    <string name="mibox_sleep_now">Sleep now</string>
+    <string name="mibox_sleep_back">Back stops the timer.</string>
+    <string name="mibox_sleep_stopped">Sleep timer stopped</string>
+    <string name="mibox_sleep_failed">LaunchOS cannot put the box to sleep: turn on “LaunchOS remote buttons” in Accessibility.</string>
 </resources>

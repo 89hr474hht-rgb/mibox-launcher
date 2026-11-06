@@ -245,6 +245,27 @@ abonnement limité à une connexion coupe l'autre lecture.
 | TV-UPD-02 | Mise à jour proposée | 0.1.0 installée sur la box, 0.2.0 publiée | Bandeau en haut à droite et « Mise à jour ! » dans le menu ; Installer → téléchargement, vérification, confirmation d'Android ; le compte est gardé | MANUEL | Non testé |
 | TV-UPD-03 | LaunchOS pas gêné | Réglages de LaunchOS → Mises à jour → Vérifier | LaunchOS ne propose jamais une version de LaunchOS TV | MANUEL | Non testé |
 
+Retour du propriétaire le 6 novembre 2026 : « J'ai testé et ça fonctionne », sur la box avec son compte, sans
+détail test par test. Les lignes ci-dessus gardent leur statut tant que chaque point n'est pas confirmé.
+
+## C undecies. LaunchOS 1.4.0 : boutons ronds et minuteur de veille
+
+Vérifié sur l'émulateur Android TV 12 (1920 × 1080) avec l'APK de release signé. Pour ne pas attendre 15 minutes,
+une version de test locale (jamais publiée) proposait 2 minutes. Le service d'accessibilité de LaunchOS est actif
+sur la box (lu par ADB), et HDMI-CEC aussi (`hdmi_control_enabled` et `hdmi_control_auto_device_off_enabled` à 1).
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| L14-01 | Boutons ronds | Haut depuis le dock, puis Droite le long de la barre | Seul le bouton sélectionné s'allonge avec son nom ; le précédent se referme ; les ronds sont alignés ; la date s'affiche en entier | MANUEL | Test partiel (émulateur) |
+| L14-02 | Icône Réglages | Barre du haut | Curseurs à la place de la maison | MANUEL | Test partiel (émulateur) |
+| L14-03 | Menu Minuteur | OK sur Minuteur | 15 min à 2 h ; « Arrêter le minuteur » quand il tourne ; le bouton dit « Veille dans … » | MANUEL | Test partiel (émulateur) |
+| L14-04 | Dernière minute | Minuteur lancé, regarder une appli | À 60 s, pastille en haut et écran « Ajouter 30 min » par-dessus l'appli | MANUEL | Test partiel (émulateur, par-dessus LaunchOS TV) |
+| L14-05 | Ajouter 30 min | OK sur l'écran de la dernière minute | L'écran part, le bouton dit « Veille dans 31 min » | MANUEL | Test partiel (émulateur) |
+| L14-06 | Retour | Retour sur l'écran de la dernière minute | Minuteur arrêté, la box ne se met pas en veille | MANUEL | Voir ci-dessous |
+| L14-07 | Mise en veille | Laisser finir | La box passe en veille, la Samsung s'éteint (CEC), la JBL se coupe | MANUEL | Test partiel (émulateur : veille « Asleep ») ; télé et JBL non testées |
+| L14-08 | Par-dessus Netflix / SFR TV | Minuteur pendant une vidéo | L'écran de la dernière minute s'affiche, la vidéo reprend après « Ajouter 30 min » | MANUEL | Non testé |
+| L14-09 | Réveil | Réveiller la box après la veille | Accueil normal, minuteur arrêté, BT et CEC comme avant (BT-05, CEC-03) | MANUEL | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

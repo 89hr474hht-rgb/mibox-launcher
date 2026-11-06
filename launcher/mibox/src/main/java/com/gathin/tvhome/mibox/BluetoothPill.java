@@ -74,6 +74,10 @@ final class BluetoothPill implements BluetoothStatus.Listener {
         return self[0];
     }
 
+    TextView view() {
+        return view;
+    }
+
     void resume() {
         status.start();
         onBluetoothChanged();

@@ -40,6 +40,9 @@ android {
             def (maj, min, pat) = miboxVersion.tokenize('.').collect { it as int }
             versionCode maj * 10000 + min * 100 + pat
             versionName miboxVersion
+            // LaunchOS is shown in French (mibox_french), with English as the fallback: the other languages'
+            // strings, AndroidX's included, are left out of the Mi Box APK (about 20 KB).
+            resourceConfigurations += ['en', 'fr']
         }
     }
 
