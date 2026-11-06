@@ -1,6 +1,7 @@
 package com.gathin.tvhome.mibox;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,7 +11,8 @@ import android.view.accessibility.AccessibilityEvent;
 /**
  * Makes the remote's Netflix, YouTube and Prime Video buttons open the app chosen for each in LaunchOS's settings
  * (RemoteRemap), from any screen. Google TV's home used to answer them; with it disabled, they reach no one. Every
- * other key, volume included, passes through untouched. It listens to keys only, never to what is on screen.
+ * other key, volume included, passes through untouched. It never reads what is on screen; the one thing it watches is
+ * when an app of mibox_a11y_pause_packages comes up, to take LaunchOS's helpers away while it is in front (A11yPause).
  * It also puts the box to sleep at the end of the sleep timer (SleepTimer), the one way an app can do that.
  * Switched on once: Settings, Accessibility, "LaunchOS remote buttons", or
  * {@code settings put secure enabled_accessibility_services com.gathin.tvhome/com.gathin.tvhome.mibox.RemoteKeysService}.
@@ -23,6 +25,13 @@ public final class RemoteKeysService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         running = this;
+        // A11yPause: window changes of the listed apps only (packageNames), and only when it can act on them.
+        AccessibilityServiceInfo info = getServiceInfo();
+        if (info != null && A11yPause.active(this)) {
+            info.eventTypes |= AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
+            info.packageNames = A11yPause.packages(this);
+            setServiceInfo(info);
+        }
     }
 
     @Override
@@ -80,6 +89,8 @@ public final class RemoteKeysService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
+        if (A11yPause.pausesFor(A11yPause.packages(this), event.getPackageName())) A11yPause.pause(this);
     }
 
     @Override

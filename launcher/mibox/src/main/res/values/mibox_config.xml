@@ -6,4 +6,11 @@
     <!-- LaunchOS shows its screens in French whatever the device's language (MiboxInit.french). false follows the
          device's language. -->
     <bool name="mibox_french">true</bool>
+    <!-- Apps that refuse to work while any accessibility service runs (A11yPause). While one is in front, LaunchOS
+         takes its key helpers away and puts them back when a LaunchOS screen comes up. Needs WRITE_SECURE_SETTINGS
+         granted with pm grant; without it nothing changes. Empty turns it off. SFR TV 7.1.0 shows "L'interface n'est
+         pas encore compatible avec le mode Accessibilité" and ignores OK; its selfcare app has no such check. -->
+    <string-array name="mibox_a11y_pause_packages" translatable="false">
+        <item>com.sfr.androidtv.launcher</item>
+    </string-array>
 </resources>

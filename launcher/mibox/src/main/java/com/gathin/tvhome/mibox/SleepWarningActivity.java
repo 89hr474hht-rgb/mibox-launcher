@@ -19,6 +19,7 @@ public final class SleepWarningActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private TextView time;
     private final Runnable tick = this::tick;
+    private boolean sleeping;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -83,6 +84,7 @@ public final class SleepWarningActivity extends Activity {
 
     private void sleep() {
         handler.removeCallbacks(tick);
+        sleeping = true;
         if (!SleepTimer.sleepNow(this)) Toast.makeText(this, R.string.mibox_sleep_failed, Toast.LENGTH_LONG).show();
         finish();
     }
@@ -106,6 +108,8 @@ public final class SleepWarningActivity extends Activity {
 
     @Override
     public void finish() {
+        // A11yPause: an app that refuses accessibility was behind; the helpers leave again.
+        A11yPause.warningClosed(this, sleeping ? 1500 : 0);
         super.finish();
         overridePendingTransition(0, 0);
     }

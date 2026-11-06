@@ -118,7 +118,7 @@
     <string name="mibox_rk_service_off">Le service des boutons est désactivé : ils ne font rien pour l\'instant. Activez « Boutons de la télécommande LaunchOS » dans Accessibilité.</string>
     <string name="mibox_rk_service_open">Accessibilité</string>
     <string name="mibox_rk_service_name">Boutons de la télécommande LaunchOS</string>
-    <string name="mibox_rk_service_description">Ouvre l\'appli choisie dans LaunchOS quand vous appuyez sur le bouton Netflix, YouTube ou Prime Video de la télécommande. Met aussi la box en veille à la fin du minuteur. Ne lit que ces boutons, jamais l\'écran.</string>
+    <string name="mibox_rk_service_description">Ouvre l\'appli choisie dans LaunchOS quand vous appuyez sur le bouton Netflix, YouTube ou Prime Video de la télécommande. Met aussi la box en veille à la fin du minuteur, et s\'écarte tant que SFR TV est ouvert, car cette appli refuse les services d\'accessibilité. Ne lit que ces boutons, jamais l\'écran.</string>
     <!-- Minuteur de veille. -->
     <string name="mibox_timer">Minuteur</string>
     <string name="mibox_timer_in">Veille dans %1$s</string>

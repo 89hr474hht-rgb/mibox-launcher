@@ -119,7 +119,7 @@
     <string name="mibox_rk_service_off">The buttons\' service is off, so they do nothing yet. Turn on “LaunchOS remote buttons” in Accessibility.</string>
     <string name="mibox_rk_service_open">Accessibility</string>
     <string name="mibox_rk_service_name">LaunchOS remote buttons</string>
-    <string name="mibox_rk_service_description">Opens the app chosen in LaunchOS when you press the remote\'s Netflix, YouTube or Prime Video button. Also puts the box to sleep at the end of the sleep timer. Reads only those buttons, never the screen.</string>
+    <string name="mibox_rk_service_description">Opens the app chosen in LaunchOS when you press the remote\'s Netflix, YouTube or Prime Video button. Also puts the box to sleep at the end of the sleep timer, and steps aside while SFR TV is open, as that app refuses accessibility services. Reads only those buttons, never the screen.</string>
     <!-- Sleep timer (SleepTimer, TimerPill, SleepWarningActivity). -->
     <string name="mibox_timer">Sleep timer</string>
     <string name="mibox_timer_in">Sleep in %1$s</string>

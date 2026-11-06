@@ -296,6 +296,26 @@ sur la box (lu par ADB), et HDMI-CEC aussi (`hdmi_control_enabled` et `hdmi_cont
 | L14-08 | Par-dessus Netflix / SFR TV | Minuteur pendant une vidéo | L'écran de la dernière minute s'affiche, la vidéo reprend après « Ajouter 30 min » | MANUEL | Non testé |
 | L14-09 | Réveil | Réveiller la box après la veille | Accueil normal, minuteur arrêté, BT et CEC comme avant (BT-05, CEC-03) | MANUEL | Non testé |
 
+## C terdecies. LaunchOS 1.5.0 : SFR TV sans le message « mode Accessibilité »
+
+Pourquoi et comment : [10-sfr-tv-et-accessibilite.md](10-sfr-tv-et-accessibilite.md). Prérequis sur la box, avec
+votre accord : LaunchOS 1.5.0 installé, puis `pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS`.
+SFR TV ne s'installe pas sur l'émulateur (APK 32 bits seulement) : les essais émulateur ont été faits avec une appli
+sonde qui porte le nom de paquet de SFR TV et fait le même contrôle `isEnabled()`.
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| A15-01 | Ouverture de SFR TV | Ouvrir SFR TV depuis LaunchOS | Pas de message « mode Accessibilité » (au pire un éclair) ; `enabled_accessibility_services` sans LaunchOS | MIXTE | Test partiel (émulateur, appli sonde : services retirés, sonde « coupée ») |
+| A15-02 | Touche OK dans SFR TV | Menus, chaîne, guide, replay avec OK | OK agit partout | MANUEL | Test partiel (émulateur, appli sonde : 7 clics sur 7) |
+| A15-03 | Accueil depuis SFR TV | Bouton Accueil pendant une chaîne | LaunchOS devant ; les 3 services de nouveau actifs (`dumpsys accessibility`) | MIXTE | Test partiel (émulateur) |
+| A15-04 | Retour depuis SFR TV | Retour jusqu'à LaunchOS | Comme A15-03 | MIXTE | Non testé |
+| A15-05 | Boutons d'applis | Netflix / YouTube / Prime dans SFR TV, puis sur l'accueil | Rien dans SFR TV (limite connue) ; sur l'accueil, YouTube ouvre YouTube | MANUEL | Test partiel (émulateur : YouTube ouvert hors SFR) |
+| A15-06 | Minuteur par-dessus SFR TV | Minuteur 15 min, regarder SFR TV | Dernière minute affichée ; veille à zéro (télé éteinte par CEC) ; services de nouveau retirés | MANUEL | Test partiel (émulateur, appli sonde : services remis à la dernière minute, veille « Asleep », services retirés au retour de la sonde ; télé et CEC non testés) |
+| A15-07 | « Ajouter 30 min » par-dessus SFR TV | OK sur « Ajouter 30 min » | SFR TV reprend sans message, OK marche | MANUEL | Non testé |
+| A15-08 | Réveil après A15-06 | Réveiller la box | SFR TV ou l'accueil sans message ; BT et CEC comme avant | MANUEL | Test partiel (émulateur : sonde devant, services toujours retirés, aucun « activé ») |
+| A15-09 | Redémarrage pendant SFR TV | Redémarrer la box SFR TV ouvert | À l'accueil LaunchOS, les 3 services reviennent | ADB | Non testé |
+| A15-10 | Autres applis | Ouvrir Netflix, YouTube, LaunchOS TV | Les 3 services restent actifs | ADB | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

@@ -79,6 +79,8 @@ public final class MiboxInit extends ContentProvider {
     private static final class Callbacks implements Application.ActivityLifecycleCallbacks {
         @Override
         public void onActivityResumed(Activity activity) {
+            // A LaunchOS screen is in front, so no app that refuses accessibility is: the helpers come back.
+            A11yPause.resume(activity);
             String name = activity.getClass().getName();
             if (HOME.equals(name)) {
                 resumedHome = new WeakReference<>(activity);
