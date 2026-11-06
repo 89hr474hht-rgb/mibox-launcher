@@ -25,13 +25,34 @@ public final class RemoteKeysService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         running = this;
-        // A11yPause: window changes of the listed apps only (packageNames), and only when it can act on them.
+        watchPausedApps();
+    }
+
+    /**
+     * A11yPause, checked again whenever a LaunchOS screen comes up: a permission granted (or taken back) after the
+     * service started then counts without restarting it.
+     */
+    static void refreshPause() {
+        RemoteKeysService s = running;
+        if (s != null) s.watchPausedApps();
+    }
+
+    /** A11yPause: window changes of the listed apps only (packageNames), and only while it can act on them. */
+    private void watchPausedApps() {
         AccessibilityServiceInfo info = getServiceInfo();
-        if (info != null && A11yPause.active(this)) {
-            info.eventTypes |= AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
-            info.packageNames = A11yPause.packages(this);
-            setServiceInfo(info);
-        }
+        if (info == null) return;
+        boolean on = A11yPause.active(this);
+        int events = watchedEvents(info.eventTypes, on);
+        if (events == info.eventTypes) return;
+        info.eventTypes = events;
+        info.packageNames = on ? A11yPause.packages(this) : null;
+        setServiceInfo(info);
+    }
+
+    /** The event types with window changes added when {@code on}, taken away otherwise. */
+    static int watchedEvents(int eventTypes, boolean on) {
+        return on ? eventTypes | AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+                : eventTypes & ~AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
     }
 
     @Override

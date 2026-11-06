@@ -64,4 +64,13 @@ public class A11yPauseTest {
         assertFalse(A11yPause.pausesFor(list, null));
         assertFalse(A11yPause.pausesFor(new String[0], "com.sfr.androidtv.launcher"));
     }
+
+    @Test
+    public void windowChangesComeAndGoWithThePermission() {
+        int window = 32;   // AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+        assertEquals(window, RemoteKeysService.watchedEvents(0, true));
+        assertEquals(0, RemoteKeysService.watchedEvents(window, false));
+        assertEquals(window, RemoteKeysService.watchedEvents(window, true));
+        assertEquals(1, RemoteKeysService.watchedEvents(1 | window, false));
+    }
 }

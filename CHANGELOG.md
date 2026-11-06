@@ -5,6 +5,11 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.5.1] - 2026-11-06
+
+### Corrigé
+- SFR TV : l'autorisation donnée à LaunchOS après sa mise à jour est prise en compte dès le retour sur l'accueil. En 1.5.0, il fallait désactiver puis réactiver « Boutons de la télécommande LaunchOS » dans Accessibilité (ou redémarrer la box). De même, si l'autorisation est retirée, LaunchOS cesse aussitôt de surveiller SFR TV.
+
 ## [1.5.0] - 2026-11-06
 
 ### Corrigé

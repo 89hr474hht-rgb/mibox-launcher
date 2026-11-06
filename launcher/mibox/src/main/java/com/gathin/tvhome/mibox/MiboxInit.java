@@ -81,6 +81,7 @@ public final class MiboxInit extends ContentProvider {
         public void onActivityResumed(Activity activity) {
             // A LaunchOS screen is in front, so no app that refuses accessibility is: the helpers come back.
             A11yPause.resume(activity);
+            RemoteKeysService.refreshPause();
             String name = activity.getClass().getName();
             if (HOME.equals(name)) {
                 resumedHome = new WeakReference<>(activity);

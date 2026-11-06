@@ -40,6 +40,9 @@ et chaque mise à jour de SFR le remplacerait.
   retire lui-même en se fermant (« Ajouter 30 min », Retour), ou 1,5 s après la mise en veille.
 - Il faut la permission `WRITE_SECURE_SETTINGS`, accordée une fois par ADB :
   `pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS`. Sans elle, rien ne change (comme en 1.4.0).
+  Depuis la 1.5.1, la permission est relue à chaque écran de LaunchOS : accordée après l'installation, elle compte dès
+  le retour sur l'accueil (en 1.5.0, il fallait redémarrer le service des boutons ; c'est ce qui a été fait sur la box,
+  en le retirant puis en le remettant dans `enabled_accessibility_services`).
 
 ## Ce que ça coûte
 
