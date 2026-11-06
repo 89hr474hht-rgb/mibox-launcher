@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Upstream translates app_name ("Accueil"): the edition's name wins in French too. -->
+    <string name="app_name">LaunchOS</string>
     <string name="tv_settings">Paramètres de l\'appareil</string>
+    <string name="launcher_settings">Réglages de LaunchOS</string>
+    <string name="dream_name">Horloge LaunchOS</string>
 </resources>

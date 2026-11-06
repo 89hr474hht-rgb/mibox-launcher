@@ -47,8 +47,8 @@ final class BluetoothPopover implements BluetoothStatus.Listener {
         this.home = home;
         this.anchor = anchor;
         density = home.getResources().getDisplayMetrics().density;
-        medium = font(home, "outfit_medium");
-        body = font(home, "outfit");
+        medium = UiFonts.medium(home);
+        body = UiFonts.regular(home);
         panel = LayoutInflater.from(home).inflate(R.layout.mibox_popup_bluetooth, null, false);
         rows = panel.findViewById(R.id.mibox_bt_rows);
         state = panel.findViewById(R.id.mibox_bt_state);
@@ -165,18 +165,6 @@ final class BluetoothPopover implements BluetoothStatus.Listener {
             } catch (ActivityNotFoundException | SecurityException e2) {
                 Toast.makeText(home, R.string.mibox_screen_unavailable, Toast.LENGTH_LONG).show();
             }
-        }
-    }
-
-    /** The launcher's bundled fonts (Outfit), looked up by name since the app's R is not visible here. */
-    @SuppressWarnings("DiscouragedApi")
-    private static Typeface font(Activity a, String name) {
-        int id = a.getResources().getIdentifier(name, "font", a.getPackageName());
-        if (id == 0) return null;
-        try {
-            return a.getResources().getFont(id);
-        } catch (RuntimeException e) {
-            return null;
         }
     }
 }

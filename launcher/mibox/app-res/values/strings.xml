@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- mibox-launcher fork: labels that differ on a streaming box, which has no TV of its own. -->
+<!-- mibox-launcher fork: labels that differ on a streaming box, which has no TV of its own, and the edition's
+     name, LaunchOS (the package stays com.gathin.tvhome, so Home, the updater and the box keep working). -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="app_name">LaunchOS</string>
     <string name="tv_settings">Device settings</string>
+    <string name="launcher_settings">LaunchOS settings</string>
+    <string name="dream_name">LaunchOS clock</string>
 </resources>

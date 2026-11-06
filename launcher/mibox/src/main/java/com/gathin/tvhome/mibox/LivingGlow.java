@@ -18,7 +18,7 @@ import android.view.View;
 
 /**
  * The home screen's glow in the focused app's colour, brought to life: instead of one still patch of colour,
- * three soft lights in that colour and two neighbouring hues drift slowly behind the tiles, like the animated
+ * three strong, soft lights in that colour and two neighbouring hues drift behind the tiles, like the animated
  * backgrounds of Apple Music, and glide to the next app's colours when the focus moves.
  *
  * Built to cost almost nothing on the box's GPU: the lights are painted into a 160 x 90 bitmap, about 20 times a
@@ -142,10 +142,13 @@ final class LivingGlow extends BitmapDrawable {
         int base = Color.rgb(Math.round(shown[0]), Math.round(shown[1]), Math.round(shown[2]));
         float t = (now - startNs) / 1e9f;
         bitmap.eraseColor(0);
-        // Three lights on slow, unrelated loops (37, 53 and 71 s), so the pattern never visibly repeats.
-        light(GlowColors.shift(base, 0f, 1f), 0.30f + 0.14f * sin(t, 37, 0f), 0.40f + 0.16f * sin(t, 53, 1.3f), 1.15f, 0.40f);
-        light(GlowColors.shift(base, 28f, 1.12f), 0.72f + 0.12f * sin(t, 53, 2.1f), 0.30f + 0.14f * sin(t, 71, 0.4f), 0.95f, 0.30f);
-        light(GlowColors.shift(base, -34f, 0.9f), 0.52f + 0.18f * sin(t, 71, 4.0f), 0.82f + 0.10f * sin(t, 37, 2.7f), 1.05f, 0.24f);
+        // Three lights on slow, unrelated loops (23, 31 and 43 s), so the pattern never visibly repeats. They are
+        // strong and travel far, and the whole glow breathes a little (every 11 s), so the movement reads from the
+        // sofa without pulling the eye off the tiles.
+        float breath = 0.88f + 0.12f * sin(t, 11, 0f);
+        light(GlowColors.shift(base, 0f, 1.08f), 0.28f + 0.22f * sin(t, 23, 0f), 0.42f + 0.24f * sin(t, 31, 1.3f), 1.30f, 0.86f * breath);
+        light(GlowColors.shift(base, 32f, 1.18f), 0.74f + 0.18f * sin(t, 31, 2.1f), 0.30f + 0.22f * sin(t, 43, 0.4f), 1.10f, 0.70f * breath);
+        light(GlowColors.shift(base, -38f, 0.98f), 0.52f + 0.26f * sin(t, 43, 4.0f), 0.82f + 0.14f * sin(t, 23, 2.7f), 1.20f, 0.60f * breath);
     }
 
     private static float sin(float t, float period, float phase) {

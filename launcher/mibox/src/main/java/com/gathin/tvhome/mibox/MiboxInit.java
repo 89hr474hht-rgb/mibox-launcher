@@ -43,6 +43,7 @@ public final class MiboxInit extends ContentProvider {
         Activity home = resumedHome.get();
         UpdatePrompt shown = prompt.get();
         if (home == null || home.isFinishing() || (shown != null && shown.isShowing())) return;
+        if (BootSplash.isShowing(home)) return;   // asked again once the start-up screen is gone
         UpdateState state = new UpdateState(home);
         if (!state.shouldPrompt(home)) return;
         Release r = state.available();
@@ -71,6 +72,8 @@ public final class MiboxInit extends ContentProvider {
                     EXTRAS.put(activity, extras);
                 }
                 extras.resume();
+                // LaunchOS's start-up screen, on the first home screen of a boot only.
+                if (BootSplash.firstHomeOfBoot(activity)) BootSplash.show(activity, MiboxInit::promptIfHomeVisible);
                 // After the home screen has drawn, so the prompt never delays the first frame.
                 activity.getWindow().getDecorView().postDelayed(MiboxInit::promptIfHomeVisible, 1500);
             } else if (SETTINGS.equals(name)) {
@@ -90,6 +93,7 @@ public final class MiboxInit extends ContentProvider {
 
         @Override
         public void onActivityDestroyed(Activity activity) {
+            BootSplash.dismissFor(activity);
             HomeExtras extras = EXTRAS.remove(activity);
             if (extras != null) extras.destroy();
             UpdatePrompt p = prompt.get();
@@ -126,6 +130,11 @@ public final class MiboxInit extends ContentProvider {
         View own = ownId == 0 ? null : activity.findViewById(ownId);
         if (own != null) {
             own.setOnClickListener(v -> activity.startActivity(new Intent(activity, UpdatesActivity.class)));
+            int remoteId = activity.getResources().getIdentifier("miboxRemoteChoice", "id", pkg);
+            View remote = remoteId == 0 ? null : activity.findViewById(remoteId);
+            if (remote != null) {
+                remote.setOnClickListener(v -> activity.startActivity(new Intent(activity, RemoteKeysActivity.class)));
+            }
             int subId = activity.getResources().getIdentifier("miboxSettingsSubtitle", "id", pkg);
             View sub = subId == 0 ? null : activity.findViewById(subId);
             if (sub instanceof TextView) {

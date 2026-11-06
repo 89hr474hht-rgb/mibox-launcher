@@ -4,7 +4,9 @@
 # test plan, get the owner's approval, then the next step. Everything is DISABLED for user 0, never
 # uninstalled.
 #
-# STEP E9 - Stock remote shortcut handler. ONLY AFTER the launcher's key service maps the YouTube
-# button (app_keys, keycode/scancode read on build 773 with the real remote) and leaves Netflix and
-# Prime unmapped. Disabling it while both handle keys avoids a double launch.
+# STEP E9 - Stock remote shortcut handler. ONLY AFTER LaunchOS 1.3.0 is installed and its "LaunchOS remote
+# buttons" accessibility service is on (Settings, Accessibility, or
+# settings put secure enabled_accessibility_services com.gathin.tvhome/com.gathin.tvhome.mibox.RemoteKeysService),
+# and the real YouTube button opens YouTube once. Keycodes on build 773: YouTube 190, Netflix 193, Prime 194.
+# Disabling it while both handle keys avoids a double launch.
 com.xiaomi.android.tvsetup.partnercustomizer

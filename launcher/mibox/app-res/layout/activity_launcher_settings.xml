@@ -2,8 +2,8 @@
 <!-- mibox-launcher fork: the Mi Box edition's launcher settings page. It replaces the upstream layout of the same
      name in release builds (mibox/app-res outranks main) and keeps every id LauncherSettingsActivity looks up, so
      the upstream code runs unchanged: rows grouped in cards under small titles, each with an icon in a coloured
-     tile, white when focused like the launcher's menus. miboxUpdatesChoice and miboxSettingsSubtitle are filled in
-     by MiboxInit. -->
+     tile, white when focused like the launcher's menus. miboxUpdatesChoice, miboxRemoteChoice and miboxSettingsSubtitle
+     are filled in by MiboxInit. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -22,10 +22,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="18dp"
-            android:fontFamily="@font/outfit_light"
+            android:fontFamily="@font/launchos_bold"
+            android:letterSpacing="-0.01"
             android:text="@string/launcher_settings"
             android:textColor="#FFFFFFFF"
-            android:textSize="36sp" />
+            android:textSize="34sp" />
 
         <TextView
             android:id="@+id/miboxSettingsSubtitle"
@@ -33,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:paddingStart="18dp"
-            android:fontFamily="@font/outfit_regular"
+            android:fontFamily="@font/launchos_regular"
             android:textColor="#80FFFFFF"
             android:textSize="15sp" />
 
@@ -47,6 +48,12 @@
                 style="@style/MiboxSetRow"
                 android:drawableStart="@drawable/mibox_tile_updates"
                 android:text="@string/mibox_settings_row" />
+            <View style="@style/MiboxSetDivider" />
+            <TextView
+                android:id="@+id/miboxRemoteChoice"
+                style="@style/MiboxSetRow"
+                android:drawableStart="@drawable/mibox_tile_remote"
+                android:text="@string/mibox_rk_row" />
             <View style="@style/MiboxSetDivider" />
             <TextView
                 android:id="@+id/reorderChoice"

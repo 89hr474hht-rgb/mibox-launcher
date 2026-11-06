@@ -186,8 +186,31 @@ deux étapes (12 OK à chaque fois) : E11, E5, E6, E7, E8, et E10 après avoir c
 |---|---|---|---|---|---|
 | NET-E5 | Après E5 à E8 | `precheck-accueil.sh` après chaque étape, puis après le redémarrage | 12 OK, Home = votre launcher, Ethernet, liste rouge active | ADB | Test réussi : 12 OK après chaque étape et après le redémarrage du 6/11 |
 | VEILLE-01 | Écran de veille | Laisser la box sans toucher la télécommande jusqu'à l'écran de veille | L'horloge du launcher s'affiche ; une touche ramène là où vous étiez | MANUEL | Non testé |
-| YT-01 | Bouton YouTube (E9, 1.2.1) | Depuis l'accueil, puis depuis une autre appli : bouton YouTube | YouTube s'ouvre une seule fois | MANUEL | Non testé |
+| YT-01 | Bouton YouTube (E9, 1.3.0) | Après avoir activé « Boutons de la télécommande LaunchOS » (Accessibilité) : bouton YouTube depuis l'accueil, puis depuis une autre appli | YouTube s'ouvre une seule fois | MANUEL | Non testé |
 | YT-02 | Netflix et Prime | Boutons Netflix et Prime Video | Ne font rien, comme vous l'avez choisi ; rien ne plante | MANUEL | Non testé |
+
+## C nonies. LaunchOS 1.3.0
+
+Vérifié sur l'émulateur Android TV (1920 × 1080) avec l'APK de release signé : écran de démarrage après un
+redémarrage, page des mises à jour (recherche puis « à jour »), réglages renommés, page des boutons de la
+télécommande et sa liste d'applis, service des boutons chargé par Android. Sur l'émulateur, Android ouvre YouTube
+pour les trois touches même sans le service, et les touches simulées par ADB ne passent pas par lui : le remappage
+ne peut être prouvé qu'avec la vraie télécommande. La carte « Mise à jour disponible » n'a pas pu être affichée
+(aucune version plus récente publiée). **Rien n'est encore testé sur la box.**
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| LOS-01 | Nom et icône | Paramètres → Applications ; rangée d'applis d'Android TV | « LaunchOS », nouvelle icône et bannière | MANUEL | Non testé |
+| BOOT-01 | Écran de démarrage | Redémarrer la box | Logo, nom, barre, au moins 4 s, puis l'accueil ; les touches ne font rien pendant ce temps | MANUEL | Test partiel : vu sur l'émulateur après un redémarrage, pas sur la box |
+| BOOT-02 | Pas au retour à l'accueil | Ouvrir une appli, puis bouton rond | L'accueil revient directement, sans écran de démarrage | MANUEL | Non testé |
+| FONT-01 | Police | Accueil, réglages, menus, mises à jour | Inter partout, rien de coupé ni de mal aligné | MANUEL | Test partiel : émulateur seulement |
+| UPD-01 | Page des mises à jour | Réglages → Mises à jour de LaunchOS → Vérifier maintenant | Ondes autour du logo pendant au moins 1,6 s, puis coche verte « LaunchOS est à jour » ; la sélection reste sur le bouton | MANUEL | Test partiel : émulateur seulement |
+| UPD-02 | Carte de mise à jour | À la prochaine version publiée | La carte glisse depuis la droite, le logo rebondit ; « Plus tard » ou Retour la fait repartir | MANUEL | Non testé |
+| GLOW-03 | Fond plus visible | Rester sur l'accueil, changer d'app | Couleurs nettement visibles et en mouvement, navigation fluide | MANUEL | Non testé |
+| NAME-01 | Nom en surbrillance | Se déplacer dans le dock, puis dans les rangées en dessous | Grand nom avec halo et reflet au-dessus du dock ; pastille blanche sous les tuiles des rangées | MANUEL | Non testé |
+| RK-01 | Activer le service | Paramètres → Accessibilité → « Boutons de la télécommande LaunchOS » → Activer | L'avertissement orange disparaît de la page des boutons | MANUEL | Non testé |
+| RK-02 | Remappage | Régler le bouton Netflix sur une autre appli, puis appuyer sur le vrai bouton | L'appli choisie s'ouvre une seule fois ; remettre « Aucune action » ensuite si vous le souhaitez | MANUEL | Validation manuelle nécessaire |
+| RK-03 | Autres touches intactes | Volume, OK, Retour, Home, micro avec le service actif | Tout répond comme avant | MANUEL | Non testé |
 
 ## D. Applications
 

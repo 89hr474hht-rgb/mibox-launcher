@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- mibox-launcher fork: the updater's strings. Translated into French only: the edition is for one box. -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="mibox_updates_title">Launcher updates</string>
-    <string name="mibox_settings_row">Launcher updates</string>
+    <string name="mibox_updates_title">LaunchOS updates</string>
+    <string name="mibox_settings_row">LaunchOS updates</string>
     <string name="mibox_prompt_title">Update available</string>
     <string name="mibox_prompt_version">Version %1$s</string>
     <string name="mibox_update_now">Update</string>
@@ -10,7 +10,7 @@
     <string name="mibox_installed_version">Installed version: %1$s</string>
     <string name="mibox_last_check">Last check: %1$s</string>
     <string name="mibox_never_checked">Not checked yet.</string>
-    <string name="mibox_up_to_date">The launcher is up to date.</string>
+    <string name="mibox_up_to_date">LaunchOS is up to date.</string>
     <string name="mibox_available">Version %1$s is available (%2$d KB)</string>
     <string name="mibox_notes">What\'s new</string>
     <string name="mibox_install">Install</string>
@@ -28,7 +28,7 @@
     <string name="mibox_r_cancelled">cancelled</string>
     <string name="mibox_r_failed">failed</string>
     <string name="mibox_r_ignored">skipped</string>
-    <string name="mibox_updated_toast">Launcher updated to version %1$s</string>
+    <string name="mibox_updated_toast">LaunchOS updated to version %1$s</string>
     <string name="mibox_permission_open">Open settings</string>
     <string name="mibox_permission_no_screen">This TV has no screen for that setting. Grant it once from a computer: adb shell appops set com.gathin.tvhome REQUEST_INSTALL_PACKAGES allow</string>
     <string name="mibox_err_network">Could not reach GitHub (%1$s).</string>
@@ -39,11 +39,11 @@
     <string name="mibox_err_size">The file does not have the announced size.</string>
     <string name="mibox_err_checksum">The SHA-256 fingerprint does not match: file refused.</string>
     <string name="mibox_err_not_apk">The downloaded file is not a valid APK.</string>
-    <string name="mibox_err_package">The APK is not this launcher.</string>
+    <string name="mibox_err_package">The APK is not LaunchOS.</string>
     <string name="mibox_err_version">The APK\'s version does not match the release.</string>
     <string name="mibox_err_not_newer">This version is not newer than the installed one.</string>
-    <string name="mibox_err_signature">The APK is not signed with the installed launcher\'s key: file refused.</string>
-    <string name="mibox_err_permission">Android does not yet allow this launcher to install its updates.</string>
+    <string name="mibox_err_signature">The APK is not signed with the installed LaunchOS key: file refused.</string>
+    <string name="mibox_err_permission">Android does not yet allow LaunchOS to install its updates.</string>
     <string name="mibox_err_install">Android refused the installation: %1$s</string>
     <string name="mibox_bluetooth">Bluetooth</string>
     <string name="mibox_bt_on">On</string>
@@ -87,4 +87,37 @@
     <string name="mibox_ai_source_manual">Installed manually</string>
     <string name="mibox_ai_target">Made for</string>
     <string name="mibox_ai_size">App size</string>
+    <string name="mibox_ignore_short">Skip</string>
+    <string name="mibox_version_line">Version %1$s</string>
+    <string name="mibox_state_idle">Not checked yet</string>
+    <string name="mibox_state_search">Searching…</string>
+    <string name="mibox_state_ok">LaunchOS is up to date</string>
+    <string name="mibox_state_available">Version %1$s available</string>
+    <string name="mibox_state_download">Downloading…</string>
+    <string name="mibox_state_verify">Verifying…</string>
+    <string name="mibox_state_wait">Confirm the installation</string>
+    <string name="mibox_state_error">The check failed</string>
+    <string name="mibox_available_card">LaunchOS %1$s · %2$d KB</string>
+    <string name="mibox_about_kicker">About</string>
+    <string name="mibox_about_title">Verified updates</string>
+    <string name="mibox_about_text">Every version comes from GitHub. Before installing it, LaunchOS checks its SHA-256 fingerprint and its signature: a changed file is refused. It also looks for updates by itself, once a day.</string>
+    <string name="mibox_splash_starting">Starting…</string>
+    <string name="mibox_splash_apps">Loading your apps…</string>
+    <string name="mibox_splash_ready">Almost ready…</string>
+    <string name="mibox_prompt_kicker">LaunchOS</string>
+    <string name="mibox_rk_row">Remote buttons</string>
+    <string name="mibox_rk_kicker">Remote</string>
+    <string name="mibox_rk_headline">App buttons</string>
+    <string name="mibox_rk_sub">Choose what each button opens, from any screen.</string>
+    <string name="mibox_rk_btn_netflix">Netflix button</string>
+    <string name="mibox_rk_btn_youtube">YouTube button</string>
+    <string name="mibox_rk_btn_prime">Prime Video button</string>
+    <string name="mibox_rk_none">No action</string>
+    <string name="mibox_rk_none_sub">The button does nothing</string>
+    <string name="mibox_rk_missing">App not found: the button does nothing</string>
+    <string name="mibox_rk_pick_sub">What should this button open?</string>
+    <string name="mibox_rk_service_off">The buttons\' service is off, so they do nothing yet. Turn on “LaunchOS remote buttons” in Accessibility.</string>
+    <string name="mibox_rk_service_open">Accessibility</string>
+    <string name="mibox_rk_service_name">LaunchOS remote buttons</string>
+    <string name="mibox_rk_service_description">Opens the app chosen in LaunchOS when you press the remote\'s Netflix, YouTube or Prime Video button. Reads only those buttons, never the screen.</string>
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "No action": a circle with a slash, in the row's text colour. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp" android:height="40dp" android:viewportWidth="40" android:viewportHeight="40">
+    <path android:pathData="M20,9 a11,11 0 1,0 0.01,0 Z M12.2,12.2 L27.8,27.8" android:strokeColor="#99FFFFFF"
+        android:strokeWidth="2.6" android:strokeLineCap="round" />
+</vector>

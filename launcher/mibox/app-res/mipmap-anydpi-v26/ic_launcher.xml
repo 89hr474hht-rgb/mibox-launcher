@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mibox-launcher fork: the LaunchOS icon (layers in the mibox module), in place of upstream's ic_launcher. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/mibox_icon_bg" />
+    <foreground android:drawable="@drawable/mibox_icon_fg" />
+</adaptive-icon>

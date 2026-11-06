@@ -61,6 +61,25 @@
             </intent-filter>
         </activity>
 
+        <!-- The remote's Netflix, YouTube and Prime Video buttons, and the page that chooses what they open. -->
+        <activity
+            android:name=".RemoteKeysActivity"
+            android:exported="false"
+            android:theme="@style/MiboxUpdatesTheme" />
+
+        <service
+            android:name=".RemoteKeysService"
+            android:exported="true"
+            android:label="@string/mibox_rk_service_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/mibox_remote_keys_service" />
+        </service>
+
         <receiver
             android:name=".InstallResultReceiver"
             android:exported="false" />

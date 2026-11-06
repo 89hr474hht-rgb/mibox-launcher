@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mibox-launcher fork: every UI font of the Mi Box edition is Inter (app-res/font/launchos_*), cleaner and closer
+     to Apple's system font than Outfit. values-vi upstream still points at the system sans-serif. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ReferenceType">
+    <string name="font_body" translatable="false">@font/launchos_regular</string>
+    <string name="font_regular" translatable="false">@font/launchos_regular</string>
+    <string name="font_light" translatable="false">@font/launchos_light</string>
+    <string name="font_extralight" translatable="false">@font/launchos_extralight</string>
+    <string name="font_medium" translatable="false">@font/launchos_medium</string>
+</resources>

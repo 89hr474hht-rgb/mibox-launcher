@@ -5,10 +5,21 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
-## [1.2.1] - 2026-11-06
+## [1.3.0] - 2026-11-06
+
+Le launcher s'appelle désormais **LaunchOS**.
 
 ### Ajouté
-- Bouton YouTube de la télécommande : il ouvre de nouveau YouTube, même sans l'accueil Google TV. C'est le service « touches de la télécommande » du launcher qui s'en charge ; il s'active une fois depuis l'ordinateur. Les boutons Netflix et Prime Video restent sans action.
+- Nom LaunchOS partout dans l'appli, nouvelle icône et nouvelle bannière (un « L » blanc sur un carré bleu-violet-rose).
+- Écran de démarrage : au premier accueil après l'allumage de la box (jamais en revenant à l'accueil), le logo apparaît avec un petit rebond, le nom s'écrit de gauche à droite et une barre se remplit pendant le chargement, sur un fond de couleurs qui dérivent. Il reste au moins 4 secondes, puis s'efface pendant que l'accueil se met en place. Les touches de la télécommande attendent la fin.
+- Boutons de la télécommande : nouvelle page dans les réglages pour choisir ce qu'ouvrent les boutons Netflix, YouTube et Prime Video (une appli, ou rien). La télécommande est dessinée à gauche ; le bouton en cours de réglage s'allume, envoie des ondes et « s'enfonce » quand on choisit une appli. Par défaut, YouTube ouvre YouTube et les deux autres ne font rien. Il faut activer une fois « Boutons de la télécommande LaunchOS » dans Paramètres → Accessibilité.
+
+### Modifié
+- Police : Inter remplace Outfit dans tout le launcher, plus nette et proche de celle d'Apple.
+- Page des mises à jour refaite : le logo au centre d'un halo qui montre l'état (ondes pendant la recherche, anneau de téléchargement, coche verte à jour, flèche violette s'il y a une nouvelle version), l'état en une ligne, et à droite des cartes (nouveautés, à propos, historique).
+- Carte « Mise à jour disponible » sur l'accueil : nouveau rendu (logo, bord dégradé, puce de version) ; elle glisse depuis la droite avec un petit rebond et repart de la même façon.
+- Fond animé de l'accueil bien plus visible : lumières plus fortes, mouvements plus amples et plus rapides, et une légère respiration.
+- Nom de l'appli sélectionnée en surbrillance : sous une tuile, texte foncé sur une pastille blanche ; au-dessus du dock, nom plus épais avec un halo et un reflet qui le traverse à chaque changement.
 
 ## [1.2.0] - 2026-11-06
 

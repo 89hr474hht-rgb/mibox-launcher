@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- View tag: NameHighlight has restyled this tile's name. -->
+    <item name="mibox_name_styled" type="id" />
+</resources>

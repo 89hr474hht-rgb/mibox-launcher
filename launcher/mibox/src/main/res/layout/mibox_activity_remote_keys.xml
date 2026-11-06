@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What the remote's app buttons open (RemoteKeysActivity): the remote on the left, the buttons or the app list on
+     the right, and a notice while the buttons' service is off. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mibox_page_bg">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/mibox_page_glow" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingStart="48dp"
+        android:paddingTop="32dp"
+        android:paddingEnd="56dp"
+        android:paddingBottom="32dp">
+
+        <FrameLayout
+            android:id="@+id/mibox_rk_remote"
+            android:layout_width="300dp"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/mibox_rk_side"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="40dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/MiboxCardKicker"
+                android:layout_marginTop="12dp"
+                android:text="@string/mibox_rk_kicker" />
+
+            <TextView
+                android:id="@+id/mibox_rk_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/mibox_rk_headline"
+                android:textColor="#FFFFFFFF"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mibox_rk_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/mibox_rk_sub"
+                android:textColor="#8CFFFFFF"
+                android:textSize="15sp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:id="@+id/mibox_rk_rows"
+                    style="@style/MiboxCard"
+                    android:layout_marginBottom="0dp"
+                    android:padding="8dp" />
+
+                <ScrollView
+                    android:id="@+id/mibox_rk_picker"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/mibox_card_bg"
+                    android:fadingEdgeLength="24dp"
+                    android:requiresFadingEdge="vertical"
+                    android:scrollbars="none"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/mibox_rk_apps"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="8dp" />
+                </ScrollView>
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/mibox_rk_service"
+                style="@style/MiboxCard"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/mibox_card_warn_bg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/MiboxText"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/mibox_rk_service_off"
+                    android:textColor="#FFFFD08A"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/mibox_rk_service_open"
+                    style="@style/MiboxPill"
+                    android:layout_marginStart="14dp"
+                    android:text="@string/mibox_rk_service_open" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
