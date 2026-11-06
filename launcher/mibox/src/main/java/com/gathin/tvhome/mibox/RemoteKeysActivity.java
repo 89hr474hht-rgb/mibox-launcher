@@ -155,6 +155,7 @@ public final class RemoteKeysActivity extends Activity {
     private void showPicker(int key) {
         picking = key;
         remote.select(key);
+        remote.picking(true);
         if (appList == null) appList = loadApps();
         apps.removeAllViews();
         String current = RemoteRemap.target(this, key);
@@ -195,6 +196,7 @@ public final class RemoteKeysActivity extends Activity {
 
     private void showRows(int key) {
         picking = 0;
+        remote.picking(false);
         refreshRows();
         swapTexts(getString(R.string.mibox_rk_headline), getString(R.string.mibox_rk_sub));
         slide(picker, rows, false);

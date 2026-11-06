@@ -5,6 +5,11 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.3.1] - 2026-11-06
+
+### Modifié
+- Page des boutons de la télécommande : la télécommande zoome doucement sur le bouton sélectionné, un peu plus pendant le choix de l'appli, puis dézoome quand le choix part (avec les ondes).
+
 ## [1.3.0] - 2026-11-06
 
 Le launcher s'appelle désormais **LaunchOS**.

@@ -48,7 +48,8 @@ final class RemoteView extends View {
     private final long born = SystemClock.uptimeMillis();
     private final float[] lift = new float[4];
     private Bitmap still2d;
-    private float scale, spotX = 100, spotY = 300, spotOn;
+    private float scale, spotX = 100, spotY = 300, spotOn, zoom = 1;
+    private boolean picking;
     private int selected;
     private long pressedAt = -1, lastFrame;
 
@@ -85,6 +86,12 @@ final class RemoteView extends View {
                 spotY = KY[i];
             }
         }
+        invalidate();
+    }
+
+    /** Zooms in further while an app is being chosen for the selected button. */
+    void picking(boolean on) {
+        picking = on;
         invalidate();
     }
 
@@ -285,6 +292,17 @@ final class RemoteView extends View {
         shadow.setAlpha(Math.round(255 * e));
         c.drawCircle(cx, cy + (VH / 2 - 6) * scale, 80 * scale, shadow);
 
+        // The spotlight glides to the selected button, and the remote zooms in on it: a little while its row has
+        // the focus, more while an app is being chosen for it, and back out as the choice is sent.
+        float k = still ? 1 : Math.min(1f, dt * 9f);
+        if (sel >= 0) {
+            spotX += (KX[sel] - spotX) * k;
+            spotY += (KY[sel] - spotY) * k;
+        }
+        spotOn += ((sel >= 0 ? 1f : 0f) - spotOn) * (still ? 1 : Math.min(1f, dt * 6f));
+        boolean sending = pressedAt > 0 && now - pressedAt < 1100;
+        float zoomTo = sel < 0 || sending ? 1f : picking ? 1.3f : 1.14f;
+        zoom += (zoomTo - zoom) * (still ? 1 : Math.min(1f, dt * 4.5f));
         c.save();
         c.translate(cx, cy + (1 - e) * 70 * scale);
         camera.save();
@@ -295,6 +313,7 @@ final class RemoteView extends View {
         c.concat(tilt);
         c.scale(scale, scale);
         c.translate(-VW / 2, -VH / 2 + floatY);
+        c.scale(zoom, zoom, spotX, spotY);
         int alpha = Math.round(255 * e);
         image.setAlpha(alpha);
         c.drawBitmap(still2d, null, grid, image);
@@ -322,13 +341,7 @@ final class RemoteView extends View {
             c.drawArc(tmp, 140, 80, false, stroke);
         }
 
-        // The spotlight glides to the selected button and darkens the rest of the remote.
-        float k = still ? 1 : Math.min(1f, dt * 9f);
-        if (sel >= 0) {
-            spotX += (KX[sel] - spotX) * k;
-            spotY += (KY[sel] - spotY) * k;
-        }
-        spotOn += ((sel >= 0 ? 1f : 0f) - spotOn) * (still ? 1 : Math.min(1f, dt * 6f));
+        // The spotlight darkens the rest of the remote.
         if (spotOn > 0.01f) {
             local.setScale(185, 185);
             local.postTranslate(spotX, spotY);
