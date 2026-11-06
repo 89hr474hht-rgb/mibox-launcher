@@ -33,19 +33,6 @@
         <item name="android:textColor">@color/text</item>
     </style>
 
-    <style name="NavItem">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">44dp</item>
-        <item name="android:layout_marginBottom">6dp</item>
-        <item name="android:background">@drawable/nav_bg</item>
-        <item name="android:focusable">true</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:fontFamily">@font/launchos_medium</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/nav_text</item>
-        <item name="android:drawablePadding">12dp</item>
-    </style>
 
     <style name="Button">
         <item name="android:layout_height">50dp</item>
@@ -57,6 +44,71 @@
         <item name="android:fontFamily">@font/launchos_semibold</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/button_text</item>
+    </style>
+
+    <style name="RailItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:background">@drawable/nav_bg</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">15dp</item>
+    </style>
+
+    <style name="GlassButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/glass_button_bg</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">22dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:drawableTint">@color/button_text</item>
+        <item name="android:fontFamily">@font/launchos_semibold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="Pill">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:background">@drawable/pill_bg</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:drawablePadding">9dp</item>
+        <item name="android:drawableTint">@color/button_text</item>
+        <item name="android:fontFamily">@font/launchos_medium</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="Tag">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/tag_bg</item>
+        <item name="android:fontFamily">@font/launchos_bold</item>
+        <item name="android:paddingStart">5dp</item>
+        <item name="android:paddingEnd">5dp</item>
+        <item name="android:paddingTop">1dp</item>
+        <item name="android:paddingBottom">1dp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="Label">
+        <item name="android:fontFamily">@font/launchos_bold</item>
+        <item name="android:textColor">@color/accent_light</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="Theme.LaunchOSTV.Player">

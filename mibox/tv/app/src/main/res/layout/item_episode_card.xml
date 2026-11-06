@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="224dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="6dp"
+    android:layout_marginEnd="6dp"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="match_parent"
+        android:layout_height="126dp"
+        android:background="@drawable/poster_bg"
+        android:duplicateParentState="true"
+        android:padding="3dp">
+
+        <FrameLayout
+            android:id="@+id/clip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/clip_round">
+
+            <TextView
+                android:id="@+id/number"
+                style="@style/Title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="#66FFFFFF"
+                android:textSize="26sp" />
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/badge"
+                style="@style/Tag"
+                android:layout_gravity="top|start"
+                android:layout_margin="6dp"
+                android:background="@drawable/badge_dark"
+                android:textColor="@color/text"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/track"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_gravity="bottom"
+                android:layout_margin="8dp"
+                android:background="@drawable/resume_track"
+                android:visibility="gone">
+
+                <View
+                    android:id="@+id/bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bar_fill" />
+            </FrameLayout>
+        </FrameLayout>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:fontFamily="@font/launchos_semibold"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
+        android:singleLine="true"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/plot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
+        android:textColor="@color/text_dim"
+        android:textSize="12sp" />
+</LinearLayout>

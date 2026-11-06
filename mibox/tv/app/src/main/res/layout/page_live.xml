@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chaînes: the groups (Favoris first), the group's channels, and on the right the small player (or the focused
+     channel's logo) with what is on now and next. Each column is its own panel. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/page_bg"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/rail_closed">
+
+    <LinearLayout
+        android:id="@+id/groups_column"
+        android:layout_width="236dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/column_bg"
+        android:orientation="vertical"
+        android:paddingStart="14dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="12dp">
+
+        <TextView
+            style="@style/Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:text="@string/nav_live"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/groups_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:paddingStart="12dp"
+            android:singleLine="true"
+            android:textColor="@color/text_dim"
+            android:textSize="13sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/groups"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="20dp"
+            android:text="@string/group_options_hint"
+            android:textColor="@color/text_dim"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/channels_column"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="10dp">
+
+        <TextView
+            android:id="@+id/group_title"
+            style="@style/Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:paddingStart="10dp"
+            android:singleLine="true"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/group_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:paddingStart="10dp"
+            android:singleLine="true"
+            android:textColor="@color/text_dim"
+            android:textSize="13sp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/channels"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="24dp" />
+
+            <TextView
+                android:id="@+id/channels_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.2"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:textColor="@color/text_dim"
+                android:textSize="15sp"
+                android:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/detail_column"
+        android:layout_width="342dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="24dp">
+
+        <FrameLayout
+            android:id="@+id/pip_slot"
+            android:layout_width="@dimen/pip_width"
+            android:layout_height="@dimen/pip_height"
+            android:background="@drawable/pip_slot_bg">
+
+            <ImageView
+                android:id="@+id/slot_logo"
+                android:layout_width="150dp"
+                android:layout_height="84dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/slot_initials"
+                style="@style/Title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="#4DFFFFFF"
+                android:textSize="40sp" />
+
+            <TextView
+                android:id="@+id/slot_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="10dp"
+                android:text="@string/live_ok_hint"
+                android:textColor="@color/text_dim"
+                android:textSize="12sp" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/detail_name"
+                style="@style/Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/detail_tag"
+                style="@style/Tag"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/detail_watched"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:singleLine="true"
+            android:textColor="@color/text_dim"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:id="@+id/detail_guide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/detail_now_label"
+                style="@style/Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/live_now" />
+
+            <TextView
+                android:id="@+id/detail_now"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/launchos_semibold"
+                android:maxLines="2"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/detail_now_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/text_dim"
+                android:textSize="13sp" />
+
+            <FrameLayout
+                android:id="@+id/detail_track"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/track_bg">
+
+                <View
+                    android:id="@+id/detail_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bar_fill" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/detail_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:ellipsize="end"
+                android:lineSpacingMultiplier="1.2"
+                android:maxLines="4"
+                android:textColor="@color/text_dim"
+                android:textSize="13sp" />
+
+            <TextView
+                style="@style/Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/live_next"
+                android:textColor="@color/text_dim" />
+
+            <TextView
+                android:id="@+id/detail_next"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/detail_no_guide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/live_no_guide"
+            android:textColor="@color/text_dim"
+            android:textSize="13sp"
+            android:visibility="gone"
+            tools:ignore="SelectableText" />
+    </LinearLayout>
+</LinearLayout>

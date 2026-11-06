@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_search">Rechercher</string>
+    <string name="nav_settings">Réglages</string>
+
+    <string name="group_favourites">Favoris</string>
+    <string name="group_all_channels">Toutes les chaînes</string>
+    <string name="favourites_hint">Tes chaînes les plus regardées apparaîtront ici.</string>
+    <string name="live_ok_hint">OK pour regarder</string>
+    <string name="live_now">Maintenant</string>
+    <string name="live_next">Ensuite</string>
+    <string name="live_no_guide">Pas de guide des programmes pour cette chaîne.</string>
+    <string name="live_keys">Haut / Bas : chaîne suivante · OK : infos · Retour : mini-lecteur</string>
+    <string name="live_keys_no_pip">Haut / Bas : chaîne suivante · OK : infos · Retour : liste des chaînes</string>
+
+    <string name="hero_label_movies">À l\'affiche</string>
+    <string name="hero_label_series">Nouveaux épisodes</string>
+    <string name="hero_play">Regarder</string>
+    <string name="hero_resume">Reprendre</string>
+    <string name="hero_info">Plus d\'infos</string>
+    <string name="browse_search_movies">Rechercher un film</string>
+    <string name="browse_search_series">Rechercher une série</string>
+    <string name="browse_all_movies">Tous les films</string>
+    <string name="browse_all_series">Toutes les séries</string>
+    <string name="row_continue">Reprendre</string>
+    <string name="row_recent_movies">Récemment ajoutés</string>
+    <string name="row_recent_series">Mises à jour récentes</string>
+    <string name="row_more">Tout voir</string>
+    <string name="row_more_count">Tout voir\n\n%1$d</string>
+    <string name="row_loading">Chargement…</string>
+    <string name="loading_section">Chargement du catalogue…\nLa première fois, un gros catalogue peut prendre quelques secondes.</string>
+
+    <string name="sort_recent">Récents</string>
+    <string name="sort_az">A → Z</string>
+    <string name="sort_rating">Mieux notés</string>
+    <string name="sort_year">Année</string>
+
+    <string name="search_hint">Film, série ou chaîne…</string>
+    <string name="search_empty">Aucun résultat.</string>
+    <string name="search_type">Tape quelques lettres : la recherche ignore les accents et les majuscules.</string>
+    <string name="search_channels">Chaînes</string>
+    <string name="search_movies">Films</string>
+    <string name="search_series">Séries</string>
+
+    <string name="detail_play">Lecture</string>
+    <string name="detail_resume">Reprendre à %1$s</string>
+    <string name="detail_restart">Depuis le début</string>
+    <string name="detail_director">Réalisation : %1$s</string>
+    <string name="detail_cast">Avec : %1$s</string>
+    <string name="series_watch">Regarder S%1$d · É%2$d</string>
+    <string name="series_resume">Reprendre S%1$d · É%2$d</string>
+    <string name="episode_title">É%1$d · %2$s</string>
+    <string name="next_episode">Épisode suivant : %1$s</string>
+
+    <string name="settings_title">Réglages</string>
+    <string name="settings_hint">Les réglages restent sur cette box, pour ce compte.</string>
+    <string name="settings_groups_live">Groupes des chaînes</string>
+    <string name="settings_groups_movies">Groupes des films</string>
+    <string name="settings_groups_series">Groupes des séries</string>
+    <string name="settings_groups_sub">Renommer, masquer ou épingler en haut</string>
+    <string name="settings_mini">Mini-lecteur</string>
+    <string name="settings_mini_sub">Retour pendant une chaîne la garde en petit, en haut à droite</string>
+    <string name="settings_next">Épisode suivant automatique</string>
+    <string name="settings_next_sub">À la fin d\'un épisode, le suivant démarre</string>
+    <string name="settings_tidy">Noms de chaînes simplifiés</string>
+    <string name="settings_tidy_sub">« FR: Chaîne FHD » devient « Chaîne » avec l\'étiquette FHD</string>
+    <string name="settings_clear_fav">Effacer les favoris</string>
+    <string name="settings_clear_fav_sub">Le temps passé sur chaque chaîne</string>
+    <string name="settings_clear_resume">Effacer les reprises</string>
+    <string name="settings_clear_resume_sub">Où les films et les épisodes ont été arrêtés</string>
+    <string name="on">Activé</string>
+    <string name="off">Désactivé</string>
+    <string name="cleared">Effacé</string>
+
+    <string name="groups_hint">OK sur un groupe pour le renommer, le masquer ou l\'épingler en haut. Les groupes épinglés passent en premier, les autres sont rangés de A à Z.</string>
+    <string name="groups_reset">Tout rétablir</string>
+    <string name="groups_reset_sub">Noms d\'origine, rien de masqué ni d\'épinglé</string>
+    <string name="group_hidden">Masqué</string>
+    <string name="group_pinned">Épinglé</string>
+    <string name="group_was">Nom d\'origine : %1$s</string>
+    <string name="group_rename">Renommer</string>
+    <string name="group_hide">Masquer</string>
+    <string name="group_show">Afficher</string>
+    <string name="group_pin">Épingler en haut</string>
+    <string name="group_unpin">Ne plus épingler</string>
+    <string name="group_original">Reprendre le nom d\'origine</string>
+    <string name="group_rename_title">Nouveau nom du groupe</string>
+    <string name="group_rename_hint">Laisse vide pour le nom d\'origine</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="group_options_hint">Appui long sur OK : options du groupe</string>
+</resources>

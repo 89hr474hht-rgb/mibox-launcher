@@ -14,8 +14,18 @@ final class Http {
     private Http() {
     }
 
+    /** Reads a 200 answer's body as it arrives. */
+    interface Body<T> {
+        T read(InputStream in) throws IOException, XtreamException;
+    }
+
     /** The body of a 200 answer, or an {@link XtreamException} that never quotes the address (it holds the account). */
     static byte[] get(String address, int maxBytes) throws XtreamException {
+        return get(address, maxBytes, in -> readAll(in, maxBytes));
+    }
+
+    /** A 200 answer handed to body as a stream, cut off after maxBytes. */
+    static <T> T get(String address, long maxBytes, Body<T> body) throws XtreamException {
         String url = address;
         try {
             for (int hop = 0; hop <= MAX_REDIRECTS; hop++) {
@@ -37,8 +47,8 @@ final class Http {
                         throw new XtreamException(code == 401 || code == 403
                                 ? XtreamException.Kind.REFUSED : XtreamException.Kind.SERVER, code);
                     }
-                    try (InputStream in = c.getInputStream()) {
-                        return readAll(in, maxBytes);
+                    try (InputStream in = new Capped(c.getInputStream(), maxBytes)) {
+                        return body.read(in);
                     }
                 } finally {
                     c.disconnect();
@@ -53,6 +63,30 @@ final class Http {
             throw new XtreamException(XtreamException.Kind.BAD_ADDRESS, 0);
         } catch (IOException e) {
             throw new XtreamException(XtreamException.Kind.NETWORK, 0);
+        }
+    }
+
+    /** Stops a body that grows past its limit, rather than filling the box's memory. */
+    private static final class Capped extends java.io.FilterInputStream {
+        private long left;
+
+        Capped(InputStream in, long max) {
+            super(in);
+            left = max;
+        }
+
+        @Override
+        public int read() throws IOException {
+            int b = super.read();
+            if (b >= 0 && --left < 0) throw new IOException("too large");
+            return b;
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            int n = super.read(b, off, len);
+            if (n > 0 && (left -= n) < 0) throw new IOException("too large");
+            return n;
         }
     }
 

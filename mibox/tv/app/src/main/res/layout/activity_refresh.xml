@@ -15,6 +15,7 @@
         android:paddingBottom="40dp">
 
         <TextView
+            android:id="@+id/page_title"
             style="@style/Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
+            android:id="@+id/page_hint"
             android:lineSpacingMultiplier="1.2"
             android:text="@string/refresh_hint"
             android:textColor="@color/text_dim"

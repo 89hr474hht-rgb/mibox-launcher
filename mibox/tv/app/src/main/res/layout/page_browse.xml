@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Films or Séries: a full-screen picture that fades from one title to the next, the spotlight (the newest titles
+     with Regarder and Plus d'infos, or the focused title), and the rows by group underneath. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/page"
+    android:clipChildren="false">
+
+    <ImageView
+        android:id="@+id/backdrop_a"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/backdrop_b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/scrim_left" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@drawable/scrim_top" />
+
+    <View
+        android:id="@+id/scrim_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="330dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/scrim_page_bottom" />
+
+    <LinearLayout
+        android:id="@+id/spotlight"
+        android:layout_width="560dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/page_start"
+        android:layout_marginTop="92dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/spot_label"
+            style="@style/Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/spot_title"
+            style="@style/Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/launchos_bold"
+            android:lineSpacingMultiplier="0.95"
+            android:maxLines="2"
+            android:textSize="36sp" />
+
+        <TextView
+            android:id="@+id/spot_meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/launchos_medium"
+            android:singleLine="true"
+            android:textColor="#D9FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/spot_plot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
+            android:lineSpacingMultiplier="1.25"
+            android:maxLines="3"
+            android:textColor="#BFFFFFFF"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:id="@+id/hero_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/hero_play"
+                style="@style/GlassButton"
+                android:drawableStart="@drawable/ic_play"
+                android:text="@string/hero_play" />
+
+            <TextView
+                android:id="@+id/hero_info"
+                style="@style/GlassButton"
+                android:layout_marginStart="12dp"
+                android:drawableStart="@drawable/ic_info"
+                android:text="@string/hero_info" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/hero_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="6dp"
+            android:layout_marginTop="18dp"
+            android:orientation="horizontal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/top_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="26dp"
+        android:layout_marginEnd="36dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/action_search"
+            style="@style/Pill"
+            android:drawableStart="@drawable/ic_search" />
+
+        <TextView
+            android:id="@+id/action_all"
+            style="@style/Pill"
+            android:layout_marginStart="10dp"
+            android:drawableStart="@drawable/ic_grid" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rows"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/rows_height"
+        android:layout_gravity="bottom"
+        android:clipChildren="false"
+        android:clipToPadding="true"
+        android:paddingBottom="10dp" />
+
+    <TextView
+        android:id="@+id/browse_status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.25"
+        android:paddingStart="140dp"
+        android:paddingEnd="60dp"
+        android:textColor="@color/text_dim"
+        android:textSize="17sp"
+        android:visibility="gone" />
+</FrameLayout>

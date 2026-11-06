@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp"
+    android:background="@drawable/live_row_bg"
+    android:baselineAligned="false"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="56dp"
+    android:orientation="horizontal"
+    android:paddingStart="18dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="18dp"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            android:ellipsize="end"
+            android:fontFamily="@font/launchos_semibold"
+            android:singleLine="true"
+            android:textColor="@color/row_text"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:duplicateParentState="true"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/row_sub"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/pinned"
+        style="@style/Tag"
+        android:layout_marginStart="8dp"
+        android:duplicateParentState="true"
+        android:text="@string/group_pinned"
+        android:textColor="@color/row_sub"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/hidden"
+        style="@style/Tag"
+        android:layout_marginStart="8dp"
+        android:duplicateParentState="true"
+        android:text="@string/group_hidden"
+        android:textColor="@color/row_sub"
+        android:visibility="gone" />
+</LinearLayout>

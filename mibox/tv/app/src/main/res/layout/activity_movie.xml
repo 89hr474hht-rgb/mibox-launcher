@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A film: its picture full screen, what it is, and Lecture or Reprendre / Depuis le début. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/page">
+
+    <ImageView
+        android:id="@+id/backdrop_a"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/backdrop_b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/scrim_left" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/scrim_page_bottom" />
+
+    <LinearLayout
+        android:layout_width="600dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="64dp"
+        android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/label"
+        style="@style/Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="@font/launchos_bold"
+        android:lineSpacingMultiplier="0.95"
+        android:maxLines="2"
+        android:textSize="40sp" />
+
+    <TextView
+        android:id="@+id/meta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/launchos_medium"
+        android:singleLine="true"
+        android:textColor="#D9FFFFFF"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/plot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:lineSpacingMultiplier="1.25"
+        android:maxLines="6"
+        android:textColor="#C7FFFFFF"
+        android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/people"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:ellipsize="end"
+            android:lineSpacingMultiplier="1.25"
+            android:maxLines="2"
+            android:textColor="@color/text_dim"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/play"
+                style="@style/GlassButton"
+                android:drawableStart="@drawable/ic_play"
+                android:text="@string/detail_play" />
+
+            <TextView
+                android:id="@+id/restart"
+                style="@style/GlassButton"
+                android:layout_marginStart="12dp"
+                android:drawableStart="@drawable/ic_restart"
+                android:text="@string/detail_restart"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -1,6 +1,8 @@
 package com.gathin.launchos.tv;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -9,294 +11,209 @@ import android.widget.TextView;
 
 import androidx.annotation.OptIn;
 import androidx.media3.common.MediaItem;
-import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
-import androidx.media3.datasource.DefaultDataSource;
-import androidx.media3.datasource.DefaultHttpDataSource;
-import androidx.media3.datasource.HttpDataSource;
-import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
-import androidx.media3.extractor.DefaultExtractorsFactory;
-import androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory;
 import androidx.media3.ui.PlayerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Full-screen playback with Media3. A live channel shows its name for a few seconds and zaps with CH+/CH− or
- * Up/Down inside its category; a film or an episode has the usual controls (OK, then Left/Right to seek).
- * A live channel is asked for as MPEG-TS first, then as HLS if that fails.
+ * Films and episodes, full screen with Media3's controls (OK, then Left/Right to seek 10 s back or 30 s on).
+ * Where it was stopped is remembered for Reprendre; at the end of an episode the next one starts (Réglages).
+ * Live channels play in the main screen instead ({@link LivePlayer}).
  */
 public final class PlayerActivity extends Activity {
-    static final String EXTRA_URL = "url";
-    static final String EXTRA_TITLE = "title";
-    static final String EXTRA_LIVE_INDEX = "live_index";
-    private static final long INFO_MS = 4000;
+    private static final String EXTRA_URL = "url";
+    private static final String EXTRA_TITLE = "title";
+    private static final String EXTRA_START = "start_ms";
+    private static final String EXTRA_KIND = "kind";
+    private static final String EXTRA_ID = "id";
+    private static final String EXTRA_NAME = "name";
+    private static final String EXTRA_IMAGE = "image";
+    private static final String EXTRA_EXT = "ext";
+    private static final String EXTRA_SERIES = "series_id";
+    private static final String EXTRA_SERIES_NAME = "series_name";
+    private static final String EXTRA_COVER = "cover";
+    private static final String EXTRA_SEASON = "season";
+    private static final String EXTRA_EPISODE_INDEX = "episode_index";
+    private static final long SAVE_MS = 15_000;
+
+    /** The season the episode was started from, so the next one can follow. */
+    static final class Episodes {
+        static List<Item> list = new ArrayList<>();
+
+        private Episodes() {
+        }
+    }
 
     private ExoPlayer player;
     private PlayerView view;
-    private View info, error;
-    private TextView infoNumber, infoTitle, infoSub, errorText, infoNow, infoNext;
-    private View infoGuide, infoBar;
-    /** The guide of the channel on screen, and which channel it belongs to. */
-    private Epg.Listing guide;
-    private String guideFor;
+    private View error;
+    private TextView errorText, toast;
     private Xtream api;
+    private Item item;
+    private String seriesId, seriesName, cover;
+    private int season, episodeIndex = -1;
+    private long startAt;
+    private final Runnable save = new Runnable() {
+        @Override
+        public void run() {
+            savePosition();
+            view.postDelayed(this, SAVE_MS);
+        }
+    };
 
-    private boolean live;
-    private List<Item> channels;
-    private int index;
-    private boolean triedHls;
-    private int liveRetries;
-    private final Runnable hideInfo = () -> info.animate().alpha(0f).setDuration(250)
-            .withEndAction(() -> info.setVisibility(View.GONE)).start();
+    static Intent film(Context c, Xtream api, Item film, long startMs) {
+        return base(c, film, api.movieUrl(film), film.title, startMs);
+    }
 
-    @OptIn(markerClass = UnstableApi.class)
+    static Intent episode(Context c, Xtream api, String seriesId, String seriesName, String cover, int season,
+                          List<Item> episodes, int index, long startMs) {
+        Item e = episodes.get(index);
+        Episodes.list = new ArrayList<>(episodes);
+        return base(c, e, api.episodeUrl(e), seriesName + " – " + e.title, startMs)
+                .putExtra(EXTRA_SERIES, seriesId).putExtra(EXTRA_SERIES_NAME, seriesName).putExtra(EXTRA_COVER, cover)
+                .putExtra(EXTRA_SEASON, season).putExtra(EXTRA_EPISODE_INDEX, index);
+    }
+
+    private static Intent base(Context c, Item i, String url, String title, long startMs) {
+        return new Intent(c, PlayerActivity.class).putExtra(EXTRA_URL, url).putExtra(EXTRA_TITLE, title)
+                .putExtra(EXTRA_START, startMs).putExtra(EXTRA_KIND, i.kind.name()).putExtra(EXTRA_ID, i.id)
+                .putExtra(EXTRA_NAME, i.name).putExtra(EXTRA_IMAGE, i.image).putExtra(EXTRA_EXT, i.ext);
+    }
+
     @Override
+    @OptIn(markerClass = UnstableApi.class)
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_player);
         view = findViewById(R.id.player);
-        info = findViewById(R.id.info);
         error = findViewById(R.id.error);
-        infoNumber = findViewById(R.id.info_number);
-        infoTitle = findViewById(R.id.info_title);
-        infoSub = findViewById(R.id.info_sub);
         errorText = findViewById(R.id.error_text);
-        infoGuide = findViewById(R.id.info_guide);
-        infoNow = findViewById(R.id.info_now);
-        infoNext = findViewById(R.id.info_next);
-        infoBar = findViewById(R.id.info_bar);
+        toast = findViewById(R.id.toast);
         Account a = AccountStore.load(this);
-        if (a == null) {
+        Intent in = getIntent();
+        if (a == null || in.getStringExtra(EXTRA_URL) == null) {
             finish();
             return;
         }
         api = new Xtream(a);
-        Epg.forAccount(AccountStore.version());
-        index = getIntent().getIntExtra(EXTRA_LIVE_INDEX, -1);
-        channels = Playlist.channels;
-        live = index >= 0 && index < channels.size();
-        view.setUseController(!live);
-        // One title at a time: no previous/next. Seeking steps are 10 s back and 30 s forward.
+        Item.Kind kind = Item.Kind.valueOf(in.getStringExtra(EXTRA_KIND));
+        item = new Item(kind, in.getStringExtra(EXTRA_ID), in.getStringExtra(EXTRA_NAME), in.getStringExtra(EXTRA_IMAGE),
+                in.getStringExtra(EXTRA_EXT), 0, "");
+        seriesId = in.getStringExtra(EXTRA_SERIES);
+        seriesName = in.getStringExtra(EXTRA_SERIES_NAME);
+        cover = in.getStringExtra(EXTRA_COVER);
+        season = in.getIntExtra(EXTRA_SEASON, 0);
+        episodeIndex = in.getIntExtra(EXTRA_EPISODE_INDEX, -1);
+        startAt = state != null ? state.getLong(EXTRA_START) : in.getLongExtra(EXTRA_START, 0);
+        // One title at a time: no previous/next buttons. Seeking steps are 10 s back and 30 s forward.
         view.setShowPreviousButton(false);
         view.setShowNextButton(false);
-        if (state != null) index = state.getInt(EXTRA_LIVE_INDEX, index);
+        if (seriesId != null) remember();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
-        out.putInt(EXTRA_LIVE_INDEX, index);
+        out.putLong(EXTRA_START, player != null ? player.getCurrentPosition() : startAt);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         if (api == null) return;
-        player = build();
+        player = Players.build(this);
         view.setPlayer(player);
-        if (live) playChannel(index);
-        else play(getIntent().getStringExtra(EXTRA_URL), null);
+        player.addListener(new Player.Listener() {
+            @Override
+            public void onPlayerError(PlaybackException e) {
+                errorText.setText(Players.describe(e));
+                error.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onPlaybackStateChanged(int state) {
+                if (state == Player.STATE_READY) error.setVisibility(View.GONE);
+                if (state == Player.STATE_ENDED) ended();
+            }
+        });
+        play(getIntent().getStringExtra(EXTRA_URL), startAt);
+        view.postDelayed(save, SAVE_MS);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        view.removeCallbacks(save);
         if (player != null) {
+            savePosition();
+            startAt = player.getCurrentPosition();
             view.setPlayer(null);
             player.release();
             player = null;
         }
     }
 
-    @OptIn(markerClass = UnstableApi.class)
-    private ExoPlayer build() {
-        HttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
-                .setUserAgent(Http.USER_AGENT)
-                .setAllowCrossProtocolRedirects(true)
-                .setConnectTimeoutMs(12_000)
-                .setReadTimeoutMs(20_000);
-        // IPTV streams often lack clean key frames or access-unit markers; these flags make MPEG-TS start anyway.
-        DefaultExtractorsFactory extractors = new DefaultExtractorsFactory()
-                .setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                        | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS)
-                .setConstantBitrateSeekingEnabled(true);
-        DefaultMediaSourceFactory sources = new DefaultMediaSourceFactory(new DefaultDataSource.Factory(this, http), extractors);
-        ExoPlayer p = new ExoPlayer.Builder(this, new DefaultRenderersFactory(this).setEnableDecoderFallback(true))
-                .setMediaSourceFactory(sources)
-                .setSeekBackIncrementMs(10_000)
-                .setSeekForwardIncrementMs(30_000)
-                .build();
-        p.addListener(new Player.Listener() {
-            @Override
-            public void onPlayerError(PlaybackException e) {
-                failed(e);
-            }
-
-            @Override
-            public void onPlaybackStateChanged(int state) {
-                if (state == Player.STATE_READY && live) {
-                    liveRetries = 0;
-                    infoSub.setText(Playlist.category);
-                }
-            }
-        });
-        p.setPlayWhenReady(true);
-        return p;
-    }
-
-    private void play(String url, String mime) {
-        if (player == null || url == null) return;
+    private void play(String url, long at) {
         error.setVisibility(View.GONE);
-        MediaItem.Builder b = new MediaItem.Builder().setUri(Uri.parse(url));
-        if (mime != null) b.setMimeType(mime);
-        if (live) b.setLiveConfiguration(new MediaItem.LiveConfiguration.Builder().build());
-        player.setMediaItem(b.build());
+        player.setMediaItem(new MediaItem.Builder().setUri(Uri.parse(url)).build(), Math.max(0, at));
         player.prepare();
     }
 
-    private void playChannel(int i) {
-        index = i;
-        triedHls = false;
-        liveRetries = 0;
-        Item c = channels.get(i);
-        play(api.liveUrl(c, false), MimeTypes.VIDEO_MP2T);
-        infoNumber.setText(c.num > 0 ? String.valueOf(c.num) : "");
-        infoTitle.setText(c.name);
-        infoSub.setText(Playlist.category);
-        if (!c.id.equals(guideFor)) {
-            guide = null;
-            guideFor = c.id;
+    private void savePosition() {
+        if (player == null || item == null) return;
+        long pos = player.getCurrentPosition(), dur = player.getDuration();
+        if (pos <= 0) return;
+        History h = History.get(this);
+        if (h == null) return;
+        h.position(item, pos, dur > 0 ? dur : 0, seriesId);
+        if (seriesId != null && dur > 0 && pos >= History.RESUME_MIN_MS && !History.worthResuming(pos, dur)) {
+            h.episodeDone(seriesId, item.id);
         }
-        showInfo();
-        Epg.get(api, c.id, listing -> {
-            if (!c.id.equals(guideFor) || isDestroyed()) return;
-            guide = listing;
-            showGuide();
-        });
     }
 
-    /** Now (times, title, progress) and next, under the channel's name. */
-    private void showGuide() {
-        long sec = System.currentTimeMillis() / 1000;
-        Epg.Programme now = guide == null ? null : guide.now(sec);
-        Epg.Programme next = guide == null ? null : guide.next(sec);
-        if (now == null && next == null) {
-            infoGuide.setVisibility(View.GONE);
+    /** The series remembers this episode, for Reprendre. */
+    private void remember() {
+        History h = History.get(this);
+        if (h != null) h.episode(seriesId, seriesName, cover, item, season);
+    }
+
+    private void ended() {
+        History h = History.get(this);
+        if (h != null) {
+            h.finished(item);   // no Reprendre for it
+            if (seriesId != null) h.episodeDone(seriesId, item.id);
+        }
+        List<Item> eps = Episodes.list;
+        if (seriesId == null || !Options.nextEpisode(this) || episodeIndex < 0 || episodeIndex + 1 >= eps.size()) {
+            finish();
             return;
         }
-        infoGuide.setVisibility(View.VISIBLE);
-        infoNow.setVisibility(now == null ? View.GONE : View.VISIBLE);
-        ((View) infoBar.getParent()).setVisibility(now == null ? View.GONE : View.VISIBLE);
-        if (now != null) {
-            infoNow.setText(getString(R.string.guide_now, clock(now.start), clock(now.end), now.title));
-            infoBar.setPivotX(0);
-            infoBar.setScaleX(now.progress(sec));
-        }
-        infoNext.setVisibility(next == null ? View.GONE : View.VISIBLE);
-        if (next != null) infoNext.setText(getString(R.string.guide_next, clock(next.start), next.title));
-    }
-
-    private static String clock(long sec) {
-        return new java.text.SimpleDateFormat("HH:mm", java.util.Locale.FRANCE).format(new java.util.Date(sec * 1000));
-    }
-
-    private void showInfo() {
-        if (live) showGuide();
-        info.removeCallbacks(hideInfo);
-        info.animate().cancel();
-        info.setAlpha(1f);
-        info.setVisibility(View.VISIBLE);
-        info.postDelayed(hideInfo, INFO_MS);
-    }
-
-    private void failed(PlaybackException e) {
-        if (live) {
-            // A live stream that drops is retried twice, then asked for as HLS once.
-            if (liveRetries < 2) {
-                liveRetries++;
-                infoSub.setText(R.string.retrying);
-                showInfo();
-                view.postDelayed(() -> {
-                    if (player != null) {
-                        player.seekToDefaultPosition();
-                        player.prepare();
-                    }
-                }, 1200);
-                return;
-            }
-            if (!triedHls) {
-                triedHls = true;
-                liveRetries = 0;
-                infoSub.setText(R.string.retrying_hls);
-                showInfo();
-                play(api.liveUrl(channels.get(index), true), MimeTypes.APPLICATION_M3U8);
-                return;
-            }
-        }
-        errorText.setText(describe(e));
-        error.setVisibility(View.VISIBLE);
-    }
-
-    /** What went wrong, without the address (it holds the account). */
-    private static String describe(PlaybackException e) {
-        Throwable c = e.getCause();
-        if (c instanceof HttpDataSource.InvalidResponseCodeException) {
-            int code = ((HttpDataSource.InvalidResponseCodeException) c).responseCode;
-            if (code == 401 || code == 403) {
-                return "Le serveur refuse ce flux (code " + code + "). Une autre lecture est peut-être en cours sur ce compte.";
-            }
-            if (code == 404) return "Ce contenu n'existe plus sur le serveur (code 404).";
-            return "Le serveur a répondu avec une erreur (code " + code + ").";
-        }
-        switch (e.errorCode) {
-            case PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED:
-                return "Impossible de joindre le serveur.";
-            case PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT:
-                return "Le serveur ne répond pas (délai dépassé).";
-            case PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED:
-            case PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED:
-                return "Format du flux non reconnu.";
-            case PlaybackException.ERROR_CODE_DECODER_INIT_FAILED:
-            case PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED:
-            case PlaybackException.ERROR_CODE_DECODING_FORMAT_EXCEEDS_CAPABILITIES:
-                return "La box ne sait pas décoder ce format vidéo ou audio.";
-            default:
-                return "Erreur de lecture (" + e.getErrorCodeName() + ").";
-        }
+        episodeIndex++;
+        Item next = eps.get(episodeIndex);
+        item = next;
+        remember();
+        toast.setText(getString(R.string.next_episode, next.title));
+        toast.setVisibility(View.VISIBLE);
+        toast.setAlpha(0f);
+        toast.animate().alpha(1f).setDuration(250).start();
+        toast.postDelayed(() -> toast.animate().alpha(0f).setDuration(400)
+                .withEndAction(() -> toast.setVisibility(View.GONE)).start(), 4000);
+        play(api.episodeUrl(next), 0);
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && error.getVisibility() == View.VISIBLE) {
             int k = event.getKeyCode();
-            if (error.getVisibility() == View.VISIBLE
-                    && (k == KeyEvent.KEYCODE_DPAD_CENTER || k == KeyEvent.KEYCODE_ENTER)) {
-                if (live) playChannel(index);
-                else {
-                    error.setVisibility(View.GONE);
-                    if (player != null) player.prepare();
-                }
+            if (k == KeyEvent.KEYCODE_DPAD_CENTER || k == KeyEvent.KEYCODE_ENTER) {
+                error.setVisibility(View.GONE);
+                if (player != null) player.prepare();
                 return true;
-            }
-            if (live) {
-                int n = channels.size();
-                if (k == KeyEvent.KEYCODE_CHANNEL_UP || k == KeyEvent.KEYCODE_DPAD_UP) {
-                    playChannel((index + 1) % n);
-                    return true;
-                }
-                if (k == KeyEvent.KEYCODE_CHANNEL_DOWN || k == KeyEvent.KEYCODE_DPAD_DOWN) {
-                    playChannel((index - 1 + n) % n);
-                    return true;
-                }
-                if (k == KeyEvent.KEYCODE_DPAD_CENTER || k == KeyEvent.KEYCODE_ENTER || k == KeyEvent.KEYCODE_INFO) {
-                    showInfo();
-                    return true;
-                }
             }
         }
         return super.dispatchKeyEvent(event);

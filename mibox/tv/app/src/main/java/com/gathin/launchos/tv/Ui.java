@@ -22,6 +22,33 @@ final class Ui {
         });
     }
 
+    /** One or two letters for a card without a picture. */
+    static String initials(String name) {
+        StringBuilder b = new StringBuilder();
+        for (String w : name.trim().split("\\s+")) {
+            if (!w.isEmpty() && Character.isLetterOrDigit(w.charAt(0))) b.appendCodePoint(w.codePointAt(0));
+            if (b.length() >= 2) break;
+        }
+        return b.toString().toUpperCase(java.util.Locale.FRANCE);
+    }
+
+    /** "2019 · 1 h 52 · Action · ★ 7,4": the parts that are known, in that order. */
+    static String meta(Object... parts) {
+        StringBuilder b = new StringBuilder();
+        for (Object p : parts) {
+            if (p == null) continue;
+            String s = String.valueOf(p).trim();
+            if (s.isEmpty() || s.equals("0")) continue;
+            if (b.length() > 0) b.append("  ·  ");
+            b.append(s);
+        }
+        return b.toString();
+    }
+
+    static String rating(float r) {
+        return r <= 0 ? "" : String.format(java.util.Locale.FRANCE, "★ %.1f", r);
+    }
+
     /** Images are cut to their frame's rounded corners. */
     static void roundClip(View frame) {
         frame.setClipToOutline(true);

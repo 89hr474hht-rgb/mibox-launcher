@@ -1,92 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<!-- A series: its picture full screen, what it is, Regarder or Reprendre, the seasons and the season's episodes. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:baselineAligned="false"
-    android:background="@drawable/page_bg"
-    android:orientation="horizontal"
-    android:paddingStart="48dp"
-    android:paddingTop="40dp"
-    android:paddingEnd="40dp">
+    android:background="@color/page">
+
+    <ImageView
+        android:id="@+id/backdrop_a"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/backdrop_b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/scrim_left" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/scrim_page_bottom" />
 
     <LinearLayout
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="36dp">
 
-        <FrameLayout
-            android:id="@+id/cover_frame"
-            android:layout_width="170dp"
-            android:layout_height="255dp"
-            android:background="@drawable/clip_round">
-
-            <ImageView
-                android:id="@+id/cover"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:importantForAccessibility="no"
-                android:scaleType="centerCrop" />
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/title"
-            style="@style/Title"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="600dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:maxLines="3"
-            android:ellipsize="end"
-            android:textSize="22sp" />
+            android:layout_marginStart="64dp"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/plot"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:ellipsize="end"
-            android:lineSpacingMultiplier="1.2"
-            android:maxLines="7"
-            android:textColor="@color/text_dim"
-            android:textSize="14sp" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/label"
+        style="@style/Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="28dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+    <TextView
+        android:id="@+id/title"
+        style="@style/Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="@font/launchos_bold"
+        android:lineSpacingMultiplier="0.95"
+        android:maxLines="2"
+        android:textSize="32sp" />
+
+    <TextView
+        android:id="@+id/meta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/launchos_medium"
+        android:singleLine="true"
+        android:textColor="#D9FFFFFF"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/plot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:lineSpacingMultiplier="1.25"
+        android:maxLines="2"
+        android:textColor="#C7FFFFFF"
+        android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/play"
+                style="@style/GlassButton"
+                android:layout_marginTop="16dp"
+                android:drawableStart="@drawable/ic_play"
+                android:text="@string/hero_play"
+                android:visibility="invisible" />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/seasons"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="46dp"
+            android:layout_marginTop="14dp"
             android:clipToPadding="false"
-            android:paddingStart="10dp" />
+            android:paddingStart="64dp"
+            android:paddingEnd="40dp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/episodes"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="12dp"
-            android:layout_weight="1"
-            tools:ignore="NestedWeights"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:paddingStart="10dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="30dp" />
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="30dp"
-            android:textColor="@color/text_dim"
-            android:textSize="17sp"
-            android:visibility="gone" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/episodes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingStart="58dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="40dp" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="30dp"
+                android:textColor="@color/text_dim"
+                android:textSize="17sp"
+                android:visibility="gone" />
+        </FrameLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

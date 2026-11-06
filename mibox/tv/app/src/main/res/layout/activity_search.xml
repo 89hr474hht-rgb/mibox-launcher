@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Search across channels, films and series, without accents or case. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/page_bg"
+    android:orientation="vertical"
+    android:paddingTop="30dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="56dp"
+        android:paddingEnd="56dp">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_search" />
+
+        <EditText
+            android:id="@+id/query"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:hint="@string/search_hint"
+            android:imeOptions="actionSearch|flagNoExtractUi"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:gravity="center"
+        android:paddingStart="80dp"
+        android:paddingEnd="80dp"
+        android:text="@string/search_type"
+        android:textColor="@color/text_dim"
+        android:textSize="16sp" />
+
+    <ScrollView
+        android:id="@+id/results_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:fillViewport="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:orientation="vertical"
+            android:paddingTop="14dp"
+            android:paddingBottom="30dp" />
+    </ScrollView>
+</LinearLayout>

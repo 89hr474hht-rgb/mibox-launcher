@@ -32,7 +32,13 @@ final class Images {
 
     /** Shows the image at url in view, sized for widthPx; clears the view when url is empty or fails. */
     static void load(ImageView view, String url, int widthPx) {
+        load(view, url, widthPx, null);
+    }
+
+    /** Same, with a view (initials) shown in place of the image until it is there, and hidden once it is. */
+    static void load(ImageView view, String url, int widthPx, android.view.View fallback) {
         view.setTag(R.id.image_url, url);
+        if (fallback != null) fallback.setVisibility(android.view.View.VISIBLE);
         if (url == null || url.isEmpty() || !url.matches("(?i)^https?://.*")) {
             view.setImageDrawable(null);
             return;
@@ -41,6 +47,7 @@ final class Images {
         Bitmap hit = MEMORY.get(key);
         if (hit != null) {
             view.setImageBitmap(hit);
+            if (fallback != null) fallback.setVisibility(android.view.View.INVISIBLE);
             return;
         }
         view.setImageDrawable(null);
@@ -51,10 +58,35 @@ final class Images {
             Bg.MAIN.post(() -> {
                 if (url.equals(view.getTag(R.id.image_url)) && b != null) {
                     view.setImageBitmap(b);
+                    if (fallback != null) fallback.setVisibility(android.view.View.INVISIBLE);
                     view.setAlpha(0f);
                     view.animate().alpha(1f).setDuration(180).start();
                 }
             });
+        });
+    }
+
+    interface Got {
+        void got(Bitmap bitmap);
+    }
+
+    /** The picture at url sized for widthPx, handed back on the main thread (null when it failed). */
+    static void get(Context context, String url, int widthPx, Got got) {
+        if (url == null || url.isEmpty() || !url.matches("(?i)^https?://.*")) {
+            got.got(null);
+            return;
+        }
+        String key = url + "@" + widthPx;
+        Bitmap hit = MEMORY.get(key);
+        if (hit != null) {
+            got.got(hit);
+            return;
+        }
+        Context app = context.getApplicationContext();
+        POOL.execute(() -> {
+            Bitmap b = fetch(app, url, widthPx);
+            if (b != null) MEMORY.put(key, b);
+            Bg.MAIN.post(() -> got.got(b));
         });
     }
 

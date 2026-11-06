@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="44dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/group_row_bg"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="10dp"
+        android:duplicateParentState="true"
+        android:importantForAccessibility="no"
+        android:tint="@color/row_text"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:fontFamily="@font/launchos_medium"
+        android:singleLine="true"
+        android:textColor="@color/row_text"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:duplicateParentState="true"
+        android:textColor="@color/row_sub"
+        android:textSize="12sp" />
+</LinearLayout>

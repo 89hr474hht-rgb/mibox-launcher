@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The rail is its own dark strip with a hairline on its right, so it never reads as part of the columns. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="#FF06080C" />
+        </shape>
+    </item>
+    <item android:gravity="end" android:width="1dp">
+        <shape>
+            <solid android:color="#1AFFFFFF" />
+        </shape>
+    </item>
+</layer-list>

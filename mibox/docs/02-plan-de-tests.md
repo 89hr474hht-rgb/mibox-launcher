@@ -248,6 +248,36 @@ abonnement limité à une connexion coupe l'autre lecture.
 Retour du propriétaire le 6 novembre 2026 : « J'ai testé et ça fonctionne », sur la box avec son compte, sans
 détail test par test. Les lignes ci-dessus gardent leur statut tant que chaque point n'est pas confirmé.
 
+## C duodecies. LaunchOS TV 0.3.0 (facilité d'utilisation)
+
+Vérifié sur l'émulateur Android TV (1920 × 1080) avec l'APK de release signé, contre le faux serveur
+`mibox/tv/mock/xtream_mock.py` (demo / demo), dont les noms imitent un vrai fournisseur (« FR: … FHD », groupes
+« |FR| SPORT ★ » dans le désordre, un groupe vide). Navigation faite avec les touches de la télécommande envoyées à
+l'émulateur. **Rien sur la box.** Planches : `audits/launchos-tv-0.3.0-chaines.png`, `-films.png`, `-series.png`
+(dossier non versionné).
+
+Sur l'émulateur, le direct se fige après 3 à 5 s : le décodeur H.264 de l'émulateur (`c2.goldfish.h264.decoder`)
+échoue sur le flux de test. C'est propre à l'émulateur ; le retour du propriétaire du 6 novembre 2026 (« les chaînes
+en général fonctionnent ») porte sur la 0.2.0 installée sur la box.
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| TV3-01 | Menu de gauche séparé | Gauche depuis le bord d'une page, Haut/Bas, Droite | Fine bande d'icônes à part des colonnes ; elle s'ouvre avec les noms par-dessus la page, la page s'assombrit ; Droite revient à l'endroit quitté | MANUEL | Test partiel (émulateur) |
+| TV3-02 | Touches dans les colonnes | Chaînes : Haut/Bas dans chaque colonne, Gauche/Droite entre elles, Retour | Haut/Bas ne sortent jamais d'une colonne ; Droite va aux chaînes puis au mini-lecteur ; Retour remonte d'un cran | MANUEL | Test partiel (émulateur) |
+| TV3-03 | Groupes rangés | Chaînes, Films, Séries | Groupes de A à Z, sans « FR | », étoiles, majuscules ni numérotation ; groupe vide absent | MANUEL | Test partiel (émulateur, faux serveur) |
+| TV3-04 | Noms des chaînes | Liste des chaînes | Noms sans préfixe ni qualité ; la qualité en étiquette (HD, FHD, 4K, HEVC) | MANUEL | Test partiel (émulateur, faux serveur) |
+| TV3-05 | Favoris | Regarder une chaîne plus d'une minute, revenir à la liste | Groupe Favoris en haut, la chaîne dedans, « Regardée N min » dans le détail | MANUEL | Test partiel (émulateur) |
+| TV3-06 | Mini-lecteur | OK sur une chaîne, puis Retour, puis OK sur une autre | La chaîne passe en haut à droite, la sélection revient sur elle ; l'autre chaîne repart en plein écran ; Retour ferme le mini-lecteur | MANUEL | Test partiel (émulateur : passage plein écran ↔ mini vu ; image figée par le décodeur de l'émulateur) |
+| TV3-07 | Films à l'affiche | Films | Grande image, titre, année, durée, genre, note ; fondu vers le film suivant toutes les 8 s ; points d'avancement | MANUEL | Test partiel (émulateur ; fondu non filmé) |
+| TV3-08 | Rangées | Films et Séries, Bas puis Droite | Une rangée à la fois en haut de l'écran, l'image de fond suit l'affiche choisie, le titre de la rangée reste lisible | MANUEL | Test partiel (émulateur) |
+| TV3-09 | Tout voir et tri | Tout voir, puis Récents / A → Z / Mieux notés / Année | Grille de 6 affiches, l'ordre change et reste choisi au retour | MANUEL | Test partiel (émulateur : A → Z vu) |
+| TV3-10 | Recherche | Rechercher, taper « phare » | Résultats pendant la frappe, par Films / Séries / Chaînes, sans doublon | MANUEL | Test partiel (émulateur, clavier de l'émulateur) |
+| TV3-11 | Options d'un groupe | Appui long sur OK sur un groupe → Épingler en haut, Masquer, Renommer | Le groupe monte en haut (ou disparaît, ou change de nom) et la sélection reste dessus | MANUEL | Test partiel (émulateur : épingler vu ; masquer et renommer non faits) |
+| TV3-12 | Fiche série | OK sur une série | Image de fond, saisons, épisodes avec durée ; « Regarder S1 · É1 » | MANUEL | Test partiel (émulateur) |
+| TV3-13 | Reprendre et épisode suivant | Arrêter un film après 2 min, revenir ; finir un épisode | « Reprendre » sur la fiche et dans la rangée ; l'épisode suivant se lance seul | MANUEL | Non testé |
+| TV3-14 | Gros catalogue | Ton fournisseur, Films puis Séries | Ouverture sans fermeture de l'appli, défilement fluide | MANUEL | Non testé |
+| TV3-15 | Télécommande réelle | Toute l'appli avec la télécommande Xiaomi | Mêmes déplacements qu'à l'émulateur, appui long sur OK reconnu | MANUEL | Validation manuelle nécessaire |
+
 ## C undecies. LaunchOS 1.4.0 : boutons ronds et minuteur de veille
 
 Vérifié sur l'émulateur Android TV 12 (1920 × 1080) avec l'APK de release signé. Pour ne pas attendre 15 minutes,

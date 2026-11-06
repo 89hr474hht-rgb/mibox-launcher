@@ -37,6 +37,19 @@ final class AccountStore {
         return version;
     }
 
+    /** A short name for the account (server and user), so the owner's groups and history stay with it. */
+    static String key(Account a) {
+        try {
+            byte[] d = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest((a.server + "\n" + a.user).getBytes(StandardCharsets.UTF_8));
+            StringBuilder b = new StringBuilder();
+            for (int i = 0; i < 8; i++) b.append(String.format(java.util.Locale.ROOT, "%02x", d[i]));
+            return b.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            return Integer.toHexString((a.server + a.user).hashCode());
+        }
+    }
+
     static synchronized Account load(Context context) {
         if (cached != null) return cached;
         SharedPreferences p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);

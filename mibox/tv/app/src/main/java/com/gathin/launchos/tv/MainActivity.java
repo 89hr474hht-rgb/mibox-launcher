@@ -1,438 +1,393 @@
 package com.gathin.launchos.tv;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 /**
- * The main screen: the sections on the left (Chaînes, Films, Séries, Compte), the section's categories, then the
- * category's channels or posters. Moving onto a category loads it; OK on a card plays it (or opens the series).
+ * The main screen. On the left, the rail: a narrow dark strip of icons (Rechercher, Chaînes, Films, Séries, then
+ * Actualiser, Réglages, Mises à jour, Compte) that opens over the page only while it has the focus. The page fills
+ * the rest: Chaînes with its three panels and the live player, or Films and Séries full screen.
+ *
+ * The remote: the arrows move inside a page; Left at a page's left edge opens the rail on the section shown, Right
+ * leaves it back where the page was. Back steps out one level at a time (full screen, small window, panel, rail),
+ * then leaves the app.
  */
 public final class MainActivity extends Activity {
-    private static final long CATEGORY_DELAY_MS = 280;
+    static final String EXTRA_PLAY_CHANNEL = "play_channel";
+    private static final long SECTION_DELAY_MS = 320;
 
-    private TextView[] nav;
-    private TextView sectionTitle, sectionCount, status;
-    private RecyclerView categoriesView, grid;
-    private final CategoryAdapter categoryAdapter = new CategoryAdapter();
-    private final CardAdapter cardAdapter = new CardAdapter();
+    private Root root;
+    private ViewGroup rail;
+    private View railShade, railTitle;
+    private View[] railItems;
+    private View[] sectionItems;
+    private View navUpdates;
+    private TextView banner, status;
+    private LivePage live;
+    private BrowsePage moviesPage, seriesPage;
+    private LivePlayer player;
+    private FrameLayout liveLayer;
 
     private Xtream api;
     private int accountVersion = -1;
-    private int catalogGeneration = -1;
     private Xtream.Section section = Xtream.Section.LIVE;
-    private Xtream.Category category;
-    private int request;   // ignores answers that arrive after the owner moved on
-    private final Runnable loadFocusedCategory = this::loadItems;
-    private TextView navUpdates, banner;
+    private boolean railOpen;
+    private ValueAnimator railAnim;
+    /** The last view focused in the page, to go back to when the rail closes. */
+    private View pageFocus;
+    private boolean resumed;
     private static String bannerShownFor;
     private final Updater.Listener updates = this::showUpdate;
+    private Xtream.Section pendingSection;
+    private final Runnable switchSection = () -> {
+        if (pendingSection != null && pendingSection != section) showSection(pendingSection, false);
+    };
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_main);
-        sectionTitle = findViewById(R.id.section_title);
-        sectionCount = findViewById(R.id.section_count);
+        root = findViewById(R.id.root);
+        rail = findViewById(R.id.rail);
+        railShade = findViewById(R.id.rail_shade);
+        railTitle = findViewById(R.id.rail_title);
         status = findViewById(R.id.status);
-        categoriesView = findViewById(R.id.categories);
-        grid = findViewById(R.id.grid);
-
-        nav = new TextView[]{findViewById(R.id.nav_live), findViewById(R.id.nav_movies), findViewById(R.id.nav_series)};
-        Xtream.Section[] sections = Xtream.Section.values();
-        for (int i = 0; i < nav.length; i++) {
-            Xtream.Section s = sections[i];
-            nav[i].setOnFocusChangeListener((v, focused) -> {
-                if (focused && s != section) showSection(s);
-            });
-            nav[i].setOnClickListener(v -> categoriesView.requestFocus());
-        }
-        findViewById(R.id.nav_account).setOnClickListener(v -> startActivity(new Intent(this, AccountActivity.class)));
-        findViewById(R.id.nav_refresh).setOnClickListener(v -> startActivity(new Intent(this, RefreshActivity.class)));
-        navUpdates = findViewById(R.id.nav_updates);
-        navUpdates.setOnClickListener(v -> startActivity(new Intent(this, UpdatesActivity.class)));
         banner = findViewById(R.id.update_banner);
+        liveLayer = findViewById(R.id.live_layer);
+
+        int[] ids = {R.id.nav_search, R.id.nav_live, R.id.nav_movies, R.id.nav_series, R.id.nav_refresh,
+                R.id.nav_settings, R.id.nav_updates, R.id.nav_account};
+        int[] icons = {R.drawable.ic_search, R.drawable.ic_live, R.drawable.ic_movie, R.drawable.ic_series,
+                R.drawable.ic_refresh, R.drawable.ic_settings, R.drawable.ic_update, R.drawable.ic_account};
+        int[] labels = {R.string.nav_search, R.string.nav_live, R.string.nav_movies, R.string.nav_series,
+                R.string.nav_refresh, R.string.nav_settings, R.string.nav_updates, R.string.nav_account};
+        railItems = new View[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            View v = findViewById(ids[i]);
+            ((ImageView) v.findViewById(R.id.rail_icon)).setImageResource(icons[i]);
+            ((TextView) v.findViewById(R.id.rail_label)).setText(labels[i]);
+            railItems[i] = v;
+        }
+        sectionItems = new View[]{railItems[1], railItems[2], railItems[3]};
+        navUpdates = railItems[6];
+        Xtream.Section[] sections = Xtream.Section.values();
+        for (int i = 0; i < sectionItems.length; i++) {
+            Xtream.Section s = sections[i];
+            sectionItems[i].setOnFocusChangeListener((v, focused) -> {
+                if (!focused || s == section) return;
+                // Moving along the rail previews the section after a short pause, not at every step.
+                pendingSection = s;
+                rail.removeCallbacks(switchSection);
+                rail.postDelayed(switchSection, SECTION_DELAY_MS);
+            });
+            sectionItems[i].setOnClickListener(v -> {
+                rail.removeCallbacks(switchSection);
+                if (s != section) showSection(s, false);
+                enterPage();
+            });
+        }
+        railItems[0].setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
+        railItems[4].setOnClickListener(v -> startActivity(new Intent(this, RefreshActivity.class)));
+        railItems[5].setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        navUpdates.setOnClickListener(v -> startActivity(new Intent(this, UpdatesActivity.class)));
+        railItems[7].setOnClickListener(v -> startActivity(new Intent(this, AccountActivity.class)));
+
+        player = new LivePlayer(this, liveLayer, new LivePlayer.Host() {
+            @Override
+            public Rect miniBounds() {
+                return section == Xtream.Section.LIVE ? live.miniBounds() : null;
+            }
+
+            @Override
+            public void modeChanged(LivePlayer.Mode mode) {
+                rail.setVisibility(mode == LivePlayer.Mode.FULL ? View.INVISIBLE : View.VISIBLE);
+                live.modeChanged(mode);
+            }
+
+            @Override
+            public void channelChanged(Item channel) {
+                live.channelChanged(channel);
+            }
+        });
+        live = new LivePage(this, findViewById(R.id.page_live), player);
+        moviesPage = new BrowsePage(this, findViewById(R.id.page_movies), Xtream.Section.MOVIES);
+        seriesPage = new BrowsePage(this, findViewById(R.id.page_series), Xtream.Section.SERIES);
+
+        root.setRouter(this::route);
+        root.getViewTreeObserver().addOnGlobalFocusChangeListener((oldFocus, newFocus) -> focusMoved(newFocus));
+
         // Same logic as LaunchOS: a daily check in the background, and one when the app opens (at most hourly).
         UpdateScheduler.schedule(this);
         UpdateScheduler.checkSoon(this);
+        handle(getIntent());
+    }
 
-        categoriesView.setLayoutManager(new LinearLayoutManager(this));
-        categoriesView.setAdapter(categoryAdapter);
-        categoriesView.setItemAnimator(null);
-        grid.setItemAnimator(null);
-        grid.setAdapter(cardAdapter);
-        applyGridColumns();
+    Root root() {
+        return root;
+    }
+
+    View liveLayer() {
+        return liveLayer;
+    }
+
+    /** True while the activity is in front and page is the one shown. */
+    boolean showing(Object page) {
+        return resumed && page == current();
+    }
+
+    private Object current() {
+        return section == Xtream.Section.LIVE ? live : section == Xtream.Section.MOVIES ? moviesPage : seriesPage;
+    }
+
+    private View pageRoot(Xtream.Section s) {
+        return s == Xtream.Section.LIVE ? live.root : s == Xtream.Section.MOVIES ? moviesPage.root : seriesPage.root;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handle(intent);
+    }
+
+    /** A channel chosen in search plays here, in Chaînes. */
+    private void handle(Intent intent) {
+        String id = intent == null ? null : intent.getStringExtra(EXTRA_PLAY_CHANNEL);
+        if (id == null) return;
+        intent.removeExtra(EXTRA_PLAY_CHANNEL);
+        Item c = Library.of(Xtream.Section.LIVE).find(id);
+        if (c == null) return;
+        if (section != Xtream.Section.LIVE) showSection(Xtream.Section.LIVE, false);
+        root.post(() -> live.play(c));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        player.resume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        player.pause();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        resumed = false;
         Updater.get().removeListener(updates);
+        moviesPage.hidden();
+        seriesPage.hidden();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        resumed = true;
         Updater.get().addListener(updates);
         showUpdate();
         int version = AccountStore.version();
-        Catalog.forAccount(version);
+        Library.forAccount(version);
         Epg.forAccount(version);
-        if (version == accountVersion && Catalog.generation() == catalogGeneration) {
-            // Back from a channel or the Actualiser screen: the programmes on the cards may have moved on.
-            cardAdapter.notifyItemRangeChanged(0, cardAdapter.getItemCount(), CardAdapter.GUIDE);
-            return;
+        Details.forAccount(version);
+        boolean first = accountVersion == -1;
+        if (version != accountVersion) {
+            accountVersion = version;
+            Account a = AccountStore.load(this);
+            api = a == null ? null : new Xtream(a);
+            player.setApi(api);
         }
-        boolean accountChanged = version != accountVersion;
-        accountVersion = version;
-        catalogGeneration = Catalog.generation();
-        if (!accountChanged) {
-            // The Actualiser screen dropped some lists: show the section again from the new ones.
-            if (api != null) showSection(section);
-            return;
-        }
-        Account a = AccountStore.load(this);
-        api = a == null ? null : new Xtream(a);
         if (api == null) {
-            categoryAdapter.set(new ArrayList<>());
-            cardAdapter.set(new ArrayList<>(), section);
-            sectionTitle.setText(sectionName(section));
-            sectionCount.setText("");
-            showStatus(getString(R.string.no_account));
-            findViewById(R.id.nav_account).requestFocus();
+            for (Xtream.Section s : Xtream.Section.values()) pageRoot(s).setVisibility(View.GONE);
+            status.setText(R.string.no_account);
+            status.setVisibility(View.VISIBLE);
+            markSection();
+            railItems[7].requestFocus();
             return;
         }
-        showSection(section);
-        nav[section.ordinal()].requestFocus();
+        status.setVisibility(View.GONE);
+        showSection(section, first);
     }
+
+    // ---- sections ----
+
+    private void showSection(Xtream.Section s, boolean focusPage) {
+        if (s != Xtream.Section.LIVE && player.mode() != LivePlayer.Mode.HIDDEN) player.stop();
+        section = s;
+        pendingSection = null;
+        markSection();
+        for (Xtream.Section x : Xtream.Section.values()) {
+            View page = pageRoot(x);
+            boolean on = x == s;
+            if (on && page.getVisibility() != View.VISIBLE) {
+                page.setAlpha(0f);
+                page.setVisibility(View.VISIBLE);
+                page.animate().alpha(1f).setDuration(220).start();
+            } else if (!on) {
+                page.setVisibility(View.GONE);
+            }
+        }
+        if (s == Xtream.Section.LIVE) {
+            moviesPage.hidden();
+            seriesPage.hidden();
+            live.show(api);
+        } else {
+            (s == Xtream.Section.MOVIES ? seriesPage : moviesPage).hidden();
+            (s == Xtream.Section.MOVIES ? moviesPage : seriesPage).show(api);
+        }
+        pageFocus = null;
+        if (focusPage) root.post(this::enterPage);
+    }
+
+    private void markSection() {
+        for (int i = 0; i < sectionItems.length; i++) sectionItems[i].setSelected(i == section.ordinal());
+    }
+
+    /** Puts the focus in the page: where it was, else the page's own start. */
+    private void enterPage() {
+        View v = pageTarget();
+        if (v != null) v.requestFocus();
+    }
+
+    private View pageTarget() {
+        if (pageFocus != null && pageFocus.isAttachedToWindow() && pageFocus.isShown()
+                && (Root.inside(pageFocus, pageRoot(section)) || pageFocus == liveLayer)) {
+            return pageFocus;
+        }
+        View v = section == Xtream.Section.LIVE ? live.defaultFocus()
+                : (section == Xtream.Section.MOVIES ? moviesPage : seriesPage).defaultFocus();
+        if (v == null && section == Xtream.Section.LIVE) live.focusGroups();
+        return v;
+    }
+
+    // ---- the remote ----
+
+    private View route(View focused, int direction, View proposed) {
+        if (player.isFull()) return focused;
+        if (focused == null) return proposed;
+        if (Root.inside(focused, rail)) {
+            if (direction == View.FOCUS_RIGHT) {
+                if (api == null) return focused;
+                rail.removeCallbacks(switchSection);
+                if (pendingSection != null && pendingSection != section) showSection(pendingSection, false);
+                View v = pageTarget();
+                return v != null ? v : focused;
+            }
+            if (direction == View.FOCUS_LEFT) return focused;
+            return Root.inside(proposed, rail) ? proposed : focused;
+        }
+        View r;
+        if (section == Xtream.Section.LIVE) r = live.route(focused, direction, proposed);
+        else r = (section == Xtream.Section.MOVIES ? moviesPage : seriesPage).route(focused, direction, proposed);
+        // Into the rail only on purpose, and then on the section shown.
+        if (r == null || Root.inside(r, rail)) {
+            return direction == View.FOCUS_LEFT ? sectionItems[section.ordinal()] : focused;
+        }
+        return r;
+    }
+
+    private void focusMoved(View now) {
+        if (now == null) return;
+        boolean inRail = Root.inside(now, rail);
+        if (inRail != railOpen) openRail(inRail);
+        if (!inRail) {
+            pageFocus = now;
+            if (section == Xtream.Section.MOVIES) moviesPage.focusChanged(now);
+            else if (section == Xtream.Section.SERIES) seriesPage.focusChanged(now);
+        }
+    }
+
+    /** The rail opens over the page (the page is dimmed behind it) and closes back to its icons. */
+    private void openRail(boolean open) {
+        railOpen = open;
+        if (railAnim != null) railAnim.cancel();
+        int from = rail.getWidth();
+        int to = getResources().getDimensionPixelSize(open ? R.dimen.rail_open : R.dimen.rail_closed);
+        railAnim = ValueAnimator.ofInt(from, to);
+        railAnim.setDuration(open ? 240 : 200);
+        railAnim.setInterpolator(new DecelerateInterpolator(1.5f));
+        railAnim.addUpdateListener(a -> {
+            ViewGroup.LayoutParams lp = rail.getLayoutParams();
+            lp.width = (int) a.getAnimatedValue();
+            rail.setLayoutParams(lp);
+        });
+        railAnim.start();
+        for (View v : railItems) v.findViewById(R.id.rail_label).animate().alpha(open ? 1f : 0f).setDuration(open ? 260 : 120).start();
+        railTitle.animate().alpha(open ? 1f : 0f).setDuration(open ? 260 : 120).start();
+        if (open) railShade.setVisibility(View.VISIBLE);
+        railShade.animate().alpha(open ? 1f : 0f).setDuration(240)
+                .withEndAction(() -> {
+                    if (!railOpen) railShade.setVisibility(View.INVISIBLE);
+                }).start();
+    }
+
+    /** The first focus is given before the window is shown, when no focus change is reported: catch up here. */
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) focusMoved(getCurrentFocus());
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (player.key(event)) return true;
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode != KeyEvent.KEYCODE_BACK) return super.onKeyDown(keyCode, event);
+        View f = getCurrentFocus();
+        if (f != null && !Root.inside(f, rail)) {
+            if (section == Xtream.Section.LIVE && live.back(f)) return true;
+            if (section != Xtream.Section.LIVE) {
+                BrowsePage p = section == Xtream.Section.MOVIES ? moviesPage : seriesPage;
+                View start = p.defaultFocus();
+                if (start != null && f != start) {
+                    // Back in the rows goes to the top of the page first.
+                    start.requestFocus();
+                    return true;
+                }
+            }
+            sectionItems[section.ordinal()].requestFocus();
+            return true;
+        }
+        if (player.mode() == LivePlayer.Mode.MINI) {
+            player.stop();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    // ---- updates ----
 
     /** The rail item says when a newer version is waiting; the banner says it once per version and session. */
     private void showUpdate() {
         UpdateState state = new UpdateState(this);
         Release r = state.available();
         boolean newer = r != null && r.version.isNewerThan(UpdateState.installed(this));
-        navUpdates.setText(newer ? R.string.nav_update_ready : R.string.nav_updates);
-        navUpdates.setCompoundDrawablesRelativeWithIntrinsicBounds(getDrawable(R.drawable.ic_update), null,
-                newer ? getDrawable(R.drawable.dot_accent) : null, null);
+        ((TextView) navUpdates.findViewById(R.id.rail_label)).setText(newer ? R.string.nav_update_ready : R.string.nav_updates);
+        navUpdates.findViewById(R.id.rail_dot).setVisibility(newer ? View.VISIBLE : View.GONE);
         if (newer && state.shouldPrompt(this) && !String.valueOf(r.version).equals(bannerShownFor)) {
             bannerShownFor = String.valueOf(r.version);
             banner.setText(getString(R.string.upd_banner, bannerShownFor));
             banner.setAlpha(0f);
-            banner.setTranslationX(Ui.dp(this, 40));
+            banner.setTranslationY(Ui.dp(this, 30));
             banner.setVisibility(View.VISIBLE);
-            banner.animate().alpha(1f).translationX(0).setDuration(320).start();
+            banner.animate().alpha(1f).translationY(0).setDuration(320).start();
             banner.postDelayed(() -> banner.animate().alpha(0f).setDuration(400)
                     .withEndAction(() -> banner.setVisibility(View.GONE)).start(), 9000);
         }
-    }
-
-    private String sectionName(Xtream.Section s) {
-        return getString(s == Xtream.Section.LIVE ? R.string.nav_live
-                : s == Xtream.Section.MOVIES ? R.string.nav_movies : R.string.nav_series);
-    }
-
-    private void showSection(Xtream.Section s) {
-        section = s;
-        for (int i = 0; i < nav.length; i++) nav[i].setSelected(i == s.ordinal());
-        sectionTitle.setText(sectionName(s));
-        sectionCount.setText("");
-        category = null;
-        categoryAdapter.set(new ArrayList<>());
-        cardAdapter.set(new ArrayList<>(), s);
-        applyGridColumns();
-        if (api == null) return;
-        List<Xtream.Category> cached = Catalog.categories(s);
-        if (cached != null) {
-            showCategories(cached);
-            return;
-        }
-        showStatus(getString(R.string.loading));
-        int r = ++request;
-        Xtream x = api;
-        Bg.run(() -> x.categories(s), (list, error) -> {
-            if (r != request || isDestroyed()) return;
-            if (error != null) {
-                showStatus(error.french());
-                return;
-            }
-            Catalog.putCategories(s, list);
-            showCategories(list);
-        });
-    }
-
-    private void showCategories(List<Xtream.Category> list) {
-        categoryAdapter.set(list);
-        sectionCount.setText(String.format(Locale.FRANCE, "%d catégorie%s", list.size(), list.size() > 1 ? "s" : ""));
-        if (list.isEmpty()) {
-            showStatus(getString(R.string.empty));
-            return;
-        }
-        selectCategory(list.get(0));
-    }
-
-    private void selectCategory(Xtream.Category c) {
-        if (c == category) return;
-        category = c;
-        // Only the rows' selected state changes: rebinding the list would move the focus.
-        for (int i = 0; i < categoriesView.getChildCount(); i++) {
-            View row = categoriesView.getChildAt(i);
-            int pos = categoriesView.getChildAdapterPosition(row);
-            row.setSelected(pos != RecyclerView.NO_POSITION && categoryAdapter.items.get(pos) == c);
-        }
-        grid.removeCallbacks(loadFocusedCategory);
-        grid.postDelayed(loadFocusedCategory, CATEGORY_DELAY_MS);
-    }
-
-    private void loadItems() {
-        Xtream.Category c = category;
-        Xtream.Section s = section;
-        if (c == null || api == null) return;
-        List<Item> cached = Catalog.items(s, c.id);
-        if (cached != null) {
-            showItems(cached, s);
-            return;
-        }
-        cardAdapter.set(new ArrayList<>(), s);
-        showStatus(getString(R.string.loading));
-        int r = ++request;
-        Xtream x = api;
-        Bg.run(() -> x.items(s, c.id), (list, error) -> {
-            if (r != request || isDestroyed()) return;
-            if (error != null) {
-                showStatus(error.french());
-                return;
-            }
-            Catalog.putItems(s, c.id, list);
-            showItems(list, s);
-        });
-    }
-
-    private void showItems(List<Item> list, Xtream.Section s) {
-        cardAdapter.set(list, s);
-        grid.scrollToPosition(0);
-        if (list.isEmpty()) showStatus(getString(R.string.empty));
-        else status.setVisibility(View.GONE);
-    }
-
-    private void showStatus(String text) {
-        status.setText(text);
-        status.setVisibility(View.VISIBLE);
-    }
-
-    private void applyGridColumns() {
-        grid.setLayoutManager(new GridLayoutManager(this, section == Xtream.Section.LIVE ? 3 : 4));
-    }
-
-    private void open(Item item, int position) {
-        if (api == null) return;
-        if (item.kind == Item.Kind.SERIES) {
-            startActivity(new Intent(this, SeriesActivity.class).putExtra(SeriesActivity.EXTRA_ID, item.id)
-                    .putExtra(SeriesActivity.EXTRA_NAME, item.name).putExtra(SeriesActivity.EXTRA_COVER, item.image));
-            return;
-        }
-        if (item.kind == Item.Kind.LIVE) {
-            Playlist.channels = cardAdapter.items;
-            Playlist.category = category != null ? category.name : "";
-            startActivity(new Intent(this, PlayerActivity.class).putExtra(PlayerActivity.EXTRA_LIVE_INDEX, position));
-            return;
-        }
-        startActivity(new Intent(this, PlayerActivity.class)
-                .putExtra(PlayerActivity.EXTRA_URL, api.movieUrl(item)).putExtra(PlayerActivity.EXTRA_TITLE, item.name));
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Back steps out one column at a time before leaving the app.
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            View f = getCurrentFocus();
-            if (f != null && grid.findContainingItemView(f) != null) {
-                View row = categoriesView.getLayoutManager() == null ? null
-                        : categoriesView.getLayoutManager().findViewByPosition(categoryAdapter.indexOf(category));
-                if (row != null) row.requestFocus();
-                else categoriesView.requestFocus();
-                return true;
-            }
-            if (f != null && categoriesView.findContainingItemView(f) != null) {
-                nav[section.ordinal()].requestFocus();
-                return true;
-            }
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    // ---- adapters ----
-
-    private final class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        List<Xtream.Category> items = new ArrayList<>();
-
-        @SuppressWarnings("NotifyDataSetChanged") // the whole list changes
-        void set(List<Xtream.Category> list) {
-            items = list;
-            notifyDataSetChanged();
-        }
-
-        int indexOf(Xtream.Category c) {
-            return Math.max(0, items.indexOf(c));
-        }
-
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category, parent, false);
-            return new RecyclerView.ViewHolder(v) {
-            };
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
-            Xtream.Category c = items.get(position);
-            TextView t = (TextView) h.itemView;
-            t.setText(c.name);
-            t.setSelected(c == category);
-            t.setOnFocusChangeListener((v, focused) -> {
-                if (focused) selectCategory(c);
-            });
-            t.setOnClickListener(v -> {
-                selectCategory(c);
-                if (cardAdapter.getItemCount() > 0) grid.requestFocus();
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return items.size();
-        }
-    }
-
-    private final class CardAdapter extends RecyclerView.Adapter<CardAdapter.Holder> {
-        static final String GUIDE = "guide";
-        List<Item> items = new ArrayList<>();
-        private Xtream.Section kind = Xtream.Section.LIVE;
-
-        final class Holder extends RecyclerView.ViewHolder {
-            final ImageView image;
-            final TextView title;
-            final TextView initials;
-            final TextView now;
-            final View track, bar;
-            /** The channel this card shows; read by the guide's thread to skip cards that scrolled away. */
-            volatile String boundId;
-
-            Holder(View v) {
-                super(v);
-                image = v.findViewById(R.id.image);
-                title = v.findViewById(R.id.title);
-                initials = v.findViewById(R.id.initials);
-                now = v.findViewById(R.id.now);
-                track = v.findViewById(R.id.track);
-                bar = v.findViewById(R.id.bar);
-                View frame = v.findViewById(R.id.frame);
-                Ui.roundClip(frame != null ? frame : (View) image.getParent());
-                Ui.lift(v, 1.06f);
-            }
-        }
-
-        @SuppressWarnings("NotifyDataSetChanged") // the whole list changes
-        void set(List<Item> list, Xtream.Section s) {
-            items = list;
-            kind = s;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            return kind == Xtream.Section.LIVE ? 0 : 1;
-        }
-
-        @Override
-        public Holder onCreateViewHolder(ViewGroup parent, int type) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(type == 0 ? R.layout.item_channel : R.layout.item_poster, parent, false);
-            return new Holder(v);
-        }
-
-        @Override
-        public void onBindViewHolder(Holder h, int position, List<Object> payloads) {
-            if (payloads.contains(GUIDE)) {
-                if (h.now != null) guide(h, items.get(position));
-                return;
-            }
-            super.onBindViewHolder(h, position, payloads);
-        }
-
-        @Override
-        public void onViewRecycled(Holder h) {
-            h.boundId = null;
-        }
-
-        /** The programme on now, under the channel's name, with how far into it we are. */
-        private void guide(Holder h, Item item) {
-            h.boundId = item.id;
-            showGuide(h, null);
-            Epg.get(api, item.id, new Epg.Callback() {
-                @Override
-                public void done(Epg.Listing listing) {
-                    if (item.id.equals(h.boundId)) showGuide(h, listing);
-                }
-
-                @Override
-                public boolean stillWanted() {
-                    return item.id.equals(h.boundId);
-                }
-            });
-        }
-
-        private void showGuide(Holder h, Epg.Listing listing) {
-            long sec = System.currentTimeMillis() / 1000;
-            Epg.Programme p = listing == null ? null : listing.now(sec);
-            h.now.setVisibility(p == null ? View.INVISIBLE : View.VISIBLE);
-            h.track.setVisibility(p == null ? View.INVISIBLE : View.VISIBLE);
-            if (p == null) return;
-            h.now.setText(p.title);
-            h.bar.setPivotX(0);
-            h.bar.setScaleX(p.progress(sec));
-        }
-
-        @Override
-        public void onBindViewHolder(Holder h, int position) {
-            Item item = items.get(position);
-            if (item.kind == Item.Kind.LIVE) {
-                h.title.setText(item.num > 0 ? item.num + "  " + item.name : item.name);
-                h.initials.setText(initials(item.name));
-                Images.load(h.image, item.image, Ui.dp(h.itemView.getContext(), 140));
-                if (h.now != null) guide(h, item);
-            } else {
-                h.title.setText(item.name);
-                Images.load(h.image, item.image, Ui.dp(h.itemView.getContext(), 120));
-            }
-            h.itemView.setOnClickListener(v -> open(item, h.getBindingAdapterPosition()));
-        }
-
-        @Override
-        public int getItemCount() {
-            return items.size();
-        }
-    }
-
-    static String initials(String name) {
-        StringBuilder b = new StringBuilder();
-        for (String w : name.trim().split("\\s+")) {
-            if (!w.isEmpty() && Character.isLetterOrDigit(w.charAt(0))) b.appendCodePoint(w.codePointAt(0));
-            if (b.length() >= 2) break;
-        }
-        return b.toString().toUpperCase(Locale.FRANCE);
     }
 }

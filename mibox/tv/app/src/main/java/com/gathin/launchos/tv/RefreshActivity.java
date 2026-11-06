@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -38,9 +39,10 @@ public final class RefreshActivity extends Activity {
         super.onCreate(saved);
         setContentView(R.layout.activity_refresh);
         Account a = AccountStore.load(this);
-        Catalog.forAccount(AccountStore.version());
+        Library.forAccount(AccountStore.version());
         Epg.forAccount(AccountStore.version());
         api = a == null ? null : new Xtream(a);
+        Details.forAccount(AccountStore.version());
         ViewGroup column = findViewById(R.id.column);
 
         allRow = row(column, R.string.refresh_all);
@@ -75,10 +77,20 @@ public final class RefreshActivity extends Activity {
     /** What each row holds now. */
     private void describe() {
         for (int i = 0; i < SECTIONS.length; i++) {
-            int n = Catalog.categoryCount(SECTIONS[i]);
-            sectionRows[i].sub.setText(n < 0 ? getString(R.string.refresh_not_loaded)
-                    : String.format(Locale.FRANCE, "%d catégorie%s · chargé %s", n, n > 1 ? "s" : "",
-                    ago(Catalog.loadedAt(SECTIONS[i]))));
+            Library lib = Library.of(SECTIONS[i]);
+            List<Xtream.Category> cats = lib.categories();
+            if (cats == null) {
+                sectionRows[i].sub.setText(getString(R.string.refresh_not_loaded));
+                continue;
+            }
+            int n = cats.size();
+            String what = lib.all() == null ? "" : String.format(Locale.FRANCE, " · %d titre%s", lib.all().size(),
+                    lib.all().size() > 1 ? "s" : "");
+            if (SECTIONS[i] == Xtream.Section.LIVE && lib.all() != null) {
+                what = String.format(Locale.FRANCE, " · %d chaîne%s", lib.all().size(), lib.all().size() > 1 ? "s" : "");
+            }
+            sectionRows[i].sub.setText(String.format(Locale.FRANCE, "%d groupe%s%s · chargé %s", n, n > 1 ? "s" : "",
+                    what, ago(lib.loadedAt())));
         }
         guideRow.sub.setText(getResources().getQuantityString(R.plurals.refresh_guide_sub, Epg.size(), Epg.size()));
         imagesRow.sub.setText(getString(R.string.refresh_images_sub, "…"));
@@ -104,16 +116,16 @@ public final class RefreshActivity extends Activity {
             return;
         }
         if (r.state.getText().toString().equals(getString(R.string.refresh_running))) return;
-        Catalog.forget(s);
+        Library lib = Library.of(s);
+        lib.forget();
         done(r, getString(R.string.refresh_running), false);
         running++;
-        Xtream x = api;
-        Bg.run(() -> x.categories(s), (list, error) -> {
+        lib.load(api, () -> {
             running--;
-            if (error == null) Catalog.putCategories(s, list);
-            else anyFailed = true;
+            boolean failed = lib.error() != null && !lib.ready();
+            if (failed) anyFailed = true;
             if (isDestroyed()) return;
-            done(r, error == null ? getString(R.string.refresh_done) : error.french(), error != null);
+            done(r, failed ? lib.error().french() : getString(R.string.refresh_done), failed);
             describe();
             if (running == 0 && allRow.state.getText().toString().equals(getString(R.string.refresh_running))) {
                 done(allRow, getString(anyFailed ? R.string.refresh_some_failed : R.string.refresh_done), anyFailed);

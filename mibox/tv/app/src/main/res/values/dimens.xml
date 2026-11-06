@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="rail_closed">72dp</dimen>
+    <dimen name="rail_open">244dp</dimen>
+    <!-- Where a page's text starts, right of the closed rail. -->
+    <dimen name="page_start">104dp</dimen>
+    <!-- A row's first card, so its focus ring lines up with the titles. -->
+    <dimen name="row_start">98dp</dimen>
+    <dimen name="pip_width">306dp</dimen>
+    <dimen name="pip_height">172dp</dimen>
+    <dimen name="rows_height">272dp</dimen>
+    <dimen name="row_height">262dp</dimen>
+    <dimen name="poster_width">124dp</dimen>
+    <dimen name="poster_height">186dp</dimen>
+    <dimen name="logo_width">176dp</dimen>
+    <dimen name="logo_height">104dp</dimen>
+    <dimen name="wide_width">236dp</dimen>
+    <dimen name="wide_height">134dp</dimen>
+</resources>

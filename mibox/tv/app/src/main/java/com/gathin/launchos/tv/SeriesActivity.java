@@ -1,6 +1,7 @@
 package com.gathin.launchos.tv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,20 +16,29 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-/** One series: its cover and summary, the seasons across the top, and the chosen season's episodes. */
+/**
+ * One series: its picture full screen, its summary, Regarder (or Reprendre where it was left), the seasons, and the
+ * chosen season's episodes side by side. Moving along the seasons shows each one's episodes.
+ */
 public final class SeriesActivity extends Activity {
-    static final String EXTRA_ID = "series_id";
-    static final String EXTRA_NAME = "series_name";
-    static final String EXTRA_COVER = "series_cover";
+    private static final String EXTRA_ID = "series_id", EXTRA_NAME = "series_name", EXTRA_COVER = "series_cover",
+            EXTRA_PLAY = "play";
 
     private Xtream api;
-    private String seriesName;
+    private Item series;
     private List<Xtream.Season> seasons = new ArrayList<>();
     private int season;
     private RecyclerView seasonsView, episodesView;
-    private TextView status;
+    private TextView status, play, meta, plot;
+    private Backdrop backdrop;
     private final SeasonAdapter seasonAdapter = new SeasonAdapter();
     private final EpisodeAdapter episodeAdapter = new EpisodeAdapter();
+    private Xtream.SeriesInfo info;
+
+    static Intent intent(Context c, Item s, boolean play) {
+        return new Intent(c, SeriesActivity.class).putExtra(EXTRA_ID, s.id).putExtra(EXTRA_NAME, s.name)
+                .putExtra(EXTRA_COVER, s.image).putExtra(EXTRA_PLAY, play);
+    }
 
     @Override
     protected void onCreate(Bundle state) {
@@ -40,41 +50,122 @@ public final class SeriesActivity extends Activity {
             return;
         }
         api = new Xtream(a);
-        seriesName = getIntent().getStringExtra(EXTRA_NAME);
-        ((TextView) findViewById(R.id.title)).setText(seriesName);
-        ImageView cover = findViewById(R.id.cover);
-        Ui.roundClip(findViewById(R.id.cover_frame));
-        Images.load(cover, getIntent().getStringExtra(EXTRA_COVER), Ui.dp(this, 170));
+        Intent in = getIntent();
+        String id = in.getStringExtra(EXTRA_ID);
+        series = Library.of(Xtream.Section.SERIES).find(id);
+        if (series == null) {
+            series = new Item(Item.Kind.SERIES, id, in.getStringExtra(EXTRA_NAME), in.getStringExtra(EXTRA_COVER), "", 0, "");
+        }
+        backdrop = new Backdrop(findViewById(R.id.backdrop_a), findViewById(R.id.backdrop_b));
+        backdrop.show(series.backdrop, series.image);
+        ((TextView) findViewById(R.id.title)).setText(series.title);
+        ((TextView) findViewById(R.id.label)).setText(series.genre.isEmpty() ? getString(R.string.nav_series) : series.genre);
+        meta = findViewById(R.id.meta);
+        plot = findViewById(R.id.plot);
+        plot.setText(series.plot);
+        meta.setText(Ui.meta(series.year > 0 ? String.valueOf(series.year) : "", Ui.rating(series.rating)));
         status = findViewById(R.id.status);
+        play = findViewById(R.id.play);
         seasonsView = findViewById(R.id.seasons);
         episodesView = findViewById(R.id.episodes);
         seasonsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         seasonsView.setAdapter(seasonAdapter);
         seasonsView.setItemAnimator(null);
-        episodesView.setLayoutManager(new LinearLayoutManager(this));
+        episodesView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         episodesView.setAdapter(episodeAdapter);
         episodesView.setItemAnimator(null);
+        play.setOnClickListener(v -> playNext());
 
         status.setText(R.string.loading);
         status.setVisibility(View.VISIBLE);
-        String id = getIntent().getStringExtra(EXTRA_ID);
-        Bg.run(() -> api.seriesInfo(id), (info, error) -> {
+        boolean autoplay = in.getBooleanExtra(EXTRA_PLAY, false);
+        Bg.run(() -> api.seriesInfo(id), (i, error) -> {
             if (isDestroyed()) return;
             if (error != null) {
                 status.setText(error.french());
                 return;
             }
-            if (!info.plot.isEmpty()) ((TextView) findViewById(R.id.plot)).setText(info.plot);
-            seasons = info.seasons;
+            info = i;
+            if (!i.plot.isEmpty()) plot.setText(i.plot);
+            backdrop.show(i.backdrop, series.backdrop, i.cover, series.image);
+            seasons = i.seasons;
+            int year = series.year > 0 ? series.year : i.year;
+            float rating = series.rating > 0 ? series.rating : i.rating;
+            meta.setText(Ui.meta(year > 0 ? String.valueOf(year) : "",
+                    seasons.size() == 1 ? "1 saison" : seasons.size() > 1 ? seasons.size() + " saisons" : "",
+                    Ui.rating(rating), i.genre.isEmpty() ? series.genre : i.genre));
             if (seasons.isEmpty()) {
                 status.setText(R.string.empty);
                 return;
             }
             status.setVisibility(View.GONE);
+            int[] last = last();
             seasonAdapter.notifyItemRangeInserted(0, seasons.size());
-            showSeason(0);
-            episodesView.post(() -> episodesView.requestFocus());
+            showSeason(last[0]);
+            episodesView.scrollToPosition(last[1]);
+            updatePlay();
+            play.setVisibility(View.VISIBLE);
+            play.requestFocus();
+            if (autoplay) playNext();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!seasons.isEmpty()) {
+            updatePlay();
+            episodeAdapter.notifyItemRangeChanged(0, episodeAdapter.getItemCount());
+        }
+    }
+
+    /** The season and episode index where the series was left, or the first one. */
+    private int[] last() {
+        History h = History.get(this);
+        String[] l = h == null ? null : h.lastEpisode(series.id);
+        if (l != null) {
+            for (int s = 0; s < seasons.size(); s++) {
+                List<Item> eps = seasons.get(s).episodes;
+                for (int e = 0; e < eps.size(); e++) {
+                    if (eps.get(e).id.equals(l[0])) {
+                        // Seen to the end: the next one.
+                        if (l[3].equals("1")) {
+                            if (e + 1 < eps.size()) return new int[]{s, e + 1};
+                            if (s + 1 < seasons.size()) return new int[]{s + 1, 0};
+                        }
+                        return new int[]{s, e};
+                    }
+                }
+            }
+        }
+        return new int[]{0, 0};
+    }
+
+    private void updatePlay() {
+        History h = History.get(this);
+        int[] at = last();
+        Xtream.Season s = seasons.get(at[0]);
+        Item e = s.episodes.isEmpty() ? null : s.episodes.get(Math.min(at[1], s.episodes.size() - 1));
+        boolean resume = e != null && h != null && h.position(Item.Kind.EPISODE, e.id) > 0;
+        int number = e == null ? 1 : e.num > 0 ? e.num : at[1] + 1;
+        play.setText(getString(resume ? R.string.series_resume : R.string.series_watch, s.number, number));
+    }
+
+    private void playNext() {
+        if (seasons.isEmpty()) return;
+        int[] at = last();
+        play(at[0], at[1]);
+    }
+
+    private void play(int s, int e) {
+        Xtream.Season sea = seasons.get(s);
+        if (sea.episodes.isEmpty()) return;
+        Item ep = sea.episodes.get(Math.min(e, sea.episodes.size() - 1));
+        History h = History.get(this);
+        long pos = h == null ? 0 : h.position(Item.Kind.EPISODE, ep.id);
+        String cover = info != null && !info.cover.isEmpty() ? info.cover : series.image;
+        startActivity(PlayerActivity.episode(this, api, series.id, series.name, cover, sea.number, sea.episodes,
+                sea.episodes.indexOf(ep), pos));
     }
 
     private void showSeason(int index) {
@@ -104,6 +195,7 @@ public final class SeriesActivity extends Activity {
                 int p = h.getBindingAdapterPosition();
                 if (focused && p != season && p != RecyclerView.NO_POSITION) showSeason(p);
             });
+            t.setOnClickListener(v -> episodesView.requestFocus());
         }
 
         @Override
@@ -117,7 +209,8 @@ public final class SeriesActivity extends Activity {
 
         final class Holder extends RecyclerView.ViewHolder {
             final ImageView image;
-            final TextView number, title, plot;
+            final TextView number, title, plot, badge;
+            final View track, bar;
 
             Holder(View v) {
                 super(v);
@@ -125,8 +218,16 @@ public final class SeriesActivity extends Activity {
                 number = v.findViewById(R.id.number);
                 title = v.findViewById(R.id.title);
                 plot = v.findViewById(R.id.plot);
-                Ui.roundClip(v.findViewById(R.id.frame));
-                Ui.lift(v, 1.02f);
+                badge = v.findViewById(R.id.badge);
+                track = v.findViewById(R.id.track);
+                bar = v.findViewById(R.id.bar);
+                Ui.roundClip(v.findViewById(R.id.clip));
+                v.setOnFocusChangeListener((view, focused) -> {
+                    View frame = view.findViewById(R.id.frame);
+                    float s = focused ? 1.06f : 1f;
+                    frame.setPivotY(frame.getHeight());
+                    frame.animate().scaleX(s).scaleY(s).setDuration(170).start();
+                });
             }
         }
 
@@ -138,20 +239,28 @@ public final class SeriesActivity extends Activity {
 
         @Override
         public Holder onCreateViewHolder(ViewGroup parent, int type) {
-            return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_episode, parent, false));
+            return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_episode_card, parent, false));
         }
 
         @Override
         public void onBindViewHolder(Holder h, int position) {
             Item e = items.get(position);
-            h.number.setText(String.valueOf(e.num > 0 ? e.num : position + 1));
-            h.title.setText(e.name);
-            h.plot.setText(e.plot);
-            h.plot.setVisibility(e.plot.isEmpty() ? View.GONE : View.VISIBLE);
-            Images.load(h.image, e.image, Ui.dp(h.itemView.getContext(), 112));
-            h.itemView.setOnClickListener(v -> startActivity(new Intent(SeriesActivity.this, PlayerActivity.class)
-                    .putExtra(PlayerActivity.EXTRA_URL, api.episodeUrl(e))
-                    .putExtra(PlayerActivity.EXTRA_TITLE, seriesName + " – " + e.name)));
+            int n = e.num > 0 ? e.num : position + 1;
+            h.number.setText(String.valueOf(n));
+            h.title.setText(getString(R.string.episode_title, n, Names.episode(series.title, e.title)));
+            String length = e.seconds > 0 ? Players.duration(e.seconds * 1000L) : "";
+            h.plot.setText(Ui.meta(length, e.plot));
+            Images.load(h.image, e.image, Ui.dp(h.itemView.getContext(), 224));
+            History hist = History.get(SeriesActivity.this);
+            History.Entry r = hist == null ? null : hist.resumeEntry(Item.Kind.EPISODE, e.id);
+            boolean started = r != null && r.duration > 0;
+            h.track.setVisibility(started ? View.VISIBLE : View.GONE);
+            if (started) {
+                h.bar.setPivotX(0);
+                h.bar.setScaleX(Math.max(0.04f, Math.min(1f, r.position / (float) r.duration)));
+            }
+            h.badge.setVisibility(View.GONE);
+            h.itemView.setOnClickListener(v -> play(season, h.getBindingAdapterPosition()));
         }
 
         @Override

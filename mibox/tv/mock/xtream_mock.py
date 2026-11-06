@@ -11,6 +11,7 @@ It answers the calls the app makes, with the shapes real panels use, numbers sen
   player_api.php?action=get_live_categories        and get_vod_categories, get_series_categories
   player_api.php?action=get_live_streams&category_id=N   and get_vod_streams, get_series
   player_api.php?action=get_series_info&series_id=N
+  player_api.php?action=get_vod_info&vod_id=N      a film's sheet (plot, backdrop, cast, duration)
   player_api.php?action=get_short_epg&stream_id=N&limit=4   now and next, titles in base64
   /live/<user>/<pass>/<id>.ts|.m3u8, /movie/<user>/<pass>/<id>.mp4, /series/<user>/<pass>/<id>.mp4
   /img/<name>.png                                  logos and posters
@@ -20,6 +21,8 @@ The media (a test pattern with a tone) is made once with ffmpeg into mock/media/
 --redirect answers every stream with a 302 to the same server, as many panels do.
 --plain-epg sends the guide's titles as plain text instead of base64, as some panels do.
 Channels whose number is a multiple of 7 have no guide.
+Names and groups look like a real panel's ("FR: TF-Un FHD", "|FR| SPORT ★", unsorted, one empty group), so the
+app's tidying and A to Z order can be seen. All titles are invented.
 """
 import argparse
 import base64
@@ -37,10 +40,30 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 MEDIA = os.path.join(HERE, "media")
 USER, PASSWORD = "demo", "demo"
 
-LIVE_CATEGORIES = [("1", "Généralistes"), ("2", "Information"), ("3", "Sport"), ("4", "Jeunesse"),
-                   ("5", "Cinéma")]
-VOD_CATEGORIES = [("10", "Nouveautés"), ("11", "Action"), ("12", "Comédie"), ("13", "Animation")]
-SERIES_CATEGORIES = [("20", "Séries françaises"), ("21", "Séries US"), ("22", "Documentaires")]
+# Sent in this (unsorted) order, decorated as panels do. Category 6 is empty.
+LIVE_CATEGORIES = [("3", "|FR| SPORT ★"), ("1", "FR | Généralistes"), ("5", "FR | Cinéma"), ("2", "★ Information ★"),
+                   ("6", "FR | Vide"), ("4", "01 - Jeunesse")]
+VOD_CATEGORIES = [("12", "VOD | Comédie"), ("10", "VOD | Nouveautés 2024"), ("13", "VOD | Animation"),
+                  ("11", "VOD | Action")]
+SERIES_CATEGORIES = [("21", "Séries US"), ("20", "Séries françaises"), ("22", "Documentaires")]
+LIVE_NAMES = {
+    "1": ["TF-Un", "Antenne 2", "Canal Trois", "Hexa", "Cinquième", "Arte-Fact", "Huit", "Neuf"],
+    "2": ["Info Continue", "Flash 24", "Le Direct", "Monde Info", "Éco News", "Parlement", "Météo+", "Planète Info"],
+    "3": ["Sport Un", "Foot Max", "Rugby TV", "Tennis Live", "Moto GP+", "Basket Zone", "Golf & Co", "Équipe 21"],
+    "4": ["Toon Kids", "Petits Loups", "Gulli-Gulli", "Kidz", "Ludo", "Mini Club", "Junior", "Bambino"],
+    "5": ["Ciné Frisson", "Ciné Émotion", "Ciné Club", "Polar TV", "Ciné Famille", "Ciné Classic", "Action+",
+          "Ciné Nuit"],
+}
+LIVE_STYLES = ["FR: {} FHD", "FR: {} HD", "|FR| {} ᴴᴰ", "FR - {}", "{} 4K", "FR: {} (SD)", "FR: {}", "VF: {} HEVC"]
+FILM_WORDS = ["L'Horizon", "Les Ombres", "Le Dernier Été", "Nuit Blanche", "La Traversée", "Le Phare", "Minuit",
+              "Les Marées", "Le Secret", "La Frontière", "Le Silence", "Les Étoiles", "Le Labyrinthe", "L'Envol",
+              "Le Grand Saut", "La Promesse"]
+FILM_ENDS = ["", " final", " de Lisbonne", " rouge", " du Nord", " infini", " d'hiver", " — Origines"]
+FILM_STYLES = ["FR: {} ({})", "{} - {}", "|VF| {} ({}) 4K", "VOSTFR - {} ({})", "{} ({}) FHD", "{} ({})"]
+SERIES_NAMES = ["Les Gardiens", "Brigade Nord", "Hôtel Riviera", "Le Bureau d'à côté", "Station Alpha", "Les Héritiers",
+                "Code Rouge", "Mers du Sud", "Les Volcans", "Planète Bleue", "Terres Sauvages", "Le Ciel vu d'en haut",
+                "Docteurs de garde", "Les Inséparables", "Cuisine & Cie", "Dossier 13", "Les Rivages", "Exode"]
+GENRES = ["Drame", "Action, Aventure", "Comédie", "Thriller", "Animation, Famille", "Science-fiction"]
 
 PROGRAMMES = ["Le journal", "Météo", "Magazine du soir", "Film : La grande traversée", "Dessins animés",
               "Match en direct", "Documentaire : les océans", "Jeu télévisé", "Série : Saison 2, épisode 4"]
@@ -50,37 +73,47 @@ COLOURS = ["0x3B5BDB", "0x9C36B5", "0xE8590C", "0x2B8A3E", "0xC2255C", "0x1098AD
 
 def build_catalogue():
     live, vod, series, episodes = [], [], [], {}
+    now = int(time.time())
     n = 0
-    for cat_id, cat_name in LIVE_CATEGORIES:
+    for cat_id in ["1", "2", "3", "4", "5"]:
         for i in range(1, 9):
             n += 1
+            name = LIVE_STYLES[n % len(LIVE_STYLES)].format(LIVE_NAMES[cat_id][i - 1])
             live.append({
-                "num": n, "name": f"{cat_name} {i}", "stream_type": "live", "stream_id": 100 + n,
+                "num": n, "name": name, "stream_type": "live", "stream_id": 100 + n,
                 "stream_icon": f"/img/logo{n % 8}.png" if n % 5 else "", "epg_channel_id": f"chan{n}.fr",
                 "added": "1700000000", "category_id": cat_id, "custom_sid": "", "tv_archive": 0,
                 "direct_source": "", "tv_archive_duration": 0,
             })
     n = 0
-    for cat_id, cat_name in VOD_CATEGORIES:
+    for cat_id in ["10", "11", "12", "13"]:
         for i in range(1, 13):
             n += 1
+            title = FILM_WORDS[(n * 5) % len(FILM_WORDS)] + FILM_ENDS[(n * 3) % len(FILM_ENDS)]
+            year = 2024 if cat_id == "10" else 2008 + (n * 7) % 16
+            rating = round(5 + ((n * 37) % 45) / 10, 1)
+            # Nouveautés were added in the last days, the rest over the last year.
+            added = now - (n * 5 * 3600 if cat_id == "10" else 86400 * ((n * 11) % 330 + 20))
             vod.append({
-                "num": n, "name": f"Film {cat_name.lower()} {i} ({2010 + n % 15})", "stream_type": "movie",
-                "stream_id": 5000 + n, "stream_icon": f"/img/poster{n % 8}.png", "rating": str(5 + n % 5),
-                "rating_5based": (5 + n % 5) / 2, "added": str(1700000000 + n), "category_id": cat_id,
+                "num": n, "name": FILM_STYLES[n % len(FILM_STYLES)].format(title, year), "stream_type": "movie",
+                "stream_id": 5000 + n, "stream_icon": f"/img/poster{n % 8}.png", "rating": str(rating),
+                "rating_5based": rating / 2, "added": str(added), "category_id": cat_id,
                 "container_extension": "mp4", "custom_sid": "", "direct_source": "",
             })
     n = 0
-    for cat_id, cat_name in SERIES_CATEGORIES:
+    for cat_id, cat_name in sorted(SERIES_CATEGORIES):
         for i in range(1, 7):
             n += 1
             sid = 800 + n
             series.append({
-                "num": n, "name": f"Série {i} – {cat_name}", "series_id": sid, "cover": f"/img/poster{(n + 3) % 8}.png",
+                "num": n, "name": ("FR: " if n % 3 == 0 else "") + SERIES_NAMES[n - 1] + (" (VOSTFR)" if n % 4 == 0 else ""),
+                "series_id": sid, "cover": f"/img/poster{(n + 3) % 8}.png",
                 "plot": "Une série inventée pour tester LaunchOS TV, avec un résumé assez long pour voir comment "
                         "le texte se coupe sur deux ou trois lignes.",
-                "cast": "", "director": "", "genre": cat_name, "releaseDate": f"{2015 + n % 9}-01-01",
-                "last_modified": "1700000000", "rating": "7", "rating_5based": 3.5, "backdrop_path": [],
+                "cast": "Camille Martin, Hugo Bernard", "director": "", "genre": GENRES[n % len(GENRES)],
+                "releaseDate": f"{2015 + n % 9}-01-01", "last_modified": str(now - 86400 * ((n * 13) % 200 + 1)),
+                "rating": str(round(6 + (n * 17 % 35) / 10, 1)), "rating_5based": 3.5,
+                "backdrop_path": [f"/img/backdrop{n % 8}.png"],
                 "youtube_trailer": "", "episode_run_time": "42", "category_id": cat_id,
             })
             seasons = {}
@@ -123,6 +156,10 @@ def make_media():
         logo = os.path.join(MEDIA, f"logo{i}.png")
         if not os.path.exists(logo):
             run("-f", "lavfi", "-i", f"color=c={c}:size=256x256", "-frames:v", "1", logo)
+        backdrop = os.path.join(MEDIA, f"backdrop{i}.png")
+        if not os.path.exists(backdrop):
+            run("-f", "lavfi", "-i", f"gradients=size=1280x720:c0={c}:c1=0x05060A:c2={COLOURS[(i + 3) % 8]}:"
+                "nb_colors=3:x0=0:y0=0:x1=1280:y1=720:speed=0", "-frames:v", "1", backdrop)
         poster = os.path.join(MEDIA, f"poster{i}.png")
         if not os.path.exists(poster):
             run("-f", "lavfi", "-i", f"gradients=size=300x450:c0={c}:c1=0x101218:nb_colors=2:speed=0",
@@ -134,6 +171,8 @@ def absolute(base, item, keys):
     for k in keys:
         if isinstance(out.get(k), str) and out[k].startswith("/img/"):
             out[k] = base + out[k]
+        elif isinstance(out.get(k), list):
+            out[k] = [base + v if isinstance(v, str) and v.startswith("/img/") else v for v in out[k]]
     return out
 
 
@@ -209,7 +248,7 @@ class Handler(BaseHTTPRequestHandler):
         if action == "get_vod_streams":
             return self.send_json([absolute(base, s, ["stream_icon"]) for s in VOD if cat in (None, s["category_id"])])
         if action == "get_series":
-            return self.send_json([absolute(base, s, ["cover"]) for s in SERIES if cat in (None, s["category_id"])])
+            return self.send_json([absolute(base, s, ["cover", "backdrop_path"]) for s in SERIES if cat in (None, s["category_id"])])
         if action == "get_series_info":
             sid = int(q.get("series_id", ["0"])[0])
             info = next((s for s in SERIES if s["series_id"] == sid), None)
@@ -220,8 +259,28 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({
                 "seasons": [{"season_number": int(k), "name": f"Saison {k}", "episode_count": str(len(v)),
                              "cover": base + info["cover"]} for k, v in seasons.items()],
-                "info": absolute(base, info, ["cover"]),
+                "info": absolute(base, info, ["cover", "backdrop_path"]),
                 "episodes": [e for v in eps.values() for e in v] if self.episodes_as_list else eps,
+            })
+        if action == "get_vod_info":
+            vid = int(q.get("vod_id", ["0"])[0])
+            film = next((v for v in VOD if v["stream_id"] == vid), None)
+            if film is None:
+                return self.send_json({"info": [], "movie_data": []})
+            n = vid - 5000
+            return self.send_json({
+                "info": {
+                    "movie_image": base + film["stream_icon"], "backdrop_path": [base + f"/img/backdrop{n % 8}.png"],
+                    "plot": "Un film inventé pour tester LaunchOS TV. Quand la nuit tombe sur la ville, une équipe "
+                            "improbable doit tout risquer pour retrouver ce qui a disparu, avant l'aube.",
+                    "genre": GENRES[n % len(GENRES)], "director": "Claire Dubois",
+                    "cast": "Léa Moreau, Karim Haddad, Paul Lefèvre", "releasedate": f"{film['name'][-5:-1]}-03-15"
+                    if film["name"].endswith(")") else "2020-03-15",
+                    "duration_secs": 5400 + (n * 300) % 2700, "duration": "", "rating": film["rating"],
+                    "youtube_trailer": "", "tmdb_id": "",
+                },
+                "movie_data": {"stream_id": vid, "name": film["name"], "added": film["added"],
+                               "category_id": film["category_id"], "container_extension": "mp4"},
             })
         if action == "get_short_epg":
             return self.send_json({"epg_listings": self.short_epg(int(q.get("stream_id", ["0"])[0]),

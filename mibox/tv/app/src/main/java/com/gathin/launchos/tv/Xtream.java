@@ -18,9 +18,12 @@ import java.util.Locale;
  * Nothing here logs: every address carries the user name and password.
  */
 final class Xtream {
-    /** A list can be several MB on a big panel; more than this is refused rather than filling the memory. */
-    private static final int MAX_LIST_BYTES = 48 * 1024 * 1024;
+    /** A whole film list can be tens of MB on a big panel. It is read item by item, but not without end. */
+    private static final long MAX_LIST_BYTES = 96L * 1024 * 1024;
+    /** Categories and a series' episodes are held as text first. */
+    private static final int MAX_TEXT_BYTES = 24 * 1024 * 1024;
     private static final int MAX_EPG_BYTES = 512 * 1024;
+    private static final int MAX_INFO_BYTES = 2 * 1024 * 1024;
 
     static final class Category {
         final String id;
@@ -67,11 +70,52 @@ final class Xtream {
         final String plot;
         final String cover;
         final List<Season> seasons;
+        final String backdrop;
+        final String genre;
+        final String cast;
+        final float rating;
+        final int year;
 
         SeriesInfo(String plot, String cover, List<Season> seasons) {
+            this(plot, cover, seasons, "", "", "", 0f, 0);
+        }
+
+        SeriesInfo(String plot, String cover, List<Season> seasons, String backdrop, String genre, String cast,
+                   float rating, int year) {
             this.plot = plot;
             this.cover = cover;
             this.seasons = seasons;
+            this.backdrop = backdrop;
+            this.genre = genre;
+            this.cast = cast;
+            this.rating = rating;
+            this.year = year;
+        }
+    }
+
+    /** A film's sheet from get_vod_info. */
+    static final class VodInfo {
+        final String plot;
+        final String backdrop;
+        final String poster;
+        final String genre;
+        final String director;
+        final String cast;
+        final float rating;
+        final int year;
+        final int seconds;
+
+        VodInfo(String plot, String backdrop, String poster, String genre, String director, String cast, float rating,
+                int year, int seconds) {
+            this.plot = plot;
+            this.backdrop = backdrop;
+            this.poster = poster;
+            this.genre = genre;
+            this.director = director;
+            this.cast = cast;
+            this.rating = rating;
+            this.year = year;
+            this.seconds = seconds;
         }
     }
 
@@ -105,11 +149,22 @@ final class Xtream {
         return parseCategories(fetch(section.categoriesAction, null));
     }
 
+    /** The section's items in one category, or in all of them when categoryId is null. Read as they arrive. */
     List<Item> items(Section section, String categoryId) throws XtreamException {
-        Object json = fetch(section.itemsAction, "&category_id=" + enc(categoryId));
         Item.Kind kind = section == Section.LIVE ? Item.Kind.LIVE
                 : section == Section.MOVIES ? Item.Kind.MOVIE : Item.Kind.SERIES;
-        return parseItems(json, kind);
+        String url = address(section.itemsAction, categoryId == null ? null : "&category_id=" + enc(categoryId));
+        return Http.get(url, MAX_LIST_BYTES, in -> {
+            try {
+                return readItems(new java.io.InputStreamReader(in, StandardCharsets.UTF_8), kind);
+            } catch (JsonStream.Malformed e) {
+                throw new XtreamException(XtreamException.Kind.BAD_ANSWER, 0);
+            }
+        });
+    }
+
+    VodInfo vodInfo(String streamId) throws XtreamException {
+        return parseVodInfo(fetch("get_vod_info", "&vod_id=" + enc(streamId), MAX_INFO_BYTES));
     }
 
     SeriesInfo seriesInfo(String seriesId) throws XtreamException {
@@ -122,12 +177,16 @@ final class Xtream {
     }
 
     private Object fetch(String action, String extra) throws XtreamException {
-        return fetch(action, extra, MAX_LIST_BYTES);
+        return fetch(action, extra, MAX_TEXT_BYTES);
+    }
+
+    private String address(String action, String extra) {
+        return account.server + "/player_api.php?username=" + enc(account.user) + "&password=" + enc(account.password)
+                + (action != null ? "&action=" + action : "") + (extra != null ? extra : "");
     }
 
     private Object fetch(String action, String extra, int maxBytes) throws XtreamException {
-        String url = account.server + "/player_api.php?username=" + enc(account.user) + "&password=" + enc(account.password)
-                + (action != null ? "&action=" + action : "") + (extra != null ? extra : "");
+        String url = address(action, extra);
         String body = new String(Http.get(url, maxBytes), StandardCharsets.UTF_8).trim();
         if (body.isEmpty() || body.equals("null")) return new JSONArray();
         try {
@@ -206,27 +265,170 @@ final class Xtream {
         return out;
     }
 
-    static List<Item> parseItems(Object json, Item.Kind kind) {
+    /** A list of channels, films or series, read one item at a time. Some panels send an object keyed by index. */
+    static List<Item> readItems(java.io.Reader reader, Item.Kind kind) throws java.io.IOException {
         List<Item> out = new ArrayList<>();
-        JSONArray a = asArray(json);
-        for (int i = 0; i < a.length(); i++) {
-            JSONObject o = a.optJSONObject(i);
-            if (o == null) continue;
-            String id = str(o, kind == Item.Kind.SERIES ? "series_id" : "stream_id");
-            if (id.isEmpty()) continue;
-            String image = str(o, kind == Item.Kind.SERIES ? "cover" : "stream_icon");
-            out.add(new Item(kind, id, str(o, "name"), image, str(o, "container_extension"),
-                    (int) num(o, "num"), str(o, "plot")));
+        JsonStream r = new JsonStream(reader);
+        JsonStream.Kind top = r.peek();
+        if (top == JsonStream.Kind.END) return out;
+        boolean keyed = top == JsonStream.Kind.OBJECT;
+        if (!keyed && top != JsonStream.Kind.ARRAY) {
+            r.skipValue();   // "null" or another lone value: an empty list
+            return out;
         }
+        if (keyed) r.beginObject();
+        else r.beginArray();
+        while (r.hasNext()) {
+            if (keyed) r.nextName();
+            if (r.peek() != JsonStream.Kind.OBJECT) {
+                r.skipValue();
+                continue;
+            }
+            Item item = readItem(r, kind);
+            if (item != null) out.add(item);
+        }
+        if (keyed) r.endObject();
+        else r.endArray();
         return out;
+    }
+
+    private static Item readItem(JsonStream r, Item.Kind kind) throws java.io.IOException {
+        String id = "", name = "", image = "", ext = "", plot = "", cat = "", cats = "", genre = "", backdrop = "";
+        String rating = "", rating5 = "", added = "", modified = "", release = "", num = "";
+        boolean series = kind == Item.Kind.SERIES;
+        r.beginObject();
+        while (r.hasNext()) {
+            String k = r.nextName();
+            switch (k) {
+                case "stream_id":
+                    if (!series) id = r.nextString();
+                    else r.skipValue();
+                    break;
+                case "series_id":
+                    if (series) id = r.nextString();
+                    else r.skipValue();
+                    break;
+                case "name":
+                    name = r.nextString();
+                    break;
+                case "stream_icon":
+                    if (!series) image = r.nextString();
+                    else r.skipValue();
+                    break;
+                case "cover":
+                    if (series) image = r.nextString();
+                    else r.skipValue();
+                    break;
+                case "container_extension":
+                    ext = r.nextString();
+                    break;
+                case "num":
+                    num = r.nextString();
+                    break;
+                case "plot":
+                    plot = r.nextString();
+                    break;
+                case "category_id":
+                    cat = r.nextString();
+                    break;
+                case "category_ids":
+                    cats = r.nextFirstString();
+                    break;
+                case "added":
+                    added = r.nextString();
+                    break;
+                case "last_modified":
+                    modified = r.nextString();
+                    break;
+                case "rating":
+                    rating = r.nextString();
+                    break;
+                case "rating_5based":
+                    rating5 = r.nextString();
+                    break;
+                case "genre":
+                    genre = r.nextString();
+                    break;
+                case "backdrop_path":
+                    backdrop = r.nextFirstString();
+                    break;
+                case "releaseDate":
+                case "release_date":
+                case "year":
+                    if (release.isEmpty()) release = r.nextString();
+                    else r.skipValue();
+                    break;
+                default:
+                    r.skipValue();
+            }
+        }
+        r.endObject();
+        if (id.isEmpty() || id.equals("null")) return null;
+        long when = parseLong(series && !modified.isEmpty() ? modified : added);
+        return new Item(kind, id, name, image, ext, (int) parseLong(num), plot, cat.isEmpty() ? cats : cat, when,
+                rating(rating, rating5), genre, backdrop, year(release), 0);
+    }
+
+    /** A rating out of 10 from "7.2" or, failing that, from rating_5based. */
+    static float rating(String ten, String five) {
+        float r = (float) parseDouble(ten);
+        if (r <= 0) r = (float) parseDouble(five) * 2;
+        return r > 0 && r <= 10 ? r : 0f;
+    }
+
+    /** The year in "2019-05-01", "2019" or "01/05/2019"; 0 when none. */
+    static int year(String date) {
+        if (date == null) return 0;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?<!\\d)(19\\d\\d|20\\d\\d)(?!\\d)").matcher(date);
+        return m.find() ? Integer.parseInt(m.group(1)) : 0;
+    }
+
+    static VodInfo parseVodInfo(Object json) {
+        JSONObject root = json instanceof JSONObject ? (JSONObject) json : new JSONObject();
+        JSONObject info = root.optJSONObject("info");
+        if (info == null) info = new JSONObject();
+        String backdrop = "";
+        Object b = info.opt("backdrop_path");
+        if (b instanceof JSONArray && ((JSONArray) b).length() > 0) backdrop = ((JSONArray) b).optString(0, "");
+        else if (b instanceof String) backdrop = (String) b;
+        if (backdrop.equals("null")) backdrop = "";
+        String cast = str(info, "cast");
+        if (cast.isEmpty()) cast = str(info, "actors");
+        String release = str(info, "releasedate");
+        if (release.isEmpty()) release = str(info, "release_date");
+        if (release.isEmpty()) release = str(info, "year");
+        int seconds = (int) num(info, "duration_secs");
+        if (seconds <= 0) seconds = clockSeconds(str(info, "duration"));
+        if (seconds <= 0) seconds = (int) num(info, "episode_run_time") * 60;
+        String plot = str(info, "plot");
+        if (plot.isEmpty()) plot = str(info, "description");
+        return new VodInfo(plot, backdrop, str(info, "movie_image"), str(info, "genre"), str(info, "director"), cast,
+                rating(str(info, "rating"), str(info, "rating_5based")), year(release), seconds);
+    }
+
+    /** "01:52:00" as seconds. */
+    static int clockSeconds(String s) {
+        if (s == null || !s.matches("\\d{1,3}:\\d{2}(:\\d{2})?")) return 0;
+        String[] p = s.split(":");
+        int total = 0;
+        for (String x : p) total = total * 60 + Integer.parseInt(x);
+        return p.length == 2 ? total * 60 : total;
     }
 
     static SeriesInfo parseSeriesInfo(Object json) {
         if (!(json instanceof JSONObject)) return new SeriesInfo("", "", Collections.emptyList());
         JSONObject root = (JSONObject) json;
         JSONObject info = root.optJSONObject("info");
-        String plot = info != null ? str(info, "plot") : "";
-        String cover = info != null ? str(info, "cover") : "";
+        if (info == null) info = new JSONObject();
+        String plot = str(info, "plot");
+        String cover = str(info, "cover");
+        String backdrop = "";
+        Object b = info.opt("backdrop_path");
+        if (b instanceof JSONArray && ((JSONArray) b).length() > 0) backdrop = ((JSONArray) b).optString(0, "");
+        else if (b instanceof String) backdrop = (String) b;
+        if (backdrop.equals("null")) backdrop = "";
+        String release = str(info, "releaseDate");
+        if (release.isEmpty()) release = str(info, "release_date");
 
         // Season names and covers, when the panel gives them.
         java.util.Map<Integer, String> names = new java.util.HashMap<>();
@@ -264,7 +466,8 @@ final class Xtream {
             String name = names.get(s.getKey());
             out.add(new Season(s.getKey(), name == null || name.isEmpty() ? "Saison " + s.getKey() : name, list));
         }
-        return new SeriesInfo(plot, cover, out);
+        return new SeriesInfo(plot, cover, out, backdrop, str(info, "genre"), str(info, "cast"),
+                rating(str(info, "rating"), str(info, "rating_5based")), year(release));
     }
 
     private static List<Item> episodes(Object json) {
@@ -284,9 +487,14 @@ final class Xtream {
         JSONObject info = o.optJSONObject("info");
         int n = (int) num(o, "episode_num");
         String title = str(o, "title");
+        int seconds = 0;
+        if (info != null) {
+            seconds = (int) num(info, "duration_secs");
+            if (seconds <= 0) seconds = clockSeconds(str(info, "duration"));
+        }
         return new Item(Item.Kind.EPISODE, id, title.isEmpty() ? "Épisode " + n : title,
                 info != null ? str(info, "movie_image") : "", str(o, "container_extension"), n,
-                info != null ? str(info, "plot") : "");
+                info != null ? str(info, "plot") : "", "", 0, 0f, "", "", 0, seconds);
     }
 
     /** Some panels send an object keyed by index instead of a list. */
@@ -317,6 +525,15 @@ final class Xtream {
         if (v instanceof Number) return ((Number) v).longValue();
         if (v instanceof Boolean) return (Boolean) v ? 1 : 0;
         return v == null ? 0 : parseLong(String.valueOf(v));
+    }
+
+    private static double parseDouble(String s) {
+        try {
+            double d = Double.parseDouble(s.trim());
+            return Double.isNaN(d) ? 0 : d;
+        } catch (NumberFormatException | NullPointerException e) {
+            return 0;
+        }
     }
 
     private static long parseLong(String s) {

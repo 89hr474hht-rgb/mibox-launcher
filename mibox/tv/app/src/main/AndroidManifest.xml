@@ -26,6 +26,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true"
             android:screenOrientation="landscape"
             tools:ignore="DiscouragedApi,LockedOrientationActivity">
@@ -39,6 +40,23 @@
         <activity
             android:name=".SeriesActivity"
             android:exported="false" />
+        <activity
+            android:name=".MovieActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GridActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustNothing|stateVisible" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GroupsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustNothing|stateHidden" />
 
         <activity
             android:name=".AccountActivity"

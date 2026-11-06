@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:duplicateParentState="true">
+
+        <ImageView
+            android:id="@+id/rail_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:duplicateParentState="true"
+            android:importantForAccessibility="no"
+            android:tint="@color/nav_text" />
+
+        <View
+            android:id="@+id/rail_dot"
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="-3dp"
+            android:layout_marginEnd="-3dp"
+            android:background="@drawable/dot_accent"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/rail_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:alpha="0"
+        android:duplicateParentState="true"
+        android:fontFamily="@font/launchos_medium"
+        android:singleLine="true"
+        android:textColor="@color/nav_text"
+        android:textSize="16sp" />
+</merge>

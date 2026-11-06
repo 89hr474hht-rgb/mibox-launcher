@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:clipChildren="false"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/block_title"
+        style="@style/Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:textSize="17sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/block_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="50dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="40dp"
+        android:paddingBottom="8dp" />
+</LinearLayout>
