@@ -58,6 +58,27 @@ final class Images {
         });
     }
 
+    static void clearMemory() {
+        MEMORY.evictAll();
+    }
+
+    /** Background thread. */
+    static long diskBytes(Context context) {
+        long total = 0;
+        File[] files = new File(context.getCacheDir(), "img").listFiles();
+        if (files != null) for (File f : files) total += f.length();
+        return total;
+    }
+
+    /** Background thread. */
+    static void clearDisk(Context context) {
+        File[] files = new File(context.getCacheDir(), "img").listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            if (!f.delete()) f.deleteOnExit();
+        }
+    }
+
     private static Bitmap fetch(Context app, String url, int widthPx) {
         File dir = new File(app.getCacheDir(), "img");
         File file = new File(dir, sha1(url));

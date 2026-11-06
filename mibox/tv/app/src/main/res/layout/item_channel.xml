@@ -43,4 +43,34 @@
         android:paddingBottom="2dp"
         android:singleLine="true"
         android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/now"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:singleLine="true"
+        android:textColor="@color/text_dim"
+        android:textSize="12sp"
+        android:visibility="invisible" />
+
+    <FrameLayout
+        android:id="@+id/track"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/track_bg"
+        android:visibility="invisible">
+
+        <View
+            android:id="@+id/bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bar_fill" />
+    </FrameLayout>
 </LinearLayout>

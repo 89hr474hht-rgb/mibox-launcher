@@ -11,14 +11,18 @@ It answers the calls the app makes, with the shapes real panels use, numbers sen
   player_api.php?action=get_live_categories        and get_vod_categories, get_series_categories
   player_api.php?action=get_live_streams&category_id=N   and get_vod_streams, get_series
   player_api.php?action=get_series_info&series_id=N
+  player_api.php?action=get_short_epg&stream_id=N&limit=4   now and next, titles in base64
   /live/<user>/<pass>/<id>.ts|.m3u8, /movie/<user>/<pass>/<id>.mp4, /series/<user>/<pass>/<id>.mp4
   /img/<name>.png                                  logos and posters
 
 The media (a test pattern with a tone) is made once with ffmpeg into mock/media/, which git ignores.
 --episodes-as-list sends get_series_info's episodes as a list, as some panels do.
 --redirect answers every stream with a 302 to the same server, as many panels do.
+--plain-epg sends the guide's titles as plain text instead of base64, as some panels do.
+Channels whose number is a multiple of 7 have no guide.
 """
 import argparse
+import base64
 import json
 import os
 import re
@@ -37,6 +41,9 @@ LIVE_CATEGORIES = [("1", "Généralistes"), ("2", "Information"), ("3", "Sport")
                    ("5", "Cinéma")]
 VOD_CATEGORIES = [("10", "Nouveautés"), ("11", "Action"), ("12", "Comédie"), ("13", "Animation")]
 SERIES_CATEGORIES = [("20", "Séries françaises"), ("21", "Séries US"), ("22", "Documentaires")]
+
+PROGRAMMES = ["Le journal", "Météo", "Magazine du soir", "Film : La grande traversée", "Dessins animés",
+              "Match en direct", "Documentaire : les océans", "Jeu télévisé", "Série : Saison 2, épisode 4"]
 
 COLOURS = ["0x3B5BDB", "0x9C36B5", "0xE8590C", "0x2B8A3E", "0xC2255C", "0x1098AD", "0x5F3DC4", "0xF08C00"]
 
@@ -134,6 +141,7 @@ class Handler(BaseHTTPRequestHandler):
     server_version = "XtreamMock/1.0"
     episodes_as_list = False
     redirect = False
+    plain_epg = False
 
     def log_message(self, fmt, *args):
         sys.stderr.write("%s %s\n" % (time.strftime("%H:%M:%S"), fmt % args))
@@ -215,7 +223,29 @@ class Handler(BaseHTTPRequestHandler):
                 "info": absolute(base, info, ["cover"]),
                 "episodes": [e for v in eps.values() for e in v] if self.episodes_as_list else eps,
             })
+        if action == "get_short_epg":
+            return self.send_json({"epg_listings": self.short_epg(int(q.get("stream_id", ["0"])[0]),
+                                                                   int(q.get("limit", ["4"])[0]))})
         return self.send_json([])
+
+    def short_epg(self, stream_id, limit):
+        n = stream_id - 100
+        if n <= 0 or n % 7 == 0:
+            return []
+        step = 30 * 60
+        start = int(time.time()) // step * step
+        out = []
+        for i in range(max(1, min(limit, 10))):
+            title = PROGRAMMES[(n + start // step + i) % len(PROGRAMMES)]
+            desc = f"{title}, sur la chaîne {n}."
+            enc = (lambda t: t) if self.plain_epg else (lambda t: base64.b64encode(t.encode()).decode())
+            a, b = start + i * step, start + (i + 1) * step
+            out.append({"id": str(n * 100 + i), "epg_id": str(n), "title": enc(title), "lang": "fr",
+                        "start": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(a)),
+                        "end": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(b)),
+                        "description": enc(desc), "channel_id": f"chan{n}.fr",
+                        "start_timestamp": str(a), "stop_timestamp": str(b)})
+        return out
 
     def media(self, name, live=False):
         path = os.path.join(MEDIA, name)
@@ -261,10 +291,12 @@ def main():
     p.add_argument("--port", type=int, default=8080)
     p.add_argument("--episodes-as-list", action="store_true")
     p.add_argument("--redirect", action="store_true")
+    p.add_argument("--plain-epg", action="store_true")
     a = p.parse_args()
     make_media()
     Handler.episodes_as_list = a.episodes_as_list
     Handler.redirect = a.redirect
+    Handler.plain_epg = a.plain_epg
     print(f"Fake Xtream server on http://127.0.0.1:{a.port} (emulator: http://10.0.2.2:{a.port}), account demo / demo")
     ThreadingHTTPServer(("127.0.0.1", a.port), Handler).serve_forever()
 

@@ -39,7 +39,11 @@ public final class PlayerActivity extends Activity {
     private ExoPlayer player;
     private PlayerView view;
     private View info, error;
-    private TextView infoNumber, infoTitle, infoSub, errorText;
+    private TextView infoNumber, infoTitle, infoSub, errorText, infoNow, infoNext;
+    private View infoGuide, infoBar;
+    /** The guide of the channel on screen, and which channel it belongs to. */
+    private Epg.Listing guide;
+    private String guideFor;
     private Xtream api;
 
     private boolean live;
@@ -62,12 +66,17 @@ public final class PlayerActivity extends Activity {
         infoTitle = findViewById(R.id.info_title);
         infoSub = findViewById(R.id.info_sub);
         errorText = findViewById(R.id.error_text);
+        infoGuide = findViewById(R.id.info_guide);
+        infoNow = findViewById(R.id.info_now);
+        infoNext = findViewById(R.id.info_next);
+        infoBar = findViewById(R.id.info_bar);
         Account a = AccountStore.load(this);
         if (a == null) {
             finish();
             return;
         }
         api = new Xtream(a);
+        Epg.forAccount(AccountStore.version());
         index = getIntent().getIntExtra(EXTRA_LIVE_INDEX, -1);
         channels = Playlist.channels;
         live = index >= 0 && index < channels.size();
@@ -159,10 +168,45 @@ public final class PlayerActivity extends Activity {
         infoNumber.setText(c.num > 0 ? String.valueOf(c.num) : "");
         infoTitle.setText(c.name);
         infoSub.setText(Playlist.category);
+        if (!c.id.equals(guideFor)) {
+            guide = null;
+            guideFor = c.id;
+        }
         showInfo();
+        Epg.get(api, c.id, listing -> {
+            if (!c.id.equals(guideFor) || isDestroyed()) return;
+            guide = listing;
+            showGuide();
+        });
+    }
+
+    /** Now (times, title, progress) and next, under the channel's name. */
+    private void showGuide() {
+        long sec = System.currentTimeMillis() / 1000;
+        Epg.Programme now = guide == null ? null : guide.now(sec);
+        Epg.Programme next = guide == null ? null : guide.next(sec);
+        if (now == null && next == null) {
+            infoGuide.setVisibility(View.GONE);
+            return;
+        }
+        infoGuide.setVisibility(View.VISIBLE);
+        infoNow.setVisibility(now == null ? View.GONE : View.VISIBLE);
+        ((View) infoBar.getParent()).setVisibility(now == null ? View.GONE : View.VISIBLE);
+        if (now != null) {
+            infoNow.setText(getString(R.string.guide_now, clock(now.start), clock(now.end), now.title));
+            infoBar.setPivotX(0);
+            infoBar.setScaleX(now.progress(sec));
+        }
+        infoNext.setVisibility(next == null ? View.GONE : View.VISIBLE);
+        if (next != null) infoNext.setText(getString(R.string.guide_next, clock(next.start), next.title));
+    }
+
+    private static String clock(long sec) {
+        return new java.text.SimpleDateFormat("HH:mm", java.util.Locale.FRANCE).format(new java.util.Date(sec * 1000));
     }
 
     private void showInfo() {
+        if (live) showGuide();
         info.removeCallbacks(hideInfo);
         info.animate().cancel();
         info.setAlpha(1f);

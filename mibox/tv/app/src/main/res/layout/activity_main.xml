@@ -69,6 +69,13 @@
             android:layout_weight="1" />
 
         <TextView
+            android:id="@+id/nav_refresh"
+            style="@style/NavItem"
+            android:drawableStart="@drawable/ic_refresh"
+            android:drawableTint="@color/nav_text"
+            android:text="@string/nav_refresh" />
+
+        <TextView
             android:id="@+id/nav_updates"
             style="@style/NavItem"
             android:drawableStart="@drawable/ic_update"

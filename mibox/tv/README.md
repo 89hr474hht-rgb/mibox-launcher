@@ -30,7 +30,7 @@ python3 -I mibox/tv/mock/xtream_mock.py --port 8080
 ```
 
 A fake Xtream server on 127.0.0.1 (account demo / demo), with test-pattern streams made by ffmpeg. The emulator
-reaches it at `http://10.0.2.2:8080`. `--redirect` and `--episodes-as-list` mimic panels that answer that way.
+reaches it at `http://10.0.2.2:8080`. `--redirect`, `--episodes-as-list` and `--plain-epg` mimic panels that answer that way.
 
 Updates: the same updater as LaunchOS, reading this repository's `tv-vX.Y.Z` releases (published by
 `.github/workflows/release-tv.yml`; notes from `CHANGELOG.md`). Bump `VERSION` and the changelog, then push the tag.

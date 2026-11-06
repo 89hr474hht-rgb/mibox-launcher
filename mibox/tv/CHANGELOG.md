@@ -6,6 +6,15 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.2.0] - 2026-11-06
+
+### Ajouté
+- Menu Actualiser (à gauche, sous Séries) : recharge les chaînes, les films, les séries et le guide des programmes, un par un ou tout d'un coup, et vide les logos et affiches gardés sur la box. Chaque ligne dit quand elle a été chargée.
+- Guide des programmes : le programme en cours sous chaque chaîne, avec une barre d'avancement ; en direct, l'heure, le titre et le programme suivant.
+
+### Modifié
+- Les listes sont gardées pour toute l'appli et se rechargent seules après 6 heures ; le guide se recharge à la fin de chaque programme.
+
 ## [0.1.0] - 2026-11-06
 
 Première version.

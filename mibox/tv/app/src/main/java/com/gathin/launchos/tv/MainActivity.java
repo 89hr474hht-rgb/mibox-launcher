@@ -15,10 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * The main screen: the sections on the left (Chaînes, Films, Séries, Compte), the section's categories, then the
@@ -26,9 +24,6 @@ import java.util.Map;
  */
 public final class MainActivity extends Activity {
     private static final long CATEGORY_DELAY_MS = 280;
-
-    private final Map<String, List<Xtream.Category>> categoryCache = new HashMap<>();
-    private final Map<String, List<Item>> itemCache = new HashMap<>();
 
     private TextView[] nav;
     private TextView sectionTitle, sectionCount, status;
@@ -38,6 +33,7 @@ public final class MainActivity extends Activity {
 
     private Xtream api;
     private int accountVersion = -1;
+    private int catalogGeneration = -1;
     private Xtream.Section section = Xtream.Section.LIVE;
     private Xtream.Category category;
     private int request;   // ignores answers that arrive after the owner moved on
@@ -66,6 +62,7 @@ public final class MainActivity extends Activity {
             nav[i].setOnClickListener(v -> categoriesView.requestFocus());
         }
         findViewById(R.id.nav_account).setOnClickListener(v -> startActivity(new Intent(this, AccountActivity.class)));
+        findViewById(R.id.nav_refresh).setOnClickListener(v -> startActivity(new Intent(this, RefreshActivity.class)));
         navUpdates = findViewById(R.id.nav_updates);
         navUpdates.setOnClickListener(v -> startActivity(new Intent(this, UpdatesActivity.class)));
         banner = findViewById(R.id.update_banner);
@@ -92,10 +89,22 @@ public final class MainActivity extends Activity {
         super.onResume();
         Updater.get().addListener(updates);
         showUpdate();
-        if (accountVersion == AccountStore.version()) return;
-        accountVersion = AccountStore.version();
-        categoryCache.clear();
-        itemCache.clear();
+        int version = AccountStore.version();
+        Catalog.forAccount(version);
+        Epg.forAccount(version);
+        if (version == accountVersion && Catalog.generation() == catalogGeneration) {
+            // Back from a channel or the Actualiser screen: the programmes on the cards may have moved on.
+            cardAdapter.notifyItemRangeChanged(0, cardAdapter.getItemCount(), CardAdapter.GUIDE);
+            return;
+        }
+        boolean accountChanged = version != accountVersion;
+        accountVersion = version;
+        catalogGeneration = Catalog.generation();
+        if (!accountChanged) {
+            // The Actualiser screen dropped some lists: show the section again from the new ones.
+            if (api != null) showSection(section);
+            return;
+        }
         Account a = AccountStore.load(this);
         api = a == null ? null : new Xtream(a);
         if (api == null) {
@@ -146,7 +155,7 @@ public final class MainActivity extends Activity {
         cardAdapter.set(new ArrayList<>(), s);
         applyGridColumns();
         if (api == null) return;
-        List<Xtream.Category> cached = categoryCache.get(s.name());
+        List<Xtream.Category> cached = Catalog.categories(s);
         if (cached != null) {
             showCategories(cached);
             return;
@@ -160,7 +169,7 @@ public final class MainActivity extends Activity {
                 showStatus(error.french());
                 return;
             }
-            categoryCache.put(s.name(), list);
+            Catalog.putCategories(s, list);
             showCategories(list);
         });
     }
@@ -192,8 +201,7 @@ public final class MainActivity extends Activity {
         Xtream.Category c = category;
         Xtream.Section s = section;
         if (c == null || api == null) return;
-        String key = s.name() + "/" + c.id;
-        List<Item> cached = itemCache.get(key);
+        List<Item> cached = Catalog.items(s, c.id);
         if (cached != null) {
             showItems(cached, s);
             return;
@@ -208,7 +216,7 @@ public final class MainActivity extends Activity {
                 showStatus(error.french());
                 return;
             }
-            itemCache.put(key, list);
+            Catalog.putItems(s, c.id, list);
             showItems(list, s);
         });
     }
@@ -310,6 +318,7 @@ public final class MainActivity extends Activity {
     }
 
     private final class CardAdapter extends RecyclerView.Adapter<CardAdapter.Holder> {
+        static final String GUIDE = "guide";
         List<Item> items = new ArrayList<>();
         private Xtream.Section kind = Xtream.Section.LIVE;
 
@@ -317,12 +326,19 @@ public final class MainActivity extends Activity {
             final ImageView image;
             final TextView title;
             final TextView initials;
+            final TextView now;
+            final View track, bar;
+            /** The channel this card shows; read by the guide's thread to skip cards that scrolled away. */
+            volatile String boundId;
 
             Holder(View v) {
                 super(v);
                 image = v.findViewById(R.id.image);
                 title = v.findViewById(R.id.title);
                 initials = v.findViewById(R.id.initials);
+                now = v.findViewById(R.id.now);
+                track = v.findViewById(R.id.track);
+                bar = v.findViewById(R.id.bar);
                 View frame = v.findViewById(R.id.frame);
                 Ui.roundClip(frame != null ? frame : (View) image.getParent());
                 Ui.lift(v, 1.06f);
@@ -349,12 +365,55 @@ public final class MainActivity extends Activity {
         }
 
         @Override
+        public void onBindViewHolder(Holder h, int position, List<Object> payloads) {
+            if (payloads.contains(GUIDE)) {
+                if (h.now != null) guide(h, items.get(position));
+                return;
+            }
+            super.onBindViewHolder(h, position, payloads);
+        }
+
+        @Override
+        public void onViewRecycled(Holder h) {
+            h.boundId = null;
+        }
+
+        /** The programme on now, under the channel's name, with how far into it we are. */
+        private void guide(Holder h, Item item) {
+            h.boundId = item.id;
+            showGuide(h, null);
+            Epg.get(api, item.id, new Epg.Callback() {
+                @Override
+                public void done(Epg.Listing listing) {
+                    if (item.id.equals(h.boundId)) showGuide(h, listing);
+                }
+
+                @Override
+                public boolean stillWanted() {
+                    return item.id.equals(h.boundId);
+                }
+            });
+        }
+
+        private void showGuide(Holder h, Epg.Listing listing) {
+            long sec = System.currentTimeMillis() / 1000;
+            Epg.Programme p = listing == null ? null : listing.now(sec);
+            h.now.setVisibility(p == null ? View.INVISIBLE : View.VISIBLE);
+            h.track.setVisibility(p == null ? View.INVISIBLE : View.VISIBLE);
+            if (p == null) return;
+            h.now.setText(p.title);
+            h.bar.setPivotX(0);
+            h.bar.setScaleX(p.progress(sec));
+        }
+
+        @Override
         public void onBindViewHolder(Holder h, int position) {
             Item item = items.get(position);
             if (item.kind == Item.Kind.LIVE) {
                 h.title.setText(item.num > 0 ? item.num + "  " + item.name : item.name);
                 h.initials.setText(initials(item.name));
                 Images.load(h.image, item.image, Ui.dp(h.itemView.getContext(), 140));
+                if (h.now != null) guide(h, item);
             } else {
                 h.title.setText(item.name);
                 Images.load(h.image, item.image, Ui.dp(h.itemView.getContext(), 120));

@@ -51,6 +51,9 @@
             android:configChanges="keyboard|keyboardHidden|navigation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false" />
         <activity
+            android:name=".RefreshActivity"
+            android:exported="false" />
+        <activity
             android:name=".UpdatesActivity"
             android:exported="false" />
 

@@ -24,4 +24,27 @@
     <string name="retrying">Nouvelle tentative…</string>
     <string name="retrying_hls">Nouvelle tentative en HLS…</string>
     <string name="retry_hint">OK pour réessayer, Retour pour quitter.</string>
+    <string name="nav_refresh">Actualiser</string>
+    <string name="refresh_title">Actualiser</string>
+    <string name="refresh_hint">Recharge les listes quand ton fournisseur a ajouté des chaînes, des films ou des épisodes. Elles se rechargent aussi seules après 6 heures, et le guide à la fin de chaque programme.</string>
+    <string name="refresh_all">Tout actualiser</string>
+    <string name="refresh_all_sub">Chaînes, films, séries et guide des programmes</string>
+    <string name="refresh_live">Chaînes en direct</string>
+    <string name="refresh_movies">Films</string>
+    <string name="refresh_series">Séries</string>
+    <string name="refresh_guide">Guide des programmes</string>
+    <string name="refresh_images">Logos et affiches</string>
+    <string name="refresh_not_loaded">Pas encore chargé</string>
+    <string name="refresh_running">Actualisation…</string>
+    <string name="refresh_done">À jour</string>
+    <string name="refresh_cleared">Vidé</string>
+    <string name="refresh_some_failed">Une liste n\'a pas pu être rechargée</string>
+    <string name="refresh_no_account">Aucun compte enregistré</string>
+    <plurals name="refresh_guide_sub">
+        <item quantity="one">%1$d chaîne en mémoire. Il se recharge quand une chaîne s\'affiche.</item>
+        <item quantity="other">%1$d chaînes en mémoire. Il se recharge quand une chaîne s\'affiche.</item>
+    </plurals>
+    <string name="refresh_images_sub">%1$s en cache sur la box. Ils se téléchargent de nouveau quand ils s\'affichent.</string>
+    <string name="guide_next">Ensuite · %1$s  %2$s</string>
+    <string name="guide_now">%1$s – %2$s · %3$s</string>
 </resources>

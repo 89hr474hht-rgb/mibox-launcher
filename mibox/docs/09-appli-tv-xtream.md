@@ -1,7 +1,8 @@
 # LaunchOS TV : l'appli pour ton compte Xtream
 
-**Statut :** V1 (0.1.0) écrite et testée sur l'émulateur avec un faux serveur, avec mises à jour automatiques.
-Publiée sur GitHub (tag `tv-v0.1.0`) avec ton accord ; jamais connectée à ton serveur par moi.
+**Statut :** 0.1.0 publiée (tag `tv-v0.1.0`) et installée sur la box le 6 novembre 2026, mises à jour autorisées.
+0.2.0 ajoute le menu Actualiser et le guide des programmes. Testé sur l'émulateur avec un faux serveur ; jamais
+connecté à ton serveur par moi.
 
 ## Ce qu'on a décidé
 
@@ -27,6 +28,11 @@ Publiée sur GitHub (tag `tv-v0.1.0`) avec ton accord ; jamais connectée à ton
   - **direct** : nom et numéro de la chaîne pendant 4 s, CH+/CH− ou Haut/Bas pour zapper dans la catégorie, OK
     pour revoir le nom. Si le flux tombe, l'appli réessaie deux fois, puis en HLS, avant d'afficher l'erreur ;
   - **films et épisodes** : OK affiche les commandes, Gauche/Droite recule de 10 s ou avance de 30 s.
+- **Actualiser** (0.2.0) : recharge les chaînes, les films, les séries ou tout, vide le guide, vide les logos et
+  affiches gardés sur la box. Sans ça, les listes se rechargent seules après 6 heures.
+- **Guide des programmes** (0.2.0) : `get_short_epg` chaîne par chaîne. Le programme en cours sous chaque chaîne
+  avec une barre d'avancement ; en direct, les heures, le titre et le programme suivant. Gardé jusqu'à la fin du
+  programme. La grille complète viendra plus tard.
 - **Messages d'erreur en français** : identifiants refusés, compte expiré, adresse introuvable, serveur muet, flux
   refusé (souvent une autre lecture en cours sur un compte à une connexion), format que la box ne sait pas décoder.
 
@@ -70,7 +76,7 @@ adresse de flux, souvent en `http` non chiffré. Ton fournisseur et ton réseau 
 - `mibox/tv/mock/xtream_mock.py` : faux serveur Xtream sur le Mac (compte demo / demo), avec des vidéos de test
   faites par ffmpeg. Il imite les variantes des vrais serveurs : nombres envoyés en texte, épisodes en tableau ou
   en liste, redirections.
-- 11 tests unitaires sur la lecture des réponses Xtream et des adresses.
+- 36 tests unitaires : réponses Xtream, adresses, guide des programmes, et le code de mise à jour.
 
 ## Ce qui a été testé
 
@@ -87,10 +93,10 @@ Sur l'émulateur, contre le faux serveur (détail dans `02-plan-de-tests.md`, se
 
 ## La suite
 
-1. **Publier la V1** sur GitHub (tag `tv-v0.1.0`), puis vérifier la somme SHA-256 et le certificat.
-2. **L'installer sur la box** par ADB, et autoriser ses mises à jour. Les suivantes arrivent toutes seules.
-3. **Ton test** : tu entres ton compte et tu me dis ce qui marche (tests TV-01 à TV-12). Je ne vois rien de ce qui
+1. ~~Publier la V1 et l'installer sur la box~~ : fait le 6 novembre 2026 (SHA-256 et certificat vérifiés).
+2. **0.2.0 par la mise à jour automatique** : la box doit la proposer d'elle-même (test TV-UPD-02).
+3. **Ton test** : tu entres ton compte et tu me dis ce qui marche (tests TV-01 à TV-16). Je ne vois rien de ce qui
    passe à l'écran ; décris-moi juste ce que tu constates.
-4. **V2**, selon ton retour : guide des programmes (maintenant / ensuite, puis grille), favoris, reprise de lecture,
+4. **Ensuite**, selon ton retour : grille complète du guide, favoris, reprise de lecture,
    recherche, replay si ton fournisseur le propose, rangées sur l'accueil de LaunchOS, touche de la télécommande
    pour ouvrir le direct, et mises à jour par le système de LaunchOS.

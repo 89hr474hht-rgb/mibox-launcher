@@ -20,6 +20,7 @@ import java.util.Locale;
 final class Xtream {
     /** A list can be several MB on a big panel; more than this is refused rather than filling the memory. */
     private static final int MAX_LIST_BYTES = 48 * 1024 * 1024;
+    private static final int MAX_EPG_BYTES = 512 * 1024;
 
     static final class Category {
         final String id;
@@ -115,10 +116,19 @@ final class Xtream {
         return parseSeriesInfo(fetch("get_series_info", "&series_id=" + enc(seriesId)));
     }
 
+    /** Now and next for one channel: a few programmes from get_short_epg. */
+    List<Epg.Programme> shortEpg(String streamId) throws XtreamException {
+        return Epg.parse(fetch("get_short_epg", "&stream_id=" + enc(streamId) + "&limit=4", MAX_EPG_BYTES));
+    }
+
     private Object fetch(String action, String extra) throws XtreamException {
+        return fetch(action, extra, MAX_LIST_BYTES);
+    }
+
+    private Object fetch(String action, String extra, int maxBytes) throws XtreamException {
         String url = account.server + "/player_api.php?username=" + enc(account.user) + "&password=" + enc(account.password)
                 + (action != null ? "&action=" + action : "") + (extra != null ? extra : "");
-        String body = new String(Http.get(url, MAX_LIST_BYTES), StandardCharsets.UTF_8).trim();
+        String body = new String(Http.get(url, maxBytes), StandardCharsets.UTF_8).trim();
         if (body.isEmpty() || body.equals("null")) return new JSONArray();
         try {
             return new JSONTokener(body).nextValue();

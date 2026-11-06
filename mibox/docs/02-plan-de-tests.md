@@ -237,8 +237,12 @@ abonnement limité à une connexion coupe l'autre lecture.
 | TV-10 | Gros catalogue | Parcourir de grosses catégories de ton fournisseur | Listes fluides, pas de fermeture de l'appli | MANUEL | Non testé |
 | TV-11 | Adresse introuvable | Serveur `serveur.invalid:8080` | Message « Adresse du serveur introuvable » | MANUEL | Non testé |
 | TV-12 | Tuile sur l'accueil | Accueil LaunchOS, bibliothèque d'applis | « LaunchOS TV » apparaît avec sa bannière | MANUEL | Test partiel (émulateur) |
+| TV-13 | Menu Actualiser | Actualiser → Tout actualiser, puis Retour | Chaque ligne passe à « À jour » ; de retour, la section se recharge | MANUEL | Test partiel (émulateur) |
+| TV-14 | Guide sur les chaînes | Chaînes, une catégorie | Le programme en cours et une barre sous les chaînes qui ont un guide ; rien sous les autres | MANUEL | Test partiel (émulateur) |
+| TV-15 | Guide en direct | Une chaîne, puis OK | Heures, titre en cours, barre d'avancement et « Ensuite » | MANUEL | Test partiel (émulateur) |
+| TV-16 | Guide de ton fournisseur | Plusieurs chaînes françaises | Titres lisibles (accents compris) et heures justes | MANUEL | Non testé |
 | TV-UPD-01 | Écran Mises à jour | Mises à jour (en bas à gauche) → Rechercher maintenant | « LaunchOS TV est à jour » et la date ; pas de cadre rouge sur la box (installation autorisée) | MANUEL | Test partiel (émulateur, vrai GitHub, aucune version TV publiée ; cadre rouge attendu sur l'émulateur) |
-| TV-UPD-02 | Mise à jour proposée | À la prochaine version publiée | Bandeau en haut à droite et « Mise à jour ! » dans le menu ; Installer → téléchargement, vérification, confirmation d'Android ; le compte est gardé | MANUEL | Non testé |
+| TV-UPD-02 | Mise à jour proposée | 0.1.0 installée sur la box, 0.2.0 publiée | Bandeau en haut à droite et « Mise à jour ! » dans le menu ; Installer → téléchargement, vérification, confirmation d'Android ; le compte est gardé | MANUEL | Non testé |
 | TV-UPD-03 | LaunchOS pas gêné | Réglages de LaunchOS → Mises à jour → Vérifier | LaunchOS ne propose jamais une version de LaunchOS TV | MANUEL | Non testé |
 
 ## D. Applications
