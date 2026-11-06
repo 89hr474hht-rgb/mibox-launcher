@@ -1,137 +1,113 @@
-# Étude : comment avoir une barre de volume personnalisée
+# Étude : comment mettre la barre de volume LaunchOS à la place des barres actuelles
 
-**Statut : étude, rien n'est modifié sur la box.** Les relevés ci-dessous ont été faits le 2026-11-06 en ADB, en
-lecture seule (`settings get`, `getprop`, et quelques lignes filtrées de `dumpsys audio` et `dumpsys hdmi_control`).
+**Statut :** étude, plus un prototype testé sur l'émulateur Android TV du Mac, sur la branche
+`volume-bar-proto`. Rien n'est publié, et rien n'est modifié sur la box.
 
-Cette étude fait suite au premier essai décrit dans `mibox/docs/06-barre-de-volume.md`, sur la branche `volume-hud`.
-Cet essai interceptait les touches de volume, et Android TV ne le permet pas.
+Les relevés sur la box ont été faits le 2026-11-06, en lecture seule : `settings get`, `getprop`, `cmd -l`, et
+quelques lignes filtrées de `dumpsys audio` et `dumpsys hdmi_control`. Le code cité est celui d'AOSP Android 11
+(`android-11.0.0_r48`), la version de la box.
+
+Cette étude fait suite au premier essai décrit dans `mibox/docs/06-barre-de-volume.md`, sur la branche
+`volume-hud`. Cet essai interceptait les touches de volume, et Android TV ne le permet pas.
 
 ## En bref
 
-- **Sur la JBL (Bluetooth)**, une barre LaunchOS est faisable sans root. C'est la box qui règle le volume, LaunchOS
-  connaît le niveau, et sa barre peut se poser **par-dessus** celle d'Android et la cacher.
-- **Sur les haut-parleurs de la Samsung**, ce n'est pas la box qui règle le volume. Elle transmet + et − à la télé
-  par HDMI-CEC, et c'est la Samsung qui affiche **sa** barre. LaunchOS ne connaît pas le niveau et ne peut pas cacher
-  la barre de Samsung. La seule façon d'y arriver est de faire régler le volume par la box au lieu de la télé (piste C).
-  Cela change le fonctionnement du son et touche au réglage HDMI-CEC : c'est à toi de décider.
-- **Avant d'écrire du code**, il faut un test d'une minute (voir « Ce qu'il faut vérifier avec toi ») : quelle barre
-  apparaît aujourd'hui quand tu appuies sur Volume +, avec et sans la JBL ?
+Il y a deux barres différentes selon d'où sort le son.
 
-## Comment le volume marche sur ta box
-
-| Relevé (lecture seule) | Valeur | Ce que ça veut dire |
+| Le son sort par… | La barre qu'on voit aujourd'hui | Peut-on mettre celle de LaunchOS ? |
 |---|---|---|
-| `ro.hdmi.device_type` | 4 | La box est un « lecteur » HDMI-CEC (playback). |
-| `hdmi_control_enabled` | 1 | HDMI-CEC est actif. |
-| `dumpsys audio` → `mHdmiCecSink` | true | La Samsung répond en CEC. |
-| `dumpsys audio` → `mHdmiCecVolumeControlEnabled` | true | Le volume peut être envoyé à la télé par CEC. |
-| `dumpsys audio` → `mUseFixedVolume` | false | Le volume de la box n'est pas bloqué en général. |
-| `dumpsys audio` → `mIsSingleVolume` | true | Un seul volume pour tout (normal sur une box TV). |
-| `ro.config.media_vol_steps` | 15 | 15 crans de volume côté box. |
-| `dumpsys audio` → `mAvrcpAbsVolSupported` | false | Avec la JBL, c'est la box qui atténue le son (pas la JBL). |
-| `dumpsys audio` → `mVolumeController` | présent | La barre d'Android est celle de SystemUI. |
+| **La JBL (Bluetooth)** | Celle d'Android, une capsule à droite | **Oui.** Android ne permet pas de désactiver la sienne sans root, mais LaunchOS peut la **recouvrir** entièrement. Le prototype marche. |
+| **Les haut-parleurs de la Samsung** | Celle de **Samsung** (Android masque la sienne) | **Non, sauf à couper HDMI-CEC** entier, ce qui est sur ta liste rouge. Le détail est plus bas. |
 
-Dans le code d'Android 11 (`AudioService`, `android-11.0.0_r48`), quand la télé répond en CEC (`mHdmiCecSink`), la
-sortie HDMI passe en « volume plein ». Chaque Volume + ou − est alors **envoyé à la télé** sous forme de touche CEC
-(`HdmiPlaybackClient.sendVolumeKeyEvent`), au lieu de baisser le son de la box. C'est pour ça que la Samsung affiche
-sa propre barre.
+## Pourquoi deux cas
 
-Avec la JBL, le son sort en Bluetooth (`bt_a2dp`), qui n'est pas en volume plein : c'est la box qui baisse le son, et
-Android affiche son panneau.
+| Relevé sur la box | Valeur |
+|---|---|
+| `ro.hdmi.device_type` | 4 (la box est un « lecteur » HDMI-CEC) |
+| `hdmi_control_enabled` | 1 (HDMI-CEC actif) |
+| `mHdmiCecSink` | true (la Samsung répond en CEC) |
+| `mHdmiCecVolumeControlEnabled` | true |
+| `mAvrcpAbsVolSupported` | false (avec la JBL, c'est la box qui atténue le son) |
+| `ro.config.media_vol_steps` | 15 |
 
-Par ailleurs, la télécommande Xiaomi a aussi de l'infrarouge. Si Google TV l'a configurée pour régler le volume de la
-télé en infrarouge, les touches de volume ne passent même pas par la box. C'est l'une des choses à vérifier.
+**Haut-parleurs de la télé.** Quand la télé répond en CEC, Android 11 passe la sortie HDMI en « volume plein »
+(`updateHdmiCecSinkLocked`).
+- Volume + et − ne changent plus le son de la box. Ils sont **envoyés à la Samsung** en touches CEC
+  (`sendVolumeKeyEvent`), et la Samsung affiche sa barre.
+- Android retire lui-même l'affichage de son panneau pour cette sortie (`sendVolumeUpdate` enlève `FLAG_SHOW_UI`).
+- La box ne connaît pas le niveau de la Samsung, et aucun signal de volume n'arrive aux applis. LaunchOS ne pourrait
+  même pas afficher une barre en plus.
 
-## Ce qui est impossible sans root (déjà prouvé)
+**JBL.** Le son sort en Bluetooth, qui n'est pas en « volume plein ». La box baisse elle-même le son, sur 15 crans,
+et Android affiche son panneau. Les applis reçoivent le changement (`VOLUME_CHANGED_ACTION`) et peuvent lire le
+niveau.
 
-- **Recevoir les touches Volume + et −** : sur Android TV, elles sont traitées avant les services d'accessibilité
-  (`PhoneWindowManager`, voir le document 06). Seul Muet arrive.
-- **Supprimer le panneau de volume d'Android** : il appartient à SystemUI. Le modifier demande une appli système ou
-  un overlay signé par le fabricant. Désactiver SystemUI est exclu (liste rouge, la box ne marcherait plus).
-- **Devenir le « contrôleur de volume » d'Android** (`AudioManager.setVolumeController`) : la permission
-  `STATUS_BAR_SERVICE` est réservée au système.
-- **Changer la barre de volume de la Samsung** : c'est le logiciel de la télé.
+## « Quitte à désactiver la barre actuelle » : ce qui est possible
 
-## Les pistes possibles
+### La barre d'Android (cas JBL)
 
-### A. Une barre LaunchOS qui recouvre celle d'Android (recommandée, sans risque)
+| Moyen | Résultat |
+|---|---|
+| Désactiver SystemUI (`pm disable-user com.android.systemui`) | **Exclu.** Plus de fenêtres système, risque de box inutilisable. C'est un paquet cœur, refusé par les outils. |
+| Désactiver seulement le composant « volume » | **Impossible.** `VolumeUI` n'est pas un composant Android déclaré, mais une classe interne de SystemUI : `pm disable` ne peut pas la viser. |
+| Un overlay (RRO) qui change SystemUI | **Impossible sans root** : il doit être signé par Xiaomi ou installé dans la partition système. |
+| Devenir le « contrôleur de volume » d'Android (`setVolumeController`) | **Impossible** : permission `STATUS_BAR_SERVICE`, réservée au système. |
+| Un réglage caché, ou une commande `cmd audio` | Rien. Sur la box, `cmd audio` n'existe pas (« No shell command implementation »). |
+| **La recouvrir avec la barre LaunchOS** | **Possible, et le prototype marche.** Voir plus bas. |
 
-Le principe :
-- LaunchOS a déjà un service d'accessibilité, « Boutons de la télécommande LaunchOS ». Il peut aussi afficher une
-  fenêtre par-dessus tout, de type `TYPE_ACCESSIBILITY_OVERLAY`.
-- Dans Android 11 (`WindowManagerPolicy`), cette couche est au niveau 31, au-dessus du panneau de volume
-  (`TYPE_VOLUME_OVERLAY`, niveau 22). Notre barre peut donc **recouvrir exactement** le panneau d'Android, qui reste
-  là mais caché dessous.
-- Le service sait quand le panneau d'Android apparaît et disparaît, et où il est, grâce aux changements de fenêtres
-  (`TYPE_WINDOWS_CHANGED`, `getWindows()`). Il sait aussi quand le volume change (`VOLUME_CHANGED_ACTION`,
-  `STREAM_MUTE_CHANGED_ACTION`) et lit le niveau (`AudioManager.getStreamVolume`). Pas besoin de capture d'écran ni de
-  lire le contenu des applis.
-- La barre ne prend ni le focus ni les touches (`FLAG_NOT_FOCUSABLE`, `FLAG_NOT_TOUCHABLE`), donc la télécommande
-  continue de marcher normalement.
-- Le dessin existe déjà sur la branche `volume-hud` : une capsule façon Dynamic Island, à reprendre avec la police
-  Inter. Elle peut montrer la sortie (télé ou JBL), le niveau en 15 crans et le muet.
+Conclusion : on ne peut pas désactiver la barre d'Android, mais on peut la rendre invisible en posant la nôtre
+par-dessus. Le résultat à l'écran revient au même.
 
-Ce que ça donne :
-- **JBL** : une vraie barre LaunchOS, avec le bon niveau, à la place de celle d'Android.
-- **Haut-parleurs de la télé** : rien de mieux. La Samsung affiche toujours sa barre, et la box ne connaît pas le
-  niveau.
+### La barre de Samsung (cas haut-parleurs de la télé)
 
-Risques :
-- Le panneau d'Android peut se voir une fraction de seconde avant d'être recouvert. C'est à mesurer sur la box.
-- Si Android place son panneau ailleurs que prévu, le recouvrement est partiel. Le service lit sa position à chaque
-  fois, ce qui limite ce risque.
-- Rien n'est désactivé sur la box. Pour revenir en arrière, il suffit de couper l'option dans les réglages de
-  LaunchOS.
+| Moyen | Résultat |
+|---|---|
+| Couper seulement le contrôle du volume par CEC (`hdmi_control_volume_control_enabled`) | **À ne pas faire.** La sortie HDMI resterait en « volume plein », et rien ne serait envoyé à la télé : Volume + et − de la télécommande Xiaomi **ne feraient plus rien**. Dans la première version de cette étude, j'avais présenté cette piste à tort comme une solution. |
+| Forcer la sortie HDMI en volume réglable (`setDeviceVolumeBehavior`) | **Impossible sans root** : permission `MODIFY_AUDIO_ROUTING`, réservée au système, et pas de commande shell sur Android 11 (`cmd audio` et `cmd hdmi_control` ne répondent pas). |
+| Masquer la barre dans les réglages de la Samsung | À ma connaissance, Samsung n'a pas d'option pour ça. À vérifier dans le menu de ta télé si tu veux, mais je ne compterais pas dessus. |
+| **Couper HDMI-CEC entièrement** | **Ça marcherait**, mais au prix de HDMI-CEC. La box réglerait elle-même le son HDMI, Android afficherait sa barre, et LaunchOS la recouvrirait. On perd l'allumage et l'extinction de la télé avec la box, le passage automatique sur la bonne entrée HDMI, et le volume de la Samsung avec la télécommande Xiaomi. Il faudrait aussi régler une fois la Samsung à un niveau fixe. **HDMI-CEC est sur ta liste rouge**, donc je ne le ferai que si tu changes cette règle. |
+| Root ou firmware modifié | Exclu par les règles du projet. |
 
-### B. Une petite barre « en plus », sans recouvrir
+## Le prototype (branche `volume-bar-proto`)
 
-C'est la même chose que A, mais la barre de LaunchOS s'affiche à côté de celle d'Android. C'est plus simple, mais il y
-a deux barres à l'écran, ce que tu ne voulais pas. Je ne le recommande pas.
+Ce qu'il fait :
+- **`VolumeBar`** : une capsule LaunchOS verticale, à l'endroit exact du panneau d'Android (bord droit, centrée),
+  un peu plus grande et opaque. Elle montre :
+  - le niveau en chiffres ;
+  - une barre épaisse qui se remplit en dégradé bleu, violet et rose, avec un ressort ;
+  - un haut-parleur dont les ondes suivent le niveau, barré au muet, ou une enceinte quand la JBL est connectée ;
+  - un effet élastique quand on force en haut ou en bas.
+  Elle reste 3,3 s, un peu plus que le panneau d'Android, puis s'efface.
+- **La fenêtre** est un overlay d'accessibilité. Dans Android 11, cette couche (niveau 31) passe au-dessus du panneau
+  de volume (niveau 22). La fenêtre ne prend ni le focus ni les touches : la télécommande marche comme avant.
+- **Le déclencheur** est le message de changement de volume, qui arrive en général en moins de 100 ms. En secours, il
+  y a l'ouverture de la fenêtre de volume d'Android, que le service « Boutons de la télécommande LaunchOS » détecte.
+  Pour ça, il ne lit que le **nom de classe** de la fenêtre qui s'ouvre, jamais son contenu ni ce qui passe à l'écran.
 
-### C. Faire régler le volume par la box au lieu de la Samsung (à décider)
+Résultats sur l'émulateur (Android TV, 1920×1080, même densité que la box) :
 
-Il faut couper « contrôle du volume par HDMI-CEC » (`mHdmiCecVolumeControlEnabled`) **sans couper HDMI-CEC
-lui-même**. Le réglage est dans les paramètres d'Android TV, ou se fait en ADB avec ton accord.
+| Test | Résultat |
+|---|---|
+| La barre LaunchOS recouvre entièrement celle d'Android | Test réussi |
+| Le niveau, l'icône et le remplissage suivent le volume | Test réussi |
+| Les touches de la télécommande restent utilisables | Test réussi (la fenêtre ne prend pas le focus) |
+| Aucune trace de la barre d'Android pendant que la nôtre est affichée | Test réussi (après passage en fond opaque) |
+| Au premier appui, la barre d'Android ne se voit pas du tout | **Test partiel.** Elle peut se voir un instant avant la nôtre : de 0,05 à 0,5 s selon les mesures sur l'émulateur, qui est lent quand il enregistre l'écran. À mesurer sur la box. |
+| Appui sur + au maximum (ou − à zéro) | **Test partiel.** Le volume ne change pas, donc aucun message n'arrive. La nôtre ne couvre celle d'Android qu'à l'arrivée du signal de fenêtre, environ 0,7 s plus tard. |
+| Sur la box, avec la JBL | Non testé |
 
-Après ça, la box atténue elle-même le son envoyé en HDMI. La Samsung ne reçoit plus de touches de volume, donc
-n'affiche plus sa barre. La piste A marche alors aussi pour les haut-parleurs de la télé.
+Limites connues :
+- **Taille** : avec le prototype, l'APK fait 737 828 octets, soit 548 octets au-dessus de la limite de `release.yml`
+  (737 280). Pour le publier, il faudra gagner de la place, par exemple en allégeant la police, ou relever la limite.
+- Le service « Boutons de la télécommande LaunchOS » reçoit en plus le nom de classe des fenêtres qui s'ouvrent. Il
+  ne lit toujours pas le contenu de l'écran : `canRetrieveWindowContent` reste à `false`.
 
-Contreparties :
-- **Deux volumes** : il faut régler une fois la Samsung à un niveau confortable (avec sa propre télécommande). Ensuite
-  on n'utilise plus que celui de la box.
-- **15 crans** côté box, au lieu des 100 de la Samsung : les pas sont plus gros.
-- **Son « bitstream »** (Dolby Atmos envoyé tel quel à la télé) : la box ne peut pas l'atténuer. Aujourd'hui
-  `sys.audio.passthrough` vaut `false`, donc a priori non concerné, mais c'est à vérifier avec Netflix.
-- Ça touche au réglage HDMI-CEC, qui est sur la liste rouge. Ce n'est pas une désactivation de HDMI-CEC (allumage,
-  changement de source et télécommande restent en CEC), mais c'est une **décision à prendre par toi**, après un test
-  sur un créneau libre, avec retour arrière immédiat.
+## Ce qu'il me faut de toi
 
-### D. Avec root ou un firmware modifié
-
-Un overlay de SystemUI ou une SystemUI modifiée, c'est la solution « propre ». Mais c'est exclu par les règles du
-projet : pas de root, rien de flashé.
-
-## Ce qu'il faut vérifier avec toi (1 minute, sur un créneau libre)
-
-| N° | Geste | Ce que tu me dis |
-|---|---|---|
-| V1 | Son sur la télé (JBL éteinte) : appuie sur Volume + de la télécommande Xiaomi | Quelle barre apparaît : celle de Samsung, celle d'Android (barre fine à droite), ou les deux ? |
-| V2 | JBL allumée et connectée : Volume + | Même question. |
-| V3 | Paramètres → Télécommandes et accessoires : y a-t-il un réglage « boutons de la télécommande » ou « contrôle du volume » en infrarouge ? | Ce qui est choisi (ne rien changer). |
-
-Pendant V1 et V2, je peux lire en ADB, en lecture seule, le niveau de volume de la box, pour voir s'il bouge. C'est
-seulement si tu es d'accord, et sans regarder ce qui passe à l'écran.
-
-## Le plan proposé
-
-1. **Prototype sur l'émulateur** du Mac : la barre LaunchOS recouvre le panneau d'Android
-   (`cmd media_session volume --show`). On vérifie le recouvrement, le temps d'apparition et que les touches marchent.
-2. **Les tests V1 à V3** avec toi.
-3. **Si V2 montre la barre d'Android** : la barre LaunchOS pour la JBL, en option « Barre de volume LaunchOS » dans
-   les réglages, désactivée par défaut. Puis une version à installer et des tests sur la box.
-4. **Seulement si tu le décides** : la piste C pour les haut-parleurs de la télé, testée sur un créneau libre, puis
-   annulée ou gardée.
-
-Taille : la capsule de `volume-hud` pèse quelques Ko. L'APK est à 735 Ko pour une limite de 737 Ko, donc il faudra
-gagner de la place ailleurs (par exemple réduire la police) ou relever la limite de `release.yml`. C'est une
-décision à prendre au moment de l'intégration.
+1. **Le test d'une minute**, sur un créneau libre :
+   - JBL éteinte, appuie sur Volume + : la barre de Samsung apparaît-elle seule ?
+   - JBL connectée, appuie sur Volume + : la barre d'Android apparaît-elle à droite ?
+2. **Ta décision sur les haut-parleurs de la télé** : on garde HDMI-CEC et la barre de Samsung, ce que je recommande,
+   ou tu acceptes de perdre HDMI-CEC pour avoir la barre LaunchOS partout ?
+3. Si le test 1 confirme le cas JBL : j'intègre la barre dans une version, en option « Barre de volume LaunchOS »
+   dans les réglages, après avoir gagné la place nécessaire. Puis on la teste sur la box avec la JBL.

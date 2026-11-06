@@ -16,6 +16,20 @@ import android.view.accessibility.AccessibilityEvent;
  */
 public final class RemoteKeysService extends AccessibilityService {
     private int downKey = -1;
+    private VolumeBar volumeBar;
+
+    @Override
+    protected void onServiceConnected() {
+        super.onServiceConnected();
+        volumeBar = new VolumeBar(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (volumeBar != null) volumeBar.stop();
+        volumeBar = null;
+        super.onDestroy();
+    }
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
@@ -48,8 +62,15 @@ public final class RemoteKeysService extends AccessibilityService {
         }
     }
 
+    /** Only Android's own volume panel matters here: its window class, never anything on screen. */
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+        if (volumeBar == null || event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
+        CharSequence cls = event.getClassName();
+        if (cls != null && "com.android.systemui".contentEquals(String.valueOf(event.getPackageName()))
+                && cls.toString().contains(".volume.")) {
+            volumeBar.systemPanel();
+        }
     }
 
     @Override
