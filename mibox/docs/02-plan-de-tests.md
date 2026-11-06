@@ -151,6 +151,44 @@ Vérifié sur l'émulateur Android TV 12 (1920 × 1080, même densité que la bo
 | GLOW-02 | Pas d'effet en arrière-plan | Lancer une vidéo, puis `dumpsys gfxinfo com.gathin.tvhome` | Aucune image dessinée par le launcher pendant la vidéo | ADB | Non testé |
 | CLK-01 | Animation de l'heure | Regarder l'horloge au changement de minute | Les chiffres qui changent roulent vers le haut, les autres ne bougent pas, rien ne reste en double | MANUEL | Non testé |
 
+## C septies. Accueil sans Google TV et sans commande vocale (E4, E3, E11)
+
+Plan détaillé : [07-plan-accueil-et-voix.md](07-plan-accueil-et-voix.md). Les tests RC, SFR, BT, CEC, NET et
+SYS des sections précédentes sont repassés après E3 (colonne E3).
+
+Exécution : 6 novembre 2026, vers 11 h 55, box en Ethernet, launcher 1.2.0. Contrôle préalable
+`precheck-accueil.sh` : 12 OK, 0 point à regarder. Sauvegarde : `audits/20261106-115424-avant-e4-e3/`.
+E4 puis E3, chacun par `tools/disable.sh` (enregistrements de retour arrière dans `~/.cleanyourtv/`).
+Côté ADB après E3 : seuls `setupwraith` et `launcherx` sont désactivés, liste rouge active, Internet par
+Ethernet, CEC activé, Bluetooth `ON`. Pas de redémarrage pour l'instant. Aucune capture d'écran.
+
+Stockage, le même jour, à votre demande : `pm trim-caches` (caches des applis seulement, recréés au besoin).
+Espace libre sur `/data` : 877 Mo avant, 1,6 Go après. Aucun fichier ni aucune donnée d'appli supprimés.
+
+Suite, le même jour vers 12 h 30, télé libre, à votre demande. Vous avez supprimé les 7 fichiers APK du
+dossier Téléchargements (environ 525 Mo) ; caches vidés de nouveau. Espace libre : 2,1 Go. Sauvegarde :
+`audits/20261106-122834-avant-e5-e11/`. Puis, chacune par `tools/disable.sh` avec le contrôle préalable entre
+deux étapes (12 OK à chaque fois) : E11, E5, E6, E7, E8, et E10 après avoir choisi l'horloge du launcher comme
+écran de veille (`screensaver_components` = `com.gathin.tvhome/.ClockDream`, ancienne valeur
+`com.google.android.apps.tv.dreamx/.service.Backdrop`). Puis un redémarrage (HOME-03).
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| HOME-01 | Home après E3 | `cmd package resolve-activity` (HOME), puis bouton rond depuis une appli | `com.gathin.tvhome/.MainActivity` ; le bouton rond ouvre votre launcher | ADB + MANUEL | Test réussi : côté ADB, Home = `com.gathin.tvhome/.MainActivity`, rôle HOME = `com.gathin.tvhome` ; bouton rond confirmé par vous le 6/11 |
+| HOME-02 | Boutons raccourcis | Netflix, YouTube, Prime, Apps | Ne font rien (attendu jusqu'à E9), rien ne plante | MANUEL | Non testé |
+| HOME-03 | Après redémarrage | Redémarrage, puis `precheck-accueil.sh` | Home = votre launcher, mêmes paquets désactivés, Ethernet, télécommande et JBL revenus | MIXTE | Test partiel : redémarrage du 6/11 à 12 h 30, côté ADB Home = votre launcher, les 17 paquets désactivés le restent, Ethernet, Bluetooth `ON`, CEC activé. Télécommande et JBL à confirmer par vous |
+| VOIX-01 | Micro coupé | Après E11, appui sur le bouton micro | Rien ne se passe ; le reste de la télécommande répond | MANUEL | Non testé |
+| VOIX-02 | Retour possible | `restore.sh mibox/lists/E11-assistant.txt` (seulement si vous voulez la voix) | Le micro relance l'Assistant | MIXTE | Non testé |
+
+## C octies. Nettoyage invisible, écran de veille et bouton YouTube (E5 à E10)
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| NET-E5 | Après E5 à E8 | `precheck-accueil.sh` après chaque étape, puis après le redémarrage | 12 OK, Home = votre launcher, Ethernet, liste rouge active | ADB | Test réussi : 12 OK après chaque étape et après le redémarrage du 6/11 |
+| VEILLE-01 | Écran de veille | Laisser la box sans toucher la télécommande jusqu'à l'écran de veille | L'horloge du launcher s'affiche ; une touche ramène là où vous étiez | MANUEL | Non testé |
+| YT-01 | Bouton YouTube (E9, 1.2.1) | Depuis l'accueil, puis depuis une autre appli : bouton YouTube | YouTube s'ouvre une seule fois | MANUEL | Non testé |
+| YT-02 | Netflix et Prime | Boutons Netflix et Prime Video | Ne font rien, comme vous l'avez choisi ; rien ne plante | MANUEL | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

@@ -1,0 +1,14 @@
+# Xiaomi Mi Box S 2nd gen (MiTV-AFKR0, jaws), Google TV 11, build RTT0.211222.001.773.
+# Derived from examples/xiaomi-mi-box-s-2nd-gen/debloat.txt (validated upstream on 683/737/772) and the
+# fork audit of 2026-11-05 (mibox/docs/03-audit-mi-box.md). One step per list: apply it alone, run the
+# test plan, get the owner's approval, then the next step. Everything is DISABLED for user 0, never
+# uninstalled.
+#
+# STEP E11 - Google Assistant and voice search, off at the owner's request (2026-11-06). Apply after E4
+# and E3 have passed their tests. The remote's mic button then does nothing, and voice search inside apps
+# that use Android's recognizer (YouTube's on-screen mic) stops too; typing still works.
+# Keep com.google.android.tv.remote.service enabled (red list): it carries the remote's microphone and the
+# phone remote, and katniss alone is enough to switch voice off.
+# Apply:  TV_HOST=<box> tools/disable.sh mibox/lists/E11-assistant.txt
+# Undo:   TV_HOST=<box> tools/restore.sh mibox/lists/E11-assistant.txt
+com.google.android.katniss             # Google Assistant and voice search (mic button)

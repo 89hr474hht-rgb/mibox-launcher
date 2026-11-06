@@ -7,7 +7,9 @@
 # STEP E3 - Google TV home screen.
 # Apply:  TV_HOST=<box> tools/disable.sh mibox/lists/E3-google-tv.txt
 # Undo:   TV_HOST=<box> tools/restore.sh mibox/lists/E3-google-tv.txt com.google.android.apps.tv.launcherx
-# ONLY AFTER com.gathin.tvhome is installed and holds the HOME role (step E1+E2). launcherx has HOME
-# priority 2, so it wins over any preference while enabled. Once it is off, setupwraith (priority 1)
-# still answers Home until step E4. The remote's Netflix/YouTube/Prime buttons stop working here.
+# ONLY AFTER com.gathin.tvhome holds the HOME role (step E1+E2) AND step E4 has run, in the same slot.
+# launcherx has HOME priority 2, so it wins over any preference while enabled. While setupwraith is
+# enabled its RecoveryActivity (priority 1) would take Home instead, so tools/disable.sh skips launcherx
+# until setupwraith is off: E4 comes first. The remote's Netflix/YouTube/Prime/Apps buttons stop working
+# here until step E9. Plan: mibox/docs/07-plan-accueil-et-voix.md.
 com.google.android.apps.tv.launcherx                # Google TV home

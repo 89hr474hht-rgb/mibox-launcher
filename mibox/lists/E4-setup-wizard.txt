@@ -7,8 +7,10 @@
 # STEP E4 - Google setup wizard.
 # Apply:  TV_HOST=<box> tools/disable.sh mibox/lists/E4-setup-wizard.txt
 # Undo:   TV_HOST=<box> tools/restore.sh mibox/lists/E4-setup-wizard.txt
+# Runs BEFORE E3, in the same slot: with launcherx still enabled, Home stays on Google TV meanwhile.
 # Its RecoveryActivity answers Home at priority 1. It can own the saved Wi-Fi network: on this box the
 # audit found the only saved network created by the system (cname=android.uid.system), so disable.sh's
 # guard should pass; Wi-Fi may still drop for ~20 s (upstream note). Re-enable it before a factory reset.
-# On some Google devices casting needs it; casting is not used here.
+# On some Google devices casting needs it; casting is not used here. The box is on Ethernet since
+# 2026-11-06, so the Wi-Fi guard no longer protects the connection ADB uses.
 com.google.android.tungsten.setupwraith            # setup wizard, RecoveryActivity

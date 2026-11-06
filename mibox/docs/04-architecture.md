@@ -145,11 +145,14 @@ Prérequis : un environnement Python pour `tools/` (`python3 -m venv tools/venv`
 | E8 | Google TV Films, Play Jeux | `disable.sh` | Non |
 | E9 | Bouton YouTube via le launcher, puis `partnercustomizer` | `build-and-install.sh` (`INPUT_KEY_SERVICE=1`) + `disable.sh` | Boutons de la télécommande |
 | E10 | Écran de veille horloge, puis `dreamx` | réglage + `disable.sh` | Écran de veille |
-| E11 *(option)* | Chromecast et Assistant | `disable.sh` | Bouton micro inactif |
+| **E11** | Assistant Google et recherche vocale (`katniss`), à votre demande | `disable.sh mibox/lists/E11-assistant.txt` | Bouton micro inactif |
+| E12 *(option)* | Chromecast (`mediashell`) | `disable.sh mibox/lists/E12-cast.txt` | Plus de Cast vers la box |
 
 **Différences avec la liste CleanYourTV d'origine** (`examples/xiaomi-mi-box-s-2nd-gen/debloat.txt`) :
 - **Prime Video n'est pas désactivé**, puisque vous l'utilisez. Le reste de la liste est repris tel quel, découpé en étapes ;
-- **Chromecast et Assistant sont ajoutés** en option (E11), puisque vous ne vous en servez pas.
+- **L'Assistant est ajouté** (E11, à votre demande) et **Chromecast** en option (E12), puisque vous ne vous en servez pas.
+
+Le plan détaillé de E4, E3 et E11, prêt à appliquer, est dans [07-plan-accueil-et-voix.md](07-plan-accueil-et-voix.md).
 
 Après chaque étape : tests du [plan de tests](02-plan-de-tests.md), votre validation, puis l'étape suivante. **Aucune étape visible n'est lancée sans créneau convenu**, la box étant utilisée par la famille.
 

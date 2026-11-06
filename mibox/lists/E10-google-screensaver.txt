@@ -5,5 +5,8 @@
 # uninstalled.
 #
 # STEP E10 - Google TV screensaver (dreamx, ~77 MB). ONLY AFTER the screensaver setting points to the
-# launcher's ClockDream (or Android's basic dream): dreamx is the current screensaver_components.
+# launcher's ClockDream (or Android's basic dream): dreamx was the screensaver_components until 2026-11-06.
+# Before: settings put secure screensaver_components com.gathin.tvhome/.ClockDream
+# Undo:   TV_HOST=<box> tools/restore.sh mibox/lists/E10-google-screensaver.txt, then
+#         settings put secure screensaver_components com.google.android.apps.tv.dreamx/.service.Backdrop
 com.google.android.apps.tv.dreamx

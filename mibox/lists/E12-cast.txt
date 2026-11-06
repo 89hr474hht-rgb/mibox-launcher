@@ -4,7 +4,8 @@
 # test plan, get the owner's approval, then the next step. Everything is DISABLED for user 0, never
 # uninstalled.
 #
-# STEP E11 - OPTIONAL, after a week of use. The owner does not cast and hardly uses the mic button.
-# Without katniss the remote's mic button does nothing; without mediashell nothing can cast to the box.
+# STEP E12 - OPTIONAL. Chromecast built-in; the owner does not cast. Nothing can cast to the box once it
+# is off.
+# Apply:  TV_HOST=<box> tools/disable.sh mibox/lists/E12-cast.txt
+# Undo:   TV_HOST=<box> tools/restore.sh mibox/lists/E12-cast.txt
 com.google.android.apps.mediashell     # Chromecast built-in
-com.google.android.katniss             # Google Assistant
