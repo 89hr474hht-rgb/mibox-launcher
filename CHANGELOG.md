@@ -5,6 +5,12 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.3.2] - 2026-11-06
+
+### Modifié
+- Nom de l'appli sélectionnée au-dessus du dock : une capsule de verre l'entoure et suit sa largeur ; à chaque changement elle rebondit légèrement et un reflet traverse le nom.
+- Écran de démarrage : il apparaît dès la toute première image de l'accueil (plus de flash de l'accueil avant lui), son fond est visible tout de suite, et son animation ne démarre que quand il est vraiment à l'écran (au démarrage, l'accueil peut mettre plusieurs secondes à s'afficher, ce qui faisait rater le début).
+
 ## [1.3.1] - 2026-11-06
 
 ### Modifié

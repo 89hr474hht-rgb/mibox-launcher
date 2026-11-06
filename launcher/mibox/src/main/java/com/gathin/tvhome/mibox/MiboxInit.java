@@ -88,8 +88,6 @@ public final class MiboxInit extends ContentProvider {
                     EXTRAS.put(activity, extras);
                 }
                 extras.resume();
-                // LaunchOS's start-up screen, on the first home screen of a boot only.
-                if (BootSplash.firstHomeOfBoot(activity)) BootSplash.show(activity, MiboxInit::promptIfHomeVisible);
                 // After the home screen has drawn, so the prompt never delays the first frame.
                 activity.getWindow().getDecorView().postDelayed(MiboxInit::promptIfHomeVisible, 1500);
             } else if (SETTINGS.equals(name)) {
@@ -123,6 +121,11 @@ public final class MiboxInit extends ContentProvider {
 
         @Override
         public void onActivityCreated(Activity activity, Bundle state) {
+            // LaunchOS's start-up screen, on the first home screen of a boot only. Shown as the home screen is
+            // created, before its first frame, so the home screen never flashes up before it.
+            if (HOME.equals(activity.getClass().getName()) && BootSplash.firstHomeOfBoot(activity)) {
+                BootSplash.show(activity, MiboxInit::promptIfHomeVisible);
+            }
         }
 
         @Override

@@ -52,7 +52,8 @@ final class BootSplash extends Dialog {
 
     private final Activity home;
     private final boolean still;
-    private final long start = SystemClock.uptimeMillis();
+    private long start;
+    private boolean begun;
     private Backdrop backdrop;
     private ImageView logo, wordmark;
     private Bar bar;
@@ -177,7 +178,22 @@ final class BootSplash extends Dialog {
         wordmark.setTranslationY(10 * dp);
         bar.setAlpha(0f);
         caption.setAlpha(0f);
-        logo.animate().alpha(1f).scaleX(1f).scaleY(1f).rotation(0f).setStartDelay(150).setDuration(820)
+        // The timeline starts once the screen is really shown: at boot the home screen can take seconds to draw
+        // its first frame, and the start-up screen appears with it.
+        home.getWindow().getDecorView().postDelayed(this::begin, 6000);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) begin();
+    }
+
+    private void begin() {
+        if (begun || leaving || still || !isShowing()) return;
+        begun = true;
+        start = SystemClock.uptimeMillis();
+        logo.animate().alpha(1f).scaleX(1f).scaleY(1f).rotation(0f).setStartDelay(0).setDuration(820)
                 .setInterpolator(new OvershootInterpolator(1.7f)).start();
         wordmark.animate().alpha(1f).translationY(0f).setStartDelay(620).setDuration(700)
                 .setInterpolator(new DecelerateInterpolator(1.6f)).start();
@@ -293,7 +309,7 @@ final class BootSplash extends Dialog {
 
         void frame(long t) {
             float s = t / 1000f;
-            fade = Math.min(1f, s / 1.2f);
+            fade = Math.min(1f, 0.35f + s / 0.6f);
             bitmap.eraseColor(0xFF07080C);
             blob(0x4F7BFF, 0.28f + 0.10f * (float) Math.sin(s * 0.9f), 0.36f + 0.08f * (float) Math.cos(s * 0.7f), 0.95f, 0.75f);
             blob(0x9A5CFF, 0.70f + 0.08f * (float) Math.cos(s * 0.8f), 0.30f + 0.10f * (float) Math.sin(s * 1.1f), 0.85f, 0.6f);

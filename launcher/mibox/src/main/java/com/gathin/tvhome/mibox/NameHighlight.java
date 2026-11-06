@@ -44,7 +44,23 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
         hero = (TextView) v;
         Typeface medium = UiFonts.medium(home);
         if (medium != null) hero.setTypeface(medium);
-        hero.setShadowLayer(9 * dp, 0, 0, 0x66FFFFFF);   // wider gets cut off at the view's edges
+        hero.setShadowLayer(6 * dp, 0, 0, 0x4DFFFFFF);   // wider gets cut off at the view's edges
+        // A glass capsule that hugs the name; shifted left by its padding so the letters stay where upstream puts them.
+        GradientDrawable glass = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{0x38FFFFFF, 0x14FFFFFF});
+        glass.setCornerRadius(999 * dp);
+        glass.setStroke(Math.round(1.2f * dp), 0x52FFFFFF);
+        int ph = Math.round(24 * dp), pv = Math.round(7 * dp);
+        hero.setBackground(glass);
+        hero.setPadding(ph, pv, ph, pv);
+        hero.setTranslationX(-ph);
+        hero.setPivotX(ph);
+        // Its parents would cut off the part of the capsule that sits left of them.
+        for (android.view.ViewParent p = hero.getParent(); p instanceof ViewGroup; p = p.getParent()) {
+            ((ViewGroup) p).setClipChildren(false);
+            ((ViewGroup) p).setClipToPadding(false);
+            if (p == hero.getRootView()) break;
+        }
         if (android.provider.Settings.Global.getFloat(home.getContentResolver(),
                 android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f) return;
         heroWatcher = new android.text.TextWatcher() {
@@ -59,6 +75,11 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
             @Override
             public void afterTextChanged(android.text.Editable s) {
                 hero.post(NameHighlight.this::runSheen);
+                hero.setPivotY(hero.getHeight() / 2f);
+                hero.setScaleX(0.94f);
+                hero.setScaleY(0.94f);
+                hero.animate().scaleX(1f).scaleY(1f).setDuration(380)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator(2.2f)).start();
             }
         };
         hero.addTextChangedListener(heroWatcher);
@@ -70,7 +91,7 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
         if (w <= 0 || !hero.isShown()) return;
         android.text.TextPaint paint = hero.getPaint();
         sheen = android.animation.ValueAnimator.ofFloat(0f, 1f);
-        sheen.setDuration(900);
+        sheen.setDuration(800);
         sheen.setInterpolator(new android.view.animation.DecelerateInterpolator(1.4f));
         sheen.addUpdateListener(a -> {
             float x = -w * 0.5f + (float) a.getAnimatedValue() * w * 2f;

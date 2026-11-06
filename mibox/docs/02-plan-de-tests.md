@@ -213,6 +213,8 @@ ne peut être prouvé qu'avec la vraie télécommande. La carte « Mise à jour 
 | RK-03 | Autres touches intactes | Volume, OK, Retour, Home, micro avec le service actif | Tout répond comme avant | MANUEL | Non testé |
 | RK-04 | Dessin de la télécommande | Réglages de LaunchOS → Boutons de la télécommande, passer d'une ligne à l'autre, choisir une appli | La télécommande ressemble à la vraie ; le bouton de la ligne sélectionnée se soulève et s'éclaire, le projecteur le suit ; le choix d'une appli l'enfonce et fait sortir des ondes du haut. La télécommande zoome un peu sur le bouton sélectionné, plus pendant le choix, sans être coupée. Fluide sur la box | MANUEL | Test partiel (émulateur, 2026-11-06) |
 | FR-01 | Tout en français | Ouvrir l'accueil, les réglages de LaunchOS, Mises à jour, Boutons de la télécommande | Aucun texte de LaunchOS en anglais (les noms d'applis et les écrans d'Android suivent la langue de la box) | MANUEL | Test partiel (émulateur réglé en anglais, 2026-11-06) |
+| NAME-02 | Capsule du nom | Accueil, passer d'une appli à l'autre dans le dock | Le nom est dans une capsule de verre qui suit sa largeur et rebondit légèrement ; le texte reste aligné sur le dock | MANUEL | Test partiel (émulateur, 2026-11-06) |
+| BOOT-03 | Démarrage dès la première image | Redémarrer la box | Aucun flash de l'accueil avant l'écran LaunchOS ; on voit tout : logo, nom, barre, puis l'accueil | MANUEL | Test partiel (émulateur, vidéo du démarrage, 2026-11-06) |
 
 ## D. Applications
 
