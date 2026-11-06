@@ -1,0 +1,91 @@
+// LaunchOS TV: a player for an Xtream Codes account (live channels, films, series), for the owner's Mi Box.
+// A separate app from the launcher: it needs the network and a video engine (Media3), which the launcher
+// must not carry. Plain Java, like the launcher. Signed with the same release key as LaunchOS.
+plugins {
+    id 'com.android.application'
+}
+
+def tvVersion = rootProject.file('VERSION').text.trim()
+if (!(tvVersion ==~ /\d+\.\d+\.\d+/)) throw new GradleException("VERSION must be X.Y.Z, found '$tvVersion'")
+
+// CI passes the key through the environment; on the owner's Mac it sits outside the repo. Without it the
+// release build is signed with the debug key (fine for the emulator, refused as an update on the box).
+def env = System.getenv()
+def signing = null
+if (env.MIBOX_KEYSTORE_FILE) {
+    signing = [storeFile: env.MIBOX_KEYSTORE_FILE, storePassword: env.MIBOX_KEYSTORE_PASSWORD,
+               keyAlias: env.MIBOX_KEY_ALIAS, keyPassword: env.MIBOX_KEY_PASSWORD]
+} else {
+    def f = new File(System.getProperty('user.home'), '.mibox-launcher/keystore.properties')
+    if (f.exists()) {
+        def props = new Properties()
+        f.withInputStream { props.load(it) }
+        signing = props
+    }
+}
+
+android {
+    namespace 'com.gathin.launchos.tv'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.gathin.launchos.tv'
+        minSdk 26
+        targetSdk 34
+        def (maj, min, pat) = tvVersion.tokenize('.').collect { it as int }
+        versionCode maj * 10000 + min * 100 + pat
+        versionName tvVersion
+        // Where the updater looks for tv-vX.Y.Z releases (the launcher's public repository).
+        buildConfigField 'String', 'RELEASES_REPO', '"89hr474hht-rgb/mibox-launcher"'
+    }
+
+    if (signing != null) {
+        signingConfigs {
+            launchos {
+                storeFile file(signing.storeFile)
+                storePassword signing.storePassword
+                keyAlias signing.keyAlias
+                keyPassword signing.keyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signing != null ? signingConfigs.launchos : signingConfigs.debug
+        }
+    }
+
+    packagingOptions {
+        resources {
+            excludes += ['kotlin/**', 'META-INF/*.version', 'META-INF/*.kotlin_module', 'DebugProbesKt.bin']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    lint {
+        abortOnError true
+    }
+}
+
+dependencies {
+    def media3 = '1.4.1'
+    implementation "androidx.media3:media3-exoplayer:$media3"
+    implementation "androidx.media3:media3-exoplayer-hls:$media3"
+    implementation "androidx.media3:media3-ui:$media3"
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    testImplementation 'junit:junit:4.13.2'
+    // android.jar's org.json is a stub in plain JVM tests; the real one is test-only.
+    testImplementation 'org.json:json:20240303'
+}

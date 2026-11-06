@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The TV banner size Android asks for (320x180). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:tools="http://schemas.android.com/tools" tools:ignore="VectorRaster"
+    android:width="320dp" android:height="180dp" android:viewportWidth="320" android:viewportHeight="180">
+    <path android:pathData="M0,0h320v180h-320z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="0" android:startY="0" android:endX="320" android:endY="180"
+                android:startColor="#FF1B2340" android:centerColor="#FF3A2A66" android:endColor="#FF5A2348" />
+        </aapt:attr>
+    </path>
+    <path android:pathData="M128,58h64a12,12 0,0 1,12 12v40a12,12 0,0 1,-12 12h-64a12,12 0,0 1,-12 -12v-40a12,12 0,0 1,12 -12z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="116" android:startY="58" android:endX="204" android:endY="122"
+                android:startColor="#FF4F7BFF" android:centerColor="#FF9A5CFF" android:endColor="#FFFF5C9A" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#FFFFFFFF" android:pathData="M150,74L176,90L150,106Z" />
+</vector>

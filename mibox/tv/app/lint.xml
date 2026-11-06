@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Updater.install: a rough free-space floor before a ~1 MB download; Android checks again when installing. -->
+    <issue id="UsableSpace" severity="ignore" />
+</lint>

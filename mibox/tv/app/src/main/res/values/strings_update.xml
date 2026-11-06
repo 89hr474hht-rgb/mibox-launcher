@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_updates">Mises à jour</string>
+    <string name="nav_update_ready">Mise à jour !</string>
+    <string name="upd_title">Mises à jour de LaunchOS TV</string>
+    <string name="upd_installed">Version installée : %1$s</string>
+    <string name="upd_never_checked">Pas encore vérifié.</string>
+    <string name="upd_up_to_date_at">LaunchOS TV est à jour.\nDernière vérification : %1$s</string>
+    <string name="upd_available">Version %1$s disponible</string>
+    <string name="upd_check">Rechercher maintenant</string>
+    <string name="upd_checking">Recherche en cours…</string>
+    <string name="upd_install">Installer la version %1$s</string>
+    <string name="upd_later">Plus tard</string>
+    <string name="upd_downloading">Téléchargement : %1$d %%</string>
+    <string name="upd_verifying">Vérification de l\'empreinte et de la signature…</string>
+    <string name="upd_waiting">Confirme l\'installation dans la fenêtre d\'Android.</string>
+    <string name="upd_permission_open">Ouvrir le réglage</string>
+    <string name="upd_permission_no_screen">Ce réglage ne s\'ouvre pas sur cette box : il faut l\'autoriser par ADB.</string>
+    <string name="upd_history">Historique</string>
+    <string name="upd_h_installed">installée</string>
+    <string name="upd_h_cancelled">installation annulée</string>
+    <string name="upd_h_failed">échec</string>
+    <string name="upd_h_ignored">ignorée</string>
+    <string name="upd_banner">LaunchOS TV %1$s est disponible : ouvre « Mises à jour » en bas à gauche.</string>
+    <string name="upd_updated_toast">LaunchOS TV mis à jour : version %1$s</string>
+    <string name="upd_err_network">Impossible de joindre GitHub (%1$s).</string>
+    <string name="upd_err_http">GitHub a répondu %1$d.</string>
+    <string name="upd_err_rate">Trop de vérifications : GitHub en autorise 60 par heure. Réessaie plus tard.</string>
+    <string name="upd_err_format">Réponse de GitHub illisible.</string>
+    <string name="upd_err_space">Espace insuffisant : %1$d Mo nécessaires.</string>
+    <string name="upd_err_size">Le fichier n\'a pas la taille annoncée.</string>
+    <string name="upd_err_checksum">L\'empreinte SHA-256 ne correspond pas : fichier refusé.</string>
+    <string name="upd_err_not_apk">Le fichier téléchargé n\'est pas un APK valide.</string>
+    <string name="upd_err_package">Cet APK n\'est pas LaunchOS TV.</string>
+    <string name="upd_err_version">La version de l\'APK ne correspond pas à la publication.</string>
+    <string name="upd_err_not_newer">Cette version n\'est pas plus récente que celle installée.</string>
+    <string name="upd_err_signature">L\'APK n\'est pas signé avec la clé de LaunchOS TV installé : fichier refusé.</string>
+    <string name="upd_err_permission">Android n\'autorise pas encore LaunchOS TV à installer ses mises à jour.</string>
+    <string name="upd_err_install">Android a refusé l\'installation : %1$s</string>
+</resources>

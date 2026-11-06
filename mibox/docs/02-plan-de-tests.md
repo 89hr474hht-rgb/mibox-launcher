@@ -216,6 +216,31 @@ ne peut être prouvé qu'avec la vraie télécommande. La carte « Mise à jour 
 | NAME-02 | Capsule du nom | Accueil, passer d'une appli à l'autre dans le dock | Le nom est dans une capsule de verre qui suit sa largeur et rebondit légèrement ; le texte reste aligné sur le dock | MANUEL | Test partiel (émulateur, 2026-11-06) |
 | BOOT-03 | Démarrage dès la première image | Redémarrer la box | Aucun flash de l'accueil avant l'écran LaunchOS ; on voit tout : logo, nom, barre, puis l'accueil | MANUEL | Test partiel (émulateur, vidéo du démarrage, 2026-11-06) |
 
+## C decies. LaunchOS TV 0.1.0 (appli séparée, compte Xtream)
+
+Vérifié sur l'émulateur Android TV (1920 × 1080, même densité que la box) avec l'APK de release signé, contre le
+faux serveur `mibox/tv/mock/xtream_mock.py` (compte demo / demo). **Jamais contre ton serveur, rien sur la box.**
+Sur la box, les tests `MANUEL` ci-dessous sont à faire par toi, avec ton compte, quand personne ne regarde : un
+abonnement limité à une connexion coupe l'autre lecture.
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| TV-01 | Saisie du compte | Compte → serveur, identifiant, mot de passe → Enregistrer et tester | « Connecté », date de fin d'abonnement, connexions, formats | MANUEL | Test partiel (émulateur, faux serveur) |
+| TV-02 | Mauvais identifiants | Changer le mot de passe → Enregistrer et tester | Message rouge « refusé » ; l'ancien compte reste enregistré | MANUEL | Test partiel (émulateur, faux serveur) |
+| TV-03 | Compte gardé | Mettre à jour ou relancer l'appli | Le compte est toujours là, sans le retaper | MANUEL | Test partiel (émulateur : gardé après réinstallation par-dessus) |
+| TV-04 | Chaînes | Chaînes → catégories → logos | Catégories et chaînes de ton fournisseur, logos affichés ou initiales | MANUEL | Test partiel (émulateur, faux serveur) |
+| TV-05 | Direct et zapping | OK sur une chaîne, puis CH+/CH− ou Haut/Bas | Image et son ; nom de la chaîne 4 s ; zapping dans la catégorie | MANUEL | Test partiel (émulateur, faux serveur ; son non vérifié) |
+| TV-06 | Films | Films → catégorie → OK sur une affiche | Le film se lance ; OK affiche les commandes, Gauche/Droite recule de 10 s et avance de 30 s | MANUEL | Test partiel (émulateur, faux serveur) |
+| TV-07 | Séries | Séries → OK sur une série → saison → épisode | Saisons, épisodes et résumés ; l'épisode se lance | MANUEL | Test partiel (émulateur, faux serveur, épisodes en liste et en tableau, avec redirections) |
+| TV-08 | Serveur coupé | Lancer un film ou une chaîne sans réseau | Message « Lecture impossible » clair ; OK réessaie ; le direct réessaie seul deux fois puis en HLS | MANUEL | Test partiel (émulateur, faux serveur arrêté) |
+| TV-09 | Son | Direct et film, sur la Samsung puis sur la JBL | Son correct, y compris Dolby (AC3/EAC3) si ton fournisseur en envoie | MANUEL | Non testé |
+| TV-10 | Gros catalogue | Parcourir de grosses catégories de ton fournisseur | Listes fluides, pas de fermeture de l'appli | MANUEL | Non testé |
+| TV-11 | Adresse introuvable | Serveur `serveur.invalid:8080` | Message « Adresse du serveur introuvable » | MANUEL | Non testé |
+| TV-12 | Tuile sur l'accueil | Accueil LaunchOS, bibliothèque d'applis | « LaunchOS TV » apparaît avec sa bannière | MANUEL | Test partiel (émulateur) |
+| TV-UPD-01 | Écran Mises à jour | Mises à jour (en bas à gauche) → Rechercher maintenant | « LaunchOS TV est à jour » et la date ; pas de cadre rouge sur la box (installation autorisée) | MANUEL | Test partiel (émulateur, vrai GitHub, aucune version TV publiée ; cadre rouge attendu sur l'émulateur) |
+| TV-UPD-02 | Mise à jour proposée | À la prochaine version publiée | Bandeau en haut à droite et « Mise à jour ! » dans le menu ; Installer → téléchargement, vérification, confirmation d'Android ; le compte est gardé | MANUEL | Non testé |
+| TV-UPD-03 | LaunchOS pas gêné | Réglages de LaunchOS → Mises à jour → Vérifier | LaunchOS ne propose jamais une version de LaunchOS TV | MANUEL | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

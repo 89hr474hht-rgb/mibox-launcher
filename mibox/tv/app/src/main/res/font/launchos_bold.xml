@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mibox-launcher fork: LaunchOS's text face, Inter (SIL Open Font License 1.1, mibox/fonts/OFL-Inter.txt), at
+     weight 700. Built once per process, like upstream's outfit_* families. -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <font
+        android:font="@font/launchos_text"
+        android:fontStyle="normal"
+        android:fontWeight="700"
+        android:fontVariationSettings="'wght' 700"
+        tools:targetApi="28" />
+</font-family>

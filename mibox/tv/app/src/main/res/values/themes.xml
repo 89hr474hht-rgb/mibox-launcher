@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.LaunchOSTV" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/page</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:colorBackground">@color/page</item>
+        <item name="android:textColorPrimary">@color/text</item>
+        <item name="android:textColorSecondary">@color/text_dim</item>
+        <item name="android:textViewStyle">@style/Text</item>
+        <item name="android:editTextStyle">@style/Field</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Activity</item>
+    </style>
+
+    <style name="Text" parent="android:Widget.Material.TextView">
+        <item name="android:fontFamily">@font/launchos_regular</item>
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="Field" parent="android:Widget.Material.EditText">
+        <item name="android:fontFamily">@font/launchos_regular</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textColorHint">@color/text_dim</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:background">@drawable/field_bg</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="Title">
+        <item name="android:fontFamily">@font/launchos_semibold</item>
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="NavItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:background">@drawable/nav_bg</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:fontFamily">@font/launchos_medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/nav_text</item>
+        <item name="android:drawablePadding">12dp</item>
+    </style>
+
+    <style name="Button">
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@drawable/button_bg</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">26dp</item>
+        <item name="android:paddingEnd">26dp</item>
+        <item name="android:fontFamily">@font/launchos_semibold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/button_text</item>
+    </style>
+
+    <style name="Theme.LaunchOSTV.Player">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+</resources>
