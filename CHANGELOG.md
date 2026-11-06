@@ -5,6 +5,11 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.5.2] - 2026-11-06
+
+### Modifié
+- Boutons du haut de l'accueil : celui qu'on sélectionne s'ouvre plus lentement (0,42 s au lieu de 0,22 s), pour qu'on voie son nom arriver ; le précédent se referme en 0,3 s.
+
 ## [1.5.1] - 2026-11-06
 
 ### Corrigé

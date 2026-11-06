@@ -19,7 +19,9 @@ import java.util.List;
  */
 final class RoundPills {
     private static final int SIZE_DP = 42;
-    private static final int DURATION_MS = 220;
+    /** Opening, slow enough to watch the name come in (owner's request); closing a little quicker. */
+    private static final int OPEN_MS = 420;
+    private static final int CLOSE_MS = 300;
 
     private RoundPills() {
     }
@@ -69,7 +71,7 @@ final class RoundPills {
             boolean reduced = Settings.Global.getFloat(v.getContext().getContentResolver(),
                     Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
             anim = ValueAnimator.ofFloat(0f, 1f);
-            anim.setDuration(reduced ? 0 : DURATION_MS);
+            anim.setDuration(reduced ? 0 : target > 0 ? OPEN_MS : CLOSE_MS);
             anim.setInterpolator(new DecelerateInterpolator(1.5f));
             anim.addUpdateListener(a -> {
                 float f = (float) a.getAnimatedValue();
