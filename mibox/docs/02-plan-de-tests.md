@@ -264,7 +264,7 @@ en général fonctionnent ») porte sur la 0.2.0 installée sur la box.
 |---|---|---|---|---|---|
 | TV3-01 | Menu de gauche séparé | Gauche depuis le bord d'une page, Haut/Bas, Droite | Fine bande d'icônes à part des colonnes ; elle s'ouvre avec les noms par-dessus la page, la page s'assombrit ; Droite revient à l'endroit quitté | MANUEL | Test partiel (émulateur) |
 | TV3-02 | Touches dans les colonnes | Chaînes : Haut/Bas dans chaque colonne, Gauche/Droite entre elles, Retour | Haut/Bas ne sortent jamais d'une colonne ; Droite va aux chaînes puis au mini-lecteur ; Retour remonte d'un cran | MANUEL | Test partiel (émulateur) |
-| TV3-03 | Groupes rangés | Chaînes, Films, Séries | Groupes de A à Z, sans « FR | », étoiles, majuscules ni numérotation ; groupe vide absent | MANUEL | Test partiel (émulateur, faux serveur) |
+| TV3-03 | Groupes rangés | Chaînes, Films, Séries | Groupes de A à Z, sans « FR \| », étoiles, majuscules ni numérotation ; groupe vide absent | MANUEL | Test partiel (émulateur, faux serveur) |
 | TV3-04 | Noms des chaînes | Liste des chaînes | Noms sans préfixe ni qualité ; la qualité en étiquette (HD, FHD, 4K, HEVC) | MANUEL | Test partiel (émulateur, faux serveur) |
 | TV3-05 | Favoris | Regarder une chaîne plus d'une minute, revenir à la liste | Groupe Favoris en haut, la chaîne dedans, « Regardée N min » dans le détail | MANUEL | Test partiel (émulateur) |
 | TV3-06 | Mini-lecteur | OK sur une chaîne, puis Retour, puis OK sur une autre | La chaîne passe en haut à droite, la sélection revient sur elle ; l'autre chaîne repart en plein écran ; Retour ferme le mini-lecteur | MANUEL | Test partiel (émulateur : passage plein écran ↔ mini vu ; image figée par le décodeur de l'émulateur) |
