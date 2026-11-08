@@ -128,6 +128,11 @@ final class Library {
 
     /** Calls done on the main thread once the section is read (or failed); at once when it already is. */
     void load(Xtream api, Runnable done) {
+        load(api, done, null);
+    }
+
+    /** The same, telling progress how much of the whole list has arrived (background thread). */
+    void load(Xtream api, Runnable done, Http.Progress progress) {
         if (ready()) {
             done.run();
             return;
@@ -144,7 +149,7 @@ final class Library {
             List<Xtream.Category> cats = api.categories(s);
             List<Item> list = null;
             try {
-                list = api.items(s, null);
+                list = api.items(s, null, progress);
             } catch (XtreamException failed) {
                 // Too big, or a panel that wants a category: read the categories one by one when they are shown.
             }

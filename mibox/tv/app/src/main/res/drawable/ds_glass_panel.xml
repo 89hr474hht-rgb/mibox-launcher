@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A glass panel: translucent fill, a hairline border, and a faint sheen along the top. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="@color/ds_glass" />
+            <stroke android:width="1dp" android:color="@color/ds_stroke" />
+            <corners android:radius="24dp" />
+        </shape>
+    </item>
+    <item android:bottom="200dp">
+        <shape>
+            <gradient android:angle="270" android:startColor="#0FFFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
+        </shape>
+    </item>
+</layer-list>

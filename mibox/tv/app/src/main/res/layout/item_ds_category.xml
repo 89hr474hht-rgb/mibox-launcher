@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One category in the settings list: icon, name, and a dot when something waits there (an update). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:layout_marginBottom="6dp"
+    android:background="@drawable/ds_category_bg"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="14dp">
+
+    <ImageView
+        android:id="@+id/cat_icon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:duplicateParentState="true"
+        android:importantForAccessibility="no"
+        android:tint="@color/ds_category_icon" />
+
+    <TextView
+        android:id="@+id/cat_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:fontFamily="@font/launchos_medium"
+        android:singleLine="true"
+        android:textColor="@color/ds_category_text"
+        android:textSize="16sp" />
+
+    <View
+        android:id="@+id/cat_dot"
+        android:layout_width="9dp"
+        android:layout_height="9dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/dot_accent"
+        android:visibility="gone" />
+</LinearLayout>

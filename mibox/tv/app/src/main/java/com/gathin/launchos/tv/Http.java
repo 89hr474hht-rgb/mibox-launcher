@@ -19,6 +19,11 @@ final class Http {
         T read(InputStream in) throws IOException, XtreamException;
     }
 
+    /** How much of a body has arrived (background thread); total is -1 when the server did not say. */
+    interface Progress {
+        void bytes(long read, long total);
+    }
+
     /** The body of a 200 answer, or an {@link XtreamException} that never quotes the address (it holds the account). */
     static byte[] get(String address, int maxBytes) throws XtreamException {
         return get(address, maxBytes, in -> readAll(in, maxBytes));
@@ -26,6 +31,11 @@ final class Http {
 
     /** A 200 answer handed to body as a stream, cut off after maxBytes. */
     static <T> T get(String address, long maxBytes, Body<T> body) throws XtreamException {
+        return get(address, maxBytes, body, null);
+    }
+
+    /** The same, telling progress how much has arrived as it is read (about every 64 KB). */
+    static <T> T get(String address, long maxBytes, Body<T> body, Progress progress) throws XtreamException {
         String url = address;
         try {
             for (int hop = 0; hop <= MAX_REDIRECTS; hop++) {
@@ -47,7 +57,7 @@ final class Http {
                         throw new XtreamException(code == 401 || code == 403
                                 ? XtreamException.Kind.REFUSED : XtreamException.Kind.SERVER, code);
                     }
-                    try (InputStream in = new Capped(c.getInputStream(), maxBytes)) {
+                    try (InputStream in = new Capped(c.getInputStream(), maxBytes, progress, c.getContentLengthLong())) {
                         return body.read(in);
                     }
                 } finally {
@@ -66,27 +76,41 @@ final class Http {
         }
     }
 
-    /** Stops a body that grows past its limit, rather than filling the box's memory. */
+    /** Stops a body that grows past its limit, rather than filling the box's memory; tells progress as it goes. */
     private static final class Capped extends java.io.FilterInputStream {
+        private static final long STEP = 64 * 1024;
         private long left;
+        private final Progress progress;
+        private final long total;
+        private long read, told;
 
-        Capped(InputStream in, long max) {
+        Capped(InputStream in, long max, Progress progress, long total) {
             super(in);
             left = max;
+            this.progress = progress;
+            this.total = total;
+            if (progress != null) progress.bytes(0, total);
         }
 
         @Override
         public int read() throws IOException {
             int b = super.read();
-            if (b >= 0 && --left < 0) throw new IOException("too large");
+            if (b >= 0) counted(1);
             return b;
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             int n = super.read(b, off, len);
-            if (n > 0 && (left -= n) < 0) throw new IOException("too large");
+            if (n > 0) counted(n);
+            else if (n < 0 && progress != null && told != read) progress.bytes(told = read, total);
             return n;
+        }
+
+        private void counted(int n) throws IOException {
+            if ((left -= n) < 0) throw new IOException("too large");
+            read += n;
+            if (progress != null && read - told >= STEP) progress.bytes(told = read, total);
         }
     }
 

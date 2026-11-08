@@ -34,8 +34,18 @@ final class Rows {
     }
 
     static Row add(ViewGroup column, int icon, int title) {
-        View v = LayoutInflater.from(column.getContext()).inflate(R.layout.item_refresh, column, false);
-        Row r = new Row(v);
+        return add(column, icon, title, false);
+    }
+
+    /** A row of the new screens: glass that keeps its dark fill when focused, with the accent border. */
+    static Row addGlass(ViewGroup column, int icon, int title) {
+        return add(column, icon, title, true);
+    }
+
+    private static Row add(ViewGroup column, int icon, int title, boolean glass) {
+        View v = LayoutInflater.from(column.getContext())
+                .inflate(glass ? R.layout.item_ds_row : R.layout.item_refresh, column, false);
+        Row r = new Row(v, glass);
         r.icon.setImageResource(icon);
         r.title.setText(title);
         r.sub.setVisibility(View.GONE);
@@ -49,9 +59,11 @@ final class Rows {
         final ImageView icon;
         final TextView title, sub, state;
         private final View toggle, chevron;
+        private final boolean glass;
 
-        Row(View v) {
+        Row(View v, boolean glass) {
             view = v;
+            this.glass = glass;
             icon = v.findViewById(R.id.icon);
             title = v.findViewById(R.id.title);
             sub = v.findViewById(R.id.sub);
@@ -92,8 +104,13 @@ final class Rows {
 
         Row state(CharSequence text, Tone tone) {
             state.setText(text);
-            state.setTextColor(view.getContext().getColorStateList(tone == Tone.ERROR ? R.color.row_error
-                    : tone == Tone.OK ? R.color.row_ok : R.color.row_sub));
+            if (glass) {
+                state.setTextColor(view.getContext().getColor(tone == Tone.ERROR ? R.color.ds_danger
+                        : tone == Tone.OK ? R.color.ds_ok : R.color.ds_text_dim));
+            } else {
+                state.setTextColor(view.getContext().getColorStateList(tone == Tone.ERROR ? R.color.row_error
+                        : tone == Tone.OK ? R.color.row_ok : R.color.row_sub));
+            }
             return this;
         }
 

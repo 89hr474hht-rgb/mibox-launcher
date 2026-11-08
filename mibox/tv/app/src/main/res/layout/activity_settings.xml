@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Réglages, master-detail: the categories on a glass panel at the left (30 %), the open category's page at the
+  right (70 %). The page scrolls in a SafeScrollView, which keeps focused rows out of the mini-player's corner.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ds_page_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:clipChildren="false"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ds_page_x"
+        android:paddingTop="@dimen/ds_page_y"
+        android:paddingEnd="@dimen/ds_page_x"
+        android:paddingBottom="@dimen/ds_page_y">
+
+        <FrameLayout
+            android:id="@+id/master"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:background="@drawable/ds_glass_panel"
+            android:clipChildren="false"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="4dp">
+
+                <FrameLayout
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/header_tile_bg">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_settings"
+                        android:tint="#FFFFFFFF" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/launchos_bold"
+                        android:text="@string/settings_title"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ds_brand"
+                        android:textColor="@color/ds_text_faint"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/master_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:orientation="vertical" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/master_footer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:paddingStart="6dp"
+                android:textColor="@color/ds_text_faint"
+                android:textSize="12sp" />
+        </FrameLayout>
+
+        <Space
+            android:layout_width="@dimen/ds_gap"
+            android:layout_height="match_parent" />
+
+        <com.gathin.launchos.tv.SafeScrollView
+            android:id="@+id/detail_scroll"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:clipChildren="false"
+            android:fillViewport="true"
+            android:scrollbars="none">
+
+            <FrameLayout
+                android:id="@+id/detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:paddingStart="10dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="10dp" />
+        </com.gathin.launchos.tv.SafeScrollView>
+    </LinearLayout>
+</FrameLayout>

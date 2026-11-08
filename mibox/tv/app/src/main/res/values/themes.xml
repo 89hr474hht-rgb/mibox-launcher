@@ -116,4 +116,30 @@
     <style name="Theme.LaunchOSTV.Player">
         <item name="android:windowBackground">@android:color/black</item>
     </style>
+
+    <!-- LaunchTV OS design system: buttons of the new screens. -->
+    <style name="DsButtonBase">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:fontFamily">@font/launchos_semibold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="DsButton" parent="DsButtonBase">
+        <item name="android:background">@drawable/ds_button_glass</item>
+        <item name="android:textColor">@color/ds_text</item>
+        <item name="android:drawableTint">@color/ds_accent_light</item>
+    </style>
+
+    <style name="DsButtonPrimary" parent="DsButtonBase">
+        <item name="android:background">@drawable/ds_button_primary</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:drawableTint">#FFFFFFFF</item>
+    </style>
 </resources>

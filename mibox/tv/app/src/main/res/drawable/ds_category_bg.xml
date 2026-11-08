@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A settings category: focused, a lit glass with the accent border; open, a softer glass with an accent bar. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="140">
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="@color/ds_glass_focus" />
+            <stroke android:width="2dp" android:color="@color/ds_accent" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+    <item android:state_selected="true">
+        <layer-list>
+            <item>
+                <shape>
+                    <solid android:color="@color/ds_glass_raised" />
+                    <corners android:radius="14dp" />
+                </shape>
+            </item>
+            <item android:gravity="start|center_vertical" android:width="3dp" android:height="22dp" android:left="0dp">
+                <shape>
+                    <solid android:color="@color/ds_accent" />
+                    <corners android:radius="2dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#00000000" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+</selector>

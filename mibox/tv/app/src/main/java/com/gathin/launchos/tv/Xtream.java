@@ -151,6 +151,11 @@ final class Xtream {
 
     /** The section's items in one category, or in all of them when categoryId is null. Read as they arrive. */
     List<Item> items(Section section, String categoryId) throws XtreamException {
+        return items(section, categoryId, null);
+    }
+
+    /** The same, telling progress how much of the list has arrived. */
+    List<Item> items(Section section, String categoryId, Http.Progress progress) throws XtreamException {
         Item.Kind kind = section == Section.LIVE ? Item.Kind.LIVE
                 : section == Section.MOVIES ? Item.Kind.MOVIE : Item.Kind.SERIES;
         String url = address(section.itemsAction, categoryId == null ? null : "&category_id=" + enc(categoryId));
@@ -160,7 +165,7 @@ final class Xtream {
             } catch (JsonStream.Malformed e) {
                 throw new XtreamException(XtreamException.Kind.BAD_ANSWER, 0);
             }
-        });
+        }, progress);
     }
 
     VodInfo vodInfo(String streamId) throws XtreamException {

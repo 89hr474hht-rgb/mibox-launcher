@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- #0A0A0A with two faint glows (blue top left, violet bottom right) for the glass panels to show through. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="@color/ds_bg" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <gradient android:type="radial" android:gradientRadius="760dp" android:centerX="0.08" android:centerY="0.05"
+                android:startColor="#264F7BFF" android:endColor="#000A0A0A" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <gradient android:type="radial" android:gradientRadius="820dp" android:centerX="0.95" android:centerY="1"
+                android:startColor="#1A9A5CFF" android:endColor="#000A0A0A" />
+        </shape>
+    </item>
+</layer-list>

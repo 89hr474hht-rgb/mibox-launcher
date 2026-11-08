@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The new Réglages (master-detail) and its Mise à jour & Cache page. -->
+<resources>
+    <string name="ds_brand" translatable="false">LaunchTV OS</string>
+    <string name="settings_version">Version %1$s</string>
+
+    <string name="settings_cat_account">Compte</string>
+    <string name="settings_cat_channels">Chaînes</string>
+    <string name="settings_cat_vod">Films et séries</string>
+    <string name="settings_cat_play">Lecture</string>
+    <string name="settings_cat_sync">Mise à jour &amp; Cache</string>
+    <string name="settings_cat_history">Historique</string>
+
+    <string name="settings_pane_account">Le compte du fournisseur utilisé sur cette box. Les réglages restent sur la box, pour ce compte.</string>
+    <string name="settings_pane_channels">Le rangement des groupes, l\'ordre des chaînes, les doublons et ce qui est masqué.</string>
+    <string name="settings_pane_vod">Renommer, masquer ou épingler les groupes de films et de séries.</string>
+    <string name="settings_pane_play">Ce qui se passe pendant et après la lecture.</string>
+    <string name="settings_pane_sync">Recharger les listes du fournisseur, voir et vider ce qui est gardé sur la box, et les mises à jour de l\'app.</string>
+    <string name="settings_pane_history">Ce que l\'app retient de ce qui a été regardé.</string>
+
+    <string name="sync_section_lists">Listes du fournisseur</string>
+    <string name="sync_section_app">Application</string>
+    <string name="sync_live">Chaînes</string>
+    <string name="sync_movies">Films</string>
+    <string name="sync_series">Séries</string>
+    <string name="sync_all">Tout actualiser</string>
+    <string name="sync_all_running">Actualisation en cours…</string>
+    <string name="sync_connecting">Connexion au fournisseur…</string>
+    <string name="sync_received">%1$s reçus</string>
+    <string name="sync_failed">La liste n\'a pas pu être lue</string>
+    <string name="sync_loaded">%1$s · %2$s</string>
+    <plurals name="sync_count_live">
+        <item quantity="one">%1$s chaîne</item>
+        <item quantity="other">%1$s chaînes</item>
+    </plurals>
+    <plurals name="sync_count_movies">
+        <item quantity="one">%1$s film</item>
+        <item quantity="other">%1$s films</item>
+    </plurals>
+    <plurals name="sync_count_series">
+        <item quantity="one">%1$s série</item>
+        <item quantity="other">%1$s séries</item>
+    </plurals>
+    <plurals name="sync_count_groups">
+        <item quantity="one">%1$s groupe</item>
+        <item quantity="other">%1$s groupes</item>
+    </plurals>
+
+    <string name="cache_section">Cache</string>
+    <string name="cache_images">Logos et affiches</string>
+    <string name="cache_guide">Guide des programmes</string>
+    <string name="cache_lists">Listes en mémoire</string>
+    <string name="cache_clear">Vider le cache</string>
+    <string name="cache_clearing">Nettoyage…</string>
+    <string name="cache_clear_hint">Logos, affiches et guide se rechargent quand ils s\'affichent. Les listes et les réglages restent.</string>
+    <string name="cache_cleared_toast">Cache vidé · %1$s libérés</string>
+    <plurals name="cache_guide_value">
+        <item quantity="one">%1$d chaîne</item>
+        <item quantity="other">%1$d chaînes</item>
+    </plurals>
+    <plurals name="cache_lists_value">
+        <item quantity="one">%1$s titre</item>
+        <item quantity="other">%1$s titres</item>
+    </plurals>
+</resources>

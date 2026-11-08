@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Réglages › Mise à jour & Cache. Three gauge buttons read the provider's lists again (SyncStore); the cache panel
+  says what is kept on the box, with skeletons until it is measured; Vider le cache frees it and says how much.
+  Everything that acts sits on the left or the top: the bottom-right corner belongs to the mini-player.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/Label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:paddingStart="4dp"
+        android:text="@string/sync_section_lists" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:clipChildren="false"
+        android:orientation="horizontal">
+
+        <com.gathin.launchos.tv.GaugeButton
+            android:id="@+id/gauge_live"
+            android:layout_width="0dp"
+            android:layout_height="148dp"
+            android:layout_weight="1" />
+
+        <Space
+            android:layout_width="14dp"
+            android:layout_height="1dp" />
+
+        <com.gathin.launchos.tv.GaugeButton
+            android:id="@+id/gauge_movies"
+            android:layout_width="0dp"
+            android:layout_height="148dp"
+            android:layout_weight="1" />
+
+        <Space
+            android:layout_width="14dp"
+            android:layout_height="1dp" />
+
+        <com.gathin.launchos.tv.GaugeButton
+            android:id="@+id/gauge_series"
+            android:layout_width="0dp"
+            android:layout_height="148dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sync_all"
+        style="@style/DsButton"
+        android:layout_marginTop="16dp"
+        android:drawableStart="@drawable/ic_refresh"
+        android:text="@string/sync_all" />
+
+    <TextView
+        style="@style/Label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="12dp"
+        android:paddingStart="4dp"
+        android:text="@string/cache_section" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ds_glass_panel"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="6dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_image"
+                android:tint="@color/ds_text_dim" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:text="@string/cache_images"
+                android:textColor="@color/ds_text"
+                android:textSize="15sp" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.gathin.launchos.tv.SkeletonView
+                    android:id="@+id/cache_images_skeleton"
+                    android:layout_width="84dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="center_vertical|end" />
+
+                <TextView
+                    android:id="@+id/cache_images_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:fontFamily="@font/launchos_medium"
+                    android:textColor="@color/ds_text"
+                    android:textSize="15sp"
+                    android:visibility="invisible" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/ds_stroke" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_guide"
+                android:tint="@color/ds_text_dim" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:text="@string/cache_guide"
+                android:textColor="@color/ds_text"
+                android:textSize="15sp" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.gathin.launchos.tv.SkeletonView
+                    android:id="@+id/cache_guide_skeleton"
+                    android:layout_width="84dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="center_vertical|end" />
+
+                <TextView
+                    android:id="@+id/cache_guide_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:fontFamily="@font/launchos_medium"
+                    android:textColor="@color/ds_text"
+                    android:textSize="15sp"
+                    android:visibility="invisible" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/ds_stroke" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_server"
+                android:tint="@color/ds_text_dim" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:text="@string/cache_lists"
+                android:textColor="@color/ds_text"
+                android:textSize="15sp" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.gathin.launchos.tv.SkeletonView
+                    android:id="@+id/cache_lists_skeleton"
+                    android:layout_width="84dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="center_vertical|end" />
+
+                <TextView
+                    android:id="@+id/cache_lists_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:fontFamily="@font/launchos_medium"
+                    android:textColor="@color/ds_text"
+                    android:textSize="15sp"
+                    android:visibility="invisible" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:baselineAligned="false"
+        android:clipChildren="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/cache_clear"
+            style="@style/DsButtonPrimary"
+            android:drawableStart="@drawable/ic_trash"
+            android:text="@string/cache_clear" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_weight="1"
+            android:lineSpacingMultiplier="1.15"
+            android:text="@string/cache_clear_hint"
+            android:textColor="@color/ds_text_dim"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <TextView
+        style="@style/Label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="12dp"
+        android:paddingStart="4dp"
+        android:text="@string/sync_section_app" />
+
+    <LinearLayout
+        android:id="@+id/sync_app_rows"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:orientation="vertical" />
+</LinearLayout>

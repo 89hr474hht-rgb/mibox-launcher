@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A glass row of the new Réglages (same ids as item_refresh, for Rows): icon, title, one line under it, and its state, a switch or an arrow. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/ds_row_bg"
+    android:baselineAligned="false"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="68dp"
+    android:orientation="horizontal"
+    android:paddingStart="14dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="18dp"
+    android:paddingBottom="10dp">
+
+    <FrameLayout
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/ds_icon_tile_bg"
+        android:duplicateParentState="true">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="center"
+            android:duplicateParentState="true"
+            android:importantForAccessibility="no"
+            android:tint="@color/ds_accent_light" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            android:fontFamily="@font/launchos_semibold"
+            android:textColor="@color/ds_text"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:duplicateParentState="true"
+            android:textColor="@color/ds_text_dim"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:duplicateParentState="true"
+        android:fontFamily="@font/launchos_medium"
+        android:gravity="end"
+        android:maxWidth="260dp"
+        android:textColor="@color/ds_text_dim"
+        android:textSize="14sp" />
+
+    <View
+        android:id="@+id/toggle"
+        android:layout_width="46dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="14dp"
+        android:background="@drawable/switch_bg"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/chevron"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="10dp"
+        android:duplicateParentState="true"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_chevron"
+        android:tint="@color/ds_text_dim"
+        android:visibility="gone" />
+</LinearLayout>

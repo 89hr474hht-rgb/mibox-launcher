@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The page's main action: accent, lit with a white border when focused. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="140">
+    <item android:state_focused="true">
+        <shape>
+            <gradient android:angle="0" android:startColor="#FF6A90FF" android:endColor="#FFA978FF" />
+            <stroke android:width="2dp" android:color="#FFFFFFFF" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <gradient android:angle="0" android:startColor="@color/ds_accent" android:endColor="@color/ds_accent_2" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  LaunchTV OS design tokens (dark premium, glass). New screens use only these; the older screens keep colors.xml
+  until they are redone. The page is #0A0A0A, not pure black: glass needs something to sit on.
+-->
+<resources>
+    <color name="ds_bg">#FF0A0A0A</color>
+    <!-- Glass: translucent fills and hairline borders over the page's soft glows. -->
+    <color name="ds_glass">#B3121318</color>
+    <color name="ds_glass_raised">#1AFFFFFF</color>
+    <color name="ds_glass_focus">#26FFFFFF</color>
+    <color name="ds_glass_strong">#E6181A21</color>
+    <color name="ds_stroke">#1AFFFFFF</color>
+    <color name="ds_stroke_strong">#33FFFFFF</color>
+    <color name="ds_text">#FFF2F4F8</color>
+    <color name="ds_text_dim">#FF9AA3B2</color>
+    <color name="ds_text_faint">#FF5F6675</color>
+    <color name="ds_accent">#FF4F7BFF</color>
+    <color name="ds_accent_light">#FF8FB0FF</color>
+    <color name="ds_accent_2">#FF9A5CFF</color>
+    <color name="ds_ok">#FF4ADE80</color>
+    <color name="ds_danger">#FFFF6B6B</color>
+    <color name="ds_skeleton">#14FFFFFF</color>
+    <color name="ds_skeleton_shine">#22FFFFFF</color>
+</resources>

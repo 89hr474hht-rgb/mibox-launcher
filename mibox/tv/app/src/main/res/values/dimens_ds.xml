@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Page frame of the new screens. -->
+    <dimen name="ds_page_x">40dp</dimen>
+    <dimen name="ds_page_y">34dp</dimen>
+    <dimen name="ds_gap">24dp</dimen>
+    <dimen name="ds_radius">18dp</dimen>
+    <!--
+      The mini-player (picture-in-picture) sits in the bottom-right corner, 26 dp from the edges. Nothing that
+      matters may sit there or within 24 dp of it: the dead zone is pip_width + 26 + 24 by pip_height + 26 + 24
+      (306 + 26 + 24, 172 + 26 + 24). SafeScrollView keeps focused rows out of it.
+    -->
+    <dimen name="ds_pip_zone_width">356dp</dimen>
+    <dimen name="ds_pip_zone_height">222dp</dimen>
+</resources>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Inside a GaugeButton: the fill that grows from the left, then the icon, title, status and percentage. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <View
+        android:id="@+id/gauge_fill"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ds_gauge_fill" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <ImageView
+            android:id="@+id/gauge_icon"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginBottom="12dp"
+            android:importantForAccessibility="no"
+            android:tint="@color/ds_accent_light" />
+
+        <TextView
+            android:id="@+id/gauge_title"
+            style="@style/Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/gauge_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:minLines="2"
+            android:textColor="@color/ds_text_dim"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/gauge_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:fontFamily="@font/launchos_bold"
+        android:textColor="@color/ds_text"
+        android:textSize="20sp"
+        android:visibility="gone" />
+</merge>
