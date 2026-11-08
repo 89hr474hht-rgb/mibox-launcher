@@ -144,8 +144,9 @@ public final class SearchActivity extends Activity {
             }
         }
         if (g == null) return all;
+        Channels chs = s == Xtream.Section.LIVE ? Channels.get(g.context()) : null;
         List<Item> out = new ArrayList<>(all.size());
-        for (Item i : all) if (!g.hidden(s, i.categoryId)) out.add(i);
+        for (Item i : all) if (!g.hidden(s, i.categoryId) && (chs == null || !chs.hidden(i.id))) out.add(i);
         return out;
     }
 

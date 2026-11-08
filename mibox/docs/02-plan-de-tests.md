@@ -335,6 +335,25 @@ image. **Rien sur la box.** Planches : `audits/launchos-tv-0.4.0-*.png` (dossier
 | TV4-09 | Résumé d'un film | Parcourir « Récemment ajoutés » | Le résumé arrivé avec la fiche apparaît en fondu, pas d'un coup | MANUEL | Test partiel (émulateur) |
 | TV4-10 | Télécommande réelle | Toute l'appli avec la télécommande Xiaomi, sur la Samsung | Mêmes déplacements qu'à l'émulateur ; lisible à distance | MANUEL | Validation manuelle nécessaire |
 
+## C quindecies. LaunchOS TV 0.5.0 : rangement intelligent, gestion des chaînes, menu court
+
+**Ni émulateur ni box pour cette version** (émulateur indisponible). Vérifié : tests unitaires du rangement
+(`SmartTest` : thèmes, pays, adultes, numéros TNT, doublons, ordre des groupes), lint sans erreur, APK de release
+construit. Tout ce qui se voit à l'écran reste à vérifier sur la box, avec la télécommande.
+
+| ID | Test | Procédure | Critère de réussite | Méthode | Résultat |
+|---|---|---|---|---|---|
+| TV5-01 | Menu court | Gauche, puis Haut/Bas | Rechercher, Chaînes, Films, Séries, Réglages ; Bas s'arrête à Réglages | MANUEL | Non testé |
+| TV5-02 | Réglages regroupés | OK sur Réglages | Compte (« Connecté en tant que … »), Actualiser, Mises à jour en haut ; chaque ligne ouvre son écran | MANUEL | Non testé |
+| TV5-03 | Rangement intelligent | Chaînes, ton fournisseur | Groupes français d'abord, généralistes puis info, sport, cinéma… ; icône de thème sur chaque groupe | MANUEL | Test partiel (tests unitaires) |
+| TV5-04 | Changer le rangement | Réglages → Rangement des groupes, OK plusieurs fois, revenir à Chaînes | Intelligent → A à Z → Fournisseur ; la liste suit | MANUEL | Non testé |
+| TV5-05 | Numéros TNT | Groupe des chaînes françaises | TF1 1, France 2 2… en tête avec leur numéro, puis les autres de A à Z | MANUEL | Test partiel (tests unitaires) |
+| TV5-06 | Doublons | Groupe avec TF1 SD / HD / FHD | Une seule ligne TF1 (FHD) ; en coupant le réglage, les trois reviennent | MANUEL | Test partiel (tests unitaires) |
+| TV5-07 | Groupes adultes | Fournisseur avec un groupe « XXX » ou « Adultes » | Absent de Chaînes et de la recherche ; visible et réaffichable dans Groupes des chaînes | MANUEL | Test partiel (tests unitaires de la détection) |
+| TV5-08 | Favori à la main | Appui long sur OK sur une chaîne → Ajouter aux favoris | Étoile sur la ligne ; la chaîne en tête de Favoris ; Retirer l'enlève | MANUEL | Non testé |
+| TV5-09 | Chaîne masquée | Appui long → Masquer cette chaîne ; Réglages → Chaînes masquées | Disparaît des listes et de la recherche ; OK dans Chaînes masquées la fait revenir | MANUEL | Non testé |
+| TV5-10 | Gros catalogue | Toutes les chaînes chez ton fournisseur | Ouverture sans attente visible de plus qu'avant | MANUEL | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

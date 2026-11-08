@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="nav_updates">Mises à jour</string>
-    <string name="nav_update_ready">Mise à jour !</string>
     <string name="upd_title">Mises à jour de LaunchOS TV</string>
     <string name="upd_installed">Version installée : %1$s</string>
     <string name="upd_never_checked">Pas encore vérifié.</string>

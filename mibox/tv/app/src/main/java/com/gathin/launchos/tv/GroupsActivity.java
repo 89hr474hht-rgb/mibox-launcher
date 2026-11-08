@@ -116,7 +116,7 @@ public final class GroupsActivity extends Activity {
             v.setAlpha(isHidden ? 0.55f : 1f);
             ((ImageView) v.findViewById(R.id.icon)).setImageResource(isHidden ? R.drawable.ic_hide
                     : g != null && g.pinned(section, c.id) ? R.drawable.ic_pin
-                    : section == Xtream.Section.LIVE ? R.drawable.ic_live
+                    : section == Xtream.Section.LIVE ? LivePage.themeIcon(Smart.theme(c.name))
                     : section == Xtream.Section.MOVIES ? R.drawable.ic_movie : R.drawable.ic_series);
             v.setOnClickListener(x -> GroupOptions.show(GroupsActivity.this, section, c, () -> {
                 // The group may move (pinned, renamed): the focus follows it.

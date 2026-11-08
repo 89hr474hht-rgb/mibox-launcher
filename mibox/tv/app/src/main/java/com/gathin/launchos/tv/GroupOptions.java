@@ -77,7 +77,7 @@ final class GroupOptions {
         name.requestFocus();
     }
 
-    private static Dialog dialog(Activity a, int layout) {
+    static Dialog dialog(Activity a, int layout) {
         Dialog d = new Dialog(a);
         d.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         d.setContentView(layout);
@@ -89,7 +89,7 @@ final class GroupOptions {
         return d;
     }
 
-    private static TextView action(Activity a, LinearLayout body, int icon, String text, Runnable run) {
+    static TextView action(Activity a, LinearLayout body, int icon, String text, Runnable run) {
         TextView t = (TextView) LayoutInflater.from(a).inflate(R.layout.item_sheet_action, body, false);
         t.setText(text);
         t.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);

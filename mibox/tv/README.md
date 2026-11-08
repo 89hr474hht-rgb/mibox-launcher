@@ -36,4 +36,4 @@ Updates: the same updater as LaunchOS, reading this repository's `tv-vX.Y.Z` rel
 `.github/workflows/release-tv.yml`; notes from `CHANGELOG.md`). Bump `VERSION` and the changelog, then push the tag.
 
 Study and decisions: [mibox/docs/09-appli-tv-xtream.md](../docs/09-appli-tv-xtream.md). Tests: sections C decies,
-C duodecies and C quaterdecies of [mibox/docs/02-plan-de-tests.md](../docs/02-plan-de-tests.md).
+C duodecies, C quaterdecies and C quindecies of [mibox/docs/02-plan-de-tests.md](../docs/02-plan-de-tests.md).

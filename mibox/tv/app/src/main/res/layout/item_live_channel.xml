@@ -73,6 +73,17 @@
                 android:textColor="@color/row_text"
                 android:textSize="15sp" />
 
+            <ImageView
+                android:id="@+id/star"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="6dp"
+                android:duplicateParentState="true"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_star"
+                android:tint="@color/row_sub"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/tag"
                 style="@style/Tag"

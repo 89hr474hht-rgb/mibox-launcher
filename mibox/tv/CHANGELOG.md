@@ -6,6 +6,18 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.5.0] - 2026-11-08
+
+### Ajouté
+- Rangement intelligent des groupes, à partir de leur nom : la France d'abord (puis Belgique, Suisse, Québec, puis les autres pays), et dans chaque pays les généralistes, l'info, le sport, le cinéma, les séries, la jeunesse, les documentaires… Chaque groupe a l'icône de son thème. Réglages → Rangement des groupes : Intelligent, A à Z ou Fournisseur.
+- Ordre des chaînes « Numéros TNT » : TF1, France 2, France 3, Canal+… à leur numéro, puis les autres de A à Z. Aussi A à Z ou Fournisseur.
+- Doublons regroupés : une chaîne proposée en SD, HD et FHD n'apparaît qu'une fois, dans la meilleure qualité (à couper dans Réglages).
+- Groupes pour adultes masqués d'office, repérés à leur nom ; un groupe peut être réaffiché dans Groupes des chaînes, et le réglage se coupe.
+- Appui long sur OK sur une chaîne : Ajouter aux favoris (elle passe en tête de Favoris, avant les plus regardées) ou Masquer cette chaîne. Réglages → Chaînes masquées pour les réafficher.
+
+### Modifié
+- Menu de gauche plus court : Rechercher, Chaînes, Films, Séries et Réglages. Compte, Actualiser et Mises à jour sont en haut de Réglages, qui regroupe tout par sections (Compte et application, Chaînes, Films et séries, Lecture et affichage, Historique) ; un point sur Réglages signale une mise à jour.
+
 ## [0.4.0] - 2026-11-06
 
 ### Corrigé

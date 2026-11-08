@@ -5,7 +5,7 @@
 
     <string name="group_favourites">Favoris</string>
     <string name="group_all_channels">Toutes les chaînes</string>
-    <string name="favourites_hint">Tes chaînes les plus regardées apparaîtront ici.</string>
+    <string name="favourites_hint">Tes chaînes les plus regardées apparaîtront ici. Appui long sur OK sur une chaîne pour l\'ajouter.</string>
     <string name="live_ok_hint">OK pour regarder</string>
     <string name="live_now">Maintenant</string>
     <string name="live_next">Ensuite</string>
@@ -53,7 +53,6 @@
     <string name="next_episode">Épisode suivant : %1$s</string>
 
     <string name="settings_title">Réglages</string>
-    <string name="settings_section_groups">Groupes</string>
     <string name="settings_section_play">Lecture et affichage</string>
     <string name="settings_section_history">Historique</string>
     <string name="refresh_section_lists">Listes du fournisseur</string>
@@ -94,5 +93,43 @@
     <string name="group_rename_hint">Laisse vide pour le nom d\'origine</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
-    <string name="group_options_hint">Appui long sur OK : options du groupe</string>
+    <string name="group_options_hint">Appui long sur OK : options du groupe ou de la chaîne</string>
+    <string name="nav_settings_update">Réglages · mise à jour</string>
+    <string name="settings_section_app">Compte et application</string>
+    <string name="settings_section_channels">Chaînes</string>
+    <string name="settings_section_vod">Films et séries</string>
+    <string name="settings_refresh_sub">Recharger les listes du fournisseur</string>
+    <string name="settings_account_none">Aucun compte : à remplir pour commencer</string>
+    <string name="settings_account_user">Connecté en tant que %1$s</string>
+    <string name="settings_group_order">Rangement des groupes</string>
+    <string name="settings_channel_order">Ordre des chaînes</string>
+    <string name="settings_dedupe">Regrouper les doublons</string>
+    <string name="settings_dedupe_sub">Une chaîne proposée en SD, HD et FHD n\'apparaît qu\'une fois, dans la meilleure qualité</string>
+    <string name="settings_adult">Masquer les groupes pour adultes</string>
+    <string name="settings_adult_sub">Repérés à leur nom ; un groupe peut être réaffiché dans Groupes des chaînes</string>
+    <string name="settings_hidden_channels">Chaînes masquées</string>
+    <string name="settings_hidden_none">Aucune chaîne masquée</string>
+    <plurals name="settings_hidden_count">
+        <item quantity="one">%d chaîne masquée</item>
+        <item quantity="other">%d chaînes masquées</item>
+    </plurals>
+    <string name="order_smart">Intelligent</string>
+    <string name="order_az">A à Z</string>
+    <string name="order_panel">Fournisseur</string>
+    <string name="order_tnt">Numéros TNT</string>
+    <string name="order_smart_sub">France d\'abord, puis généralistes, infos, sport, cinéma, jeunesse…</string>
+    <string name="order_az_sub">Tous les groupes de A à Z</string>
+    <string name="order_panel_sub">Dans l\'ordre envoyé par le fournisseur</string>
+    <string name="order_tnt_sub">TF1, France 2, France 3… à leur numéro, puis les autres de A à Z</string>
+    <string name="order_az_channels_sub">Toutes les chaînes de A à Z</string>
+    <string name="order_panel_channels_sub">Dans l\'ordre envoyé par le fournisseur</string>
+    <string name="channel_options_sub">Options de la chaîne</string>
+    <string name="channel_star">Ajouter aux favoris</string>
+    <string name="channel_unstar">Retirer des favoris</string>
+    <string name="channel_hide">Masquer cette chaîne</string>
+    <string name="hidden_hint">OK sur une chaîne pour la réafficher dans toutes les listes.</string>
+    <string name="hidden_empty_sub">Appui long sur OK sur une chaîne, puis Masquer cette chaîne</string>
+    <string name="hidden_show_all">Tout réafficher</string>
+    <string name="hidden_section">Masquées</string>
+    <string name="hidden_row_sub">OK pour la réafficher</string>
 </resources>

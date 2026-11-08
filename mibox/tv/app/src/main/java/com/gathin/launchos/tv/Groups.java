@@ -10,7 +10,8 @@ import java.util.function.ToLongFunction;
 
 /**
  * The owner's changes to the panel's groups (categories): a new name, hidden, or pinned to the top. Kept on the box
- * for this account only. Groups are shown pinned first (in the order they were pinned), then A to Z.
+ * for this account only. Groups are shown pinned first (in the order they were pinned), then in the order chosen in
+ * Réglages (smart, A to Z, or the panel's).
  */
 final class Groups {
     private static final String PREFS = "groups";
@@ -18,9 +19,11 @@ final class Groups {
 
     private final SharedPreferences prefs;
     private final String account;
+    private final Context context;
 
     private Groups(Context c, String account) {
-        prefs = c.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        context = c.getApplicationContext();
+        prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         this.account = account;
     }
 
@@ -28,6 +31,10 @@ final class Groups {
     static Groups get(Context c) {
         Account a = AccountStore.load(c);
         return a == null ? null : new Groups(c, AccountStore.key(a));
+    }
+
+    Context context() {
+        return context;
     }
 
     /** Changes after every edit, so pages know to show the groups again. */
@@ -59,8 +66,33 @@ final class Groups {
         return prefs.contains(key(s, id, "n"));
     }
 
+    /** Hidden by the owner, or a group for adults while Réglages keeps those out of sight (the owner can show one). */
     boolean hidden(Xtream.Section s, String id) {
-        return prefs.getBoolean(key(s, id, "h"), false);
+        String k = key(s, id, "h");
+        if (prefs.contains(k)) return prefs.getBoolean(k, false);
+        return Options.hideAdult(context) && adult(s, id);
+    }
+
+    /** Hidden only because it is for adults. */
+    boolean hiddenAsAdult(Xtream.Section s, String id) {
+        return !prefs.contains(key(s, id, "h")) && Options.hideAdult(context) && adult(s, id);
+    }
+
+    /** Per section: the categories list last looked at, and which of its groups are for adults. */
+    private static final java.util.Map<Xtream.Section, Object> adultFrom = new java.util.EnumMap<>(Xtream.Section.class);
+    private static final java.util.Map<Xtream.Section, java.util.Set<String>> adultIds =
+            new java.util.EnumMap<>(Xtream.Section.class);
+
+    private static synchronized boolean adult(Xtream.Section s, String id) {
+        java.util.List<Xtream.Category> cats = Library.of(s).categories();
+        if (cats == null || id == null) return false;
+        if (adultFrom.get(s) != cats) {
+            java.util.Set<String> ids = new java.util.HashSet<>();
+            for (Xtream.Category c : cats) if (Smart.adult(c.name)) ids.add(c.id);
+            adultFrom.put(s, cats);
+            adultIds.put(s, ids);
+        }
+        return adultIds.get(s).contains(id);
     }
 
     boolean pinned(Xtream.Section s, String id) {
@@ -77,9 +109,11 @@ final class Groups {
         version++;
     }
 
+    /** A group for adults that the owner shows keeps a "not hidden" mark, so it stays shown. */
     void setHidden(Xtream.Section s, String id, boolean hidden) {
         SharedPreferences.Editor e = prefs.edit();
         if (hidden) e.putBoolean(key(s, id, "h"), true);
+        else if (adult(s, id)) e.putBoolean(key(s, id, "h"), false);
         else e.remove(key(s, id, "h"));
         e.apply();
         version++;
@@ -106,7 +140,8 @@ final class Groups {
     List<Xtream.Category> ordered(Xtream.Section s, List<Xtream.Category> cats, boolean withHidden) {
         List<Xtream.Category> shown = new ArrayList<>();
         for (Xtream.Category c : cats) if (withHidden || !hidden(s, c.id)) shown.add(c);
-        return order(shown, c -> name(s, c), c -> prefs.getLong(key(s, c.id, "p"), 0));
+        return Smart.orderGroups(shown, Options.groupOrder(context), c -> name(s, c),
+                c -> prefs.getLong(key(s, c.id, "p"), 0));
     }
 
     /** Pinned first by when they were pinned, then A to Z (accents, case and numbering ignored). */

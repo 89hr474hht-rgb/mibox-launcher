@@ -58,7 +58,8 @@ final class LivePage {
     private Group group;
     private String groupKey;
     private int lastChannel;
-    private int shownGroupsVersion = -1, shownHistory = -1, shownTidy = -1;
+    private int shownGroupsVersion = -1, shownHistory = -1;
+    private String shownStamp = "";
     private final Runnable applyGroup = this::showGroup;
     private Group pendingGroup;
 
@@ -94,7 +95,7 @@ final class LivePage {
     void show(Xtream api) {
         this.api = api;
         Library lib = Library.of(Xtream.Section.LIVE);
-        boolean changed = shownGroupsVersion != Groups.version() || shownTidy != (Options.tidyNames(activity) ? 1 : 0);
+        boolean changed = shownGroupsVersion != Groups.version() || !shownStamp.equals(stamp());
         if (lib.ready() && !changed && groupAdapter.getItemCount() > 0) {
             if (shownHistory != History.version() && player.mode() == LivePlayer.Mode.HIDDEN) rebuild(false);
             else channelAdapter.guides();
@@ -124,27 +125,36 @@ final class LivePage {
         Library lib = Library.of(Xtream.Section.LIVE);
         Groups g = Groups.get(activity);
         History h = History.get(activity);
+        Channels chs = Channels.get(activity);
         shownGroupsVersion = Groups.version();
         shownHistory = History.version();
-        shownTidy = Options.tidyNames(activity) ? 1 : 0;
+        shownStamp = stamp();
         List<Group> list = new ArrayList<>();
-        if (h != null) {
-            List<Item> fav = new ArrayList<>();
-            for (Item stored : h.favourites(FAVOURITES)) {
-                Item fresh = lib.find(stored.id);
-                if (fresh != null || lib.partial()) fav.add(fresh != null ? fresh : stored);
+        // Favoris: the channels added by hand, in that order, then the most watched ones.
+        List<Item> fav = new ArrayList<>();
+        java.util.Set<String> inFav = new java.util.HashSet<>();
+        List<Item> picked = new ArrayList<>();
+        if (chs != null) picked.addAll(chs.starredItems());
+        if (h != null) picked.addAll(h.favourites(FAVOURITES));
+        for (Item stored : picked) {
+            if (inFav.contains(stored.id) || (chs != null && chs.hidden(stored.id))) continue;
+            Item fresh = lib.find(stored.id);
+            if (fresh != null || lib.partial() || lib.all() == null) {
+                fav.add(fresh != null ? fresh : stored);
+                inFav.add(stored.id);
             }
-            if (!fav.isEmpty()) list.add(new Group(Kind.FAVOURITES, null, activity.getString(R.string.group_favourites), fav));
         }
+        if (!fav.isEmpty()) list.add(new Group(Kind.FAVOURITES, null, activity.getString(R.string.group_favourites), fav));
         if (lib.all() != null && !lib.all().isEmpty()) {
-            list.add(new Group(Kind.ALL, null, activity.getString(R.string.group_all_channels), lib.all()));
+            list.add(new Group(Kind.ALL, null, activity.getString(R.string.group_all_channels), arranged(lib.all(), chs)));
         }
         List<Xtream.Category> cats = lib.categories() == null ? new ArrayList<>() : lib.categories();
         int shownGroups = 0;
         for (Xtream.Category c : g == null ? cats : g.ordered(Xtream.Section.LIVE, cats, false)) {
             List<Item> items = lib.items(c.id);
             if (!lib.partial() && (items == null || items.isEmpty())) continue;   // empty groups are left out
-            list.add(new Group(Kind.GROUP, c, g == null ? Groups.panelName(Xtream.Section.LIVE, c) : g.name(Xtream.Section.LIVE, c), items));
+            list.add(new Group(Kind.GROUP, c, g == null ? Groups.panelName(Xtream.Section.LIVE, c) : g.name(Xtream.Section.LIVE, c),
+                    items == null ? null : arranged(items, chs)));
             shownGroups++;
         }
         groupsCount.setText(String.format(Locale.FRANCE, "%d groupe%s", shownGroups, shownGroups > 1 ? "s" : ""));
@@ -163,6 +173,18 @@ final class LivePage {
         group = null;
         select(keep, true);
         if (focusDefault && activity.showing(this) && !player.isFull()) focusGroups();
+    }
+
+    /** What decides how the lists look, apart from the groups themselves: a change means building them again. */
+    private String stamp() {
+        return Options.tidyNames(activity) + "|" + Options.channelOrder(activity) + "|" + Options.dedupe(activity) + "|"
+                + Options.hideAdult(activity) + "|" + Options.groupOrder(activity) + "|" + Channels.version();
+    }
+
+    /** A group's channels as they are shown: hidden ones out, doubles merged, in the order chosen in Réglages. */
+    private List<Item> arranged(List<Item> items, Channels chs) {
+        List<Item> l = chs == null ? items : chs.visible(items);
+        return Smart.arrange(l, Options.channelOrder(activity), Options.dedupe(activity));
     }
 
     private void status(String text) {
@@ -191,8 +213,8 @@ final class LivePage {
             groupCount.setText("");
             status(activity.getString(R.string.loading));
             Library.of(Xtream.Section.LIVE).loadCategory(api, g.category.id, () -> {
-                g.channels = Library.of(Xtream.Section.LIVE).items(g.category.id);
-                if (g.channels == null) g.channels = new ArrayList<>();
+                List<Item> loaded = Library.of(Xtream.Section.LIVE).items(g.category.id);
+                g.channels = loaded == null ? new ArrayList<>() : arranged(loaded, Channels.get(activity));
                 if (group == g) {
                     group = null;
                     pendingGroup = g;
@@ -271,6 +293,16 @@ final class LivePage {
             });
         }
         return v;
+    }
+
+    /** After an edit the list is new: the focus goes back to the same place, or the last row when it got shorter. */
+    private void focusChannelAt(int position) {
+        if (channelAdapter.getItemCount() == 0) {
+            focusGroups();
+            return;
+        }
+        lastChannel = Math.max(0, Math.min(position, channelAdapter.getItemCount() - 1));
+        focusChannels(false);
     }
 
     /** Focuses the playing channel, else the last one focused in this group. */
@@ -470,8 +502,8 @@ final class LivePage {
             TextView count = v.findViewById(R.id.count);
             count.setText(g.channels == null ? "" : String.valueOf(g.channels.size()));
             ImageView icon = v.findViewById(R.id.icon);
-            icon.setVisibility(g.kind == Kind.GROUP ? View.GONE : View.VISIBLE);
-            if (g.kind != Kind.GROUP) icon.setImageResource(g.kind == Kind.FAVOURITES ? R.drawable.ic_star : R.drawable.ic_all);
+            icon.setImageResource(g.kind == Kind.FAVOURITES ? R.drawable.ic_star : g.kind == Kind.ALL ? R.drawable.ic_all
+                    : themeIcon(Smart.theme(g.category.name)));
             v.setActivated(g == selected);
             v.setOnFocusChangeListener((view, focused) -> {
                 if (focused) select(g, false);
@@ -503,6 +535,36 @@ final class LivePage {
         }
     }
 
+    /** A group's icon, from what it is about. */
+    static int themeIcon(Smart.Theme t) {
+        switch (t) {
+            case GENERAL:
+                return R.drawable.ic_live;
+            case NEWS:
+                return R.drawable.ic_news;
+            case SPORT:
+                return R.drawable.ic_sport;
+            case MOVIES:
+                return R.drawable.ic_movie;
+            case SERIES:
+                return R.drawable.ic_series;
+            case KIDS:
+                return R.drawable.ic_kids;
+            case DOCS:
+                return R.drawable.ic_docs;
+            case MUSIC:
+                return R.drawable.ic_music;
+            case REGIONAL:
+                return R.drawable.ic_server;
+            case ENTERTAINMENT:
+                return R.drawable.ic_smile;
+            case ADULT:
+                return R.drawable.ic_hide;
+            default:
+                return R.drawable.ic_folder;
+        }
+    }
+
     private final class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.Holder> {
         static final String GUIDE = "guide";
         static final String PLAYING = "playing";
@@ -512,7 +574,7 @@ final class LivePage {
         final class Holder extends RecyclerView.ViewHolder {
             final ImageView image;
             final TextView num, title, tag, now, initials;
-            final View track, bar, playing;
+            final View track, bar, playing, star;
             volatile String boundId;
 
             Holder(View v) {
@@ -526,6 +588,7 @@ final class LivePage {
                 track = v.findViewById(R.id.track);
                 bar = v.findViewById(R.id.bar);
                 playing = v.findViewById(R.id.playing);
+                star = v.findViewById(R.id.star);
             }
         }
 
@@ -580,7 +643,11 @@ final class LivePage {
         @Override
         public void onBindViewHolder(Holder h, int position) {
             Item item = items.get(position);
-            h.num.setText(item.num > 0 ? String.valueOf(item.num) : "");
+            int tnt = Options.channelOrder(activity) == Smart.ChannelOrder.TNT ? Smart.tntFolded(item.key) : 0;
+            int number = tnt > 0 ? tnt : item.num;
+            h.num.setText(number > 0 ? String.valueOf(number) : "");
+            Channels chs = Channels.get(activity);
+            h.star.setVisibility(chs != null && chs.starred(item.id) ? View.VISIBLE : View.GONE);
             h.title.setText(display(activity, item));
             boolean tidy = Options.tidyNames(activity);
             h.tag.setText(item.tag);
@@ -600,6 +667,14 @@ final class LivePage {
                 if (p == RecyclerView.NO_POSITION || group == null) return;
                 lastChannel = p;
                 player.play(items, p, group.name);
+            });
+            h.itemView.setOnLongClickListener(v -> {
+                ChannelOptions.show(activity, item, () -> {
+                    int keep = lastChannel;
+                    rebuild(false);
+                    channelsView.post(() -> focusChannelAt(keep));
+                });
+                return true;
             });
         }
 

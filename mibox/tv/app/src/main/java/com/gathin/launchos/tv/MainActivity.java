@@ -79,7 +79,12 @@ public final class MainActivity extends Activity {
             railItems[i] = v;
         }
         sectionItems = new View[]{railItems[1], railItems[2], railItems[3]};
-        navUpdates = railItems[6];
+        // A short menu: search, the three sections, Réglages. Actualiser, Mises à jour and Compte are at the top of
+        // Réglages; their rail items stay in the layout, out of sight, so Up and Down skip them.
+        railItems[4].setVisibility(View.GONE);
+        railItems[6].setVisibility(View.GONE);
+        railItems[7].setVisibility(View.GONE);
+        navUpdates = railItems[5];
         Xtream.Section[] sections = Xtream.Section.values();
         for (int i = 0; i < sectionItems.length; i++) {
             Xtream.Section s = sections[i];
@@ -389,12 +394,12 @@ public final class MainActivity extends Activity {
 
     // ---- updates ----
 
-    /** The rail item says when a newer version is waiting; the banner says it once per version and session. */
+    /** Réglages in the rail says when a newer version is waiting; the banner says it once per version and session. */
     private void showUpdate() {
         UpdateState state = new UpdateState(this);
         Release r = state.available();
         boolean newer = r != null && r.version.isNewerThan(UpdateState.installed(this));
-        ((TextView) navUpdates.findViewById(R.id.rail_label)).setText(newer ? R.string.nav_update_ready : R.string.nav_updates);
+        ((TextView) navUpdates.findViewById(R.id.rail_label)).setText(newer ? R.string.nav_settings_update : R.string.nav_settings);
         navUpdates.findViewById(R.id.rail_dot).setVisibility(newer ? View.VISIBLE : View.GONE);
         if (newer && state.shouldPrompt(this) && !String.valueOf(r.version).equals(bannerShownFor)) {
             bannerShownFor = String.valueOf(r.version);
