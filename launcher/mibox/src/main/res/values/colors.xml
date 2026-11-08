@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="mibox_page_bg">#FF0E0F12</color>
+    <color name="mibox_page_bg">#FF000000</color>
 </resources>

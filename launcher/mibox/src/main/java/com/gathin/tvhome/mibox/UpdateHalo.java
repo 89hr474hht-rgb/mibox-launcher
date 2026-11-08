@@ -170,7 +170,7 @@ public final class UpdateHalo extends View {
         float br = logoR * 0.42f * scale;
         float bx = cx + logoR * 0.78f, by = cy + logoR * 0.78f + lift;
         if (br <= 0) return;
-        badge.setColor(0xFF0E0F12);
+        badge.setColor(0xFF000000);
         c.drawCircle(bx, by, br + 3 * dp * scale, badge);
         badge.setColor(tone());
         c.drawCircle(bx, by, br, badge);

@@ -2,5 +2,5 @@
 <!-- A soft blue-violet light from the top left of the LaunchOS pages. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <gradient android:type="radial" android:centerX="0.22" android:centerY="0.3" android:gradientRadius="720dp"
-        android:startColor="#2E5B6BFF" android:centerColor="#129A5CFF" android:endColor="#000E0F12" />
+        android:startColor="#2E5B6BFF" android:centerColor="#129A5CFF" android:endColor="#00000000" />
 </shape>

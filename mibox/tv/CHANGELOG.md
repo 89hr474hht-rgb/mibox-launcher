@@ -16,6 +16,7 @@ dans l'écran Mises à jour de l'appli.
 - Appui long sur OK sur une chaîne : Ajouter aux favoris (elle passe en tête de Favoris, avant les plus regardées) ou Masquer cette chaîne. Réglages → Chaînes masquées pour les réafficher.
 
 ### Modifié
+- Fond noir pur partout (pages, réglages, dégradés derrière les affiches) : sur l'écran OLED, ce qui est noir reste éteint.
 - Menu de gauche plus court : Rechercher, Chaînes, Films, Séries et Réglages. Compte, Actualiser et Mises à jour sont en haut de Réglages, qui regroupe tout par sections (Compte et application, Chaînes, Films et séries, Lecture et affichage, Historique) ; un point sur Réglages signale une mise à jour.
 
 ## [0.4.0] - 2026-11-06
