@@ -354,6 +354,30 @@ construit. Tout ce qui se voit à l'écran reste à vérifier sur la box, avec l
 | TV5-09 | Chaîne masquée | Appui long → Masquer cette chaîne ; Réglages → Chaînes masquées | Disparaît des listes et de la recherche ; OK dans Chaînes masquées la fait revenir | MANUEL | Non testé |
 | TV5-10 | Gros catalogue | Toutes les chaînes chez ton fournisseur | Ouverture sans attente visible de plus qu'avant | MANUEL | Non testé |
 
+## C sexdecies. LaunchOS 1.6.0 : réglages en deux colonnes et veille OLED
+
+**Ni émulateur ni box pour cette version.** Vérifié : build de l'édition Mi Box (`-Pmibox`), 352 tests du
+lanceur, lint sans erreur, APK de 543 972 octets (sous la limite de 589 824), suite Python du dépôt. La box ne
+répondait pas en ADB pendant le travail : ses réglages d'économiseur n'ont pas été lus. Avant le premier essai, lire
+(sans rien changer) `settings get secure screensaver_components`, `screensaver_enabled`,
+`screensaver_activate_on_sleep`, `sleep_timeout`, `attentive_timeout` et `settings get system screen_off_timeout`,
+et noter les valeurs pour pouvoir revenir en arrière.
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| L16-01 | Deux colonnes | Ouvrir les réglages de LaunchOS | Catégories à gauche sur fond noir, Général choisi et sa page à droite | MANUEL | Non testé |
+| L16-02 | Changer de catégorie | Haut/Bas dans la colonne de gauche | La page de droite suit en fondu ; la catégorie montrée reste éclairée | MANUEL | Non testé |
+| L16-03 | Entrer et sortir | Droite depuis une catégorie, puis Gauche depuis une ligne ou le premier choix | Droite va à la première ligne ; Gauche revient à la catégorie ; Haut/Bas ne quittent pas la page | MANUEL | Non testé |
+| L16-04 | Réglages existants | Colonnes, lignes, dock, horloge, fond, animations, démarrage | Chaque choix marche comme en 1.5.2 | MANUEL | Non testé |
+| L16-05 | Activer la veille | Veille → Écran de veille LaunchOS (avec la permission) | Coche verte, « Activé » ; `screensaver_components` = LaunchOS ; sans la permission, le message l'explique | MIXTE | Non testé |
+| L16-06 | Démarre après | Choisir 5 min, laisser la box sans télécommande, sans vidéo | Écran noir avec l'heure et la date au bout de 5 min | MANUEL | Non testé |
+| L16-07 | Anti-marquage | Regarder la veille plus de 2 min | Le texte change de place chaque minute en fondu ; rien d'autre n'est allumé | MANUEL | Non testé |
+| L16-08 | Styles et nuit | Horloge / Heure et date / Discret / Noir ; Aperçu ; le soir après 22 h | L'aperçu suit le choix ; texte plus sombre la nuit ; une touche ferme l'aperçu | MANUEL | Non testé |
+| L16-09 | Réveil | Une touche de la télécommande pendant la veille | Retour où l'on était ; BT et CEC comme avant (BT-05, CEC-03) | MANUEL | Non testé |
+| L16-10 | Éteint la télé après | Choisir 1 h | La box se met en veille et la Samsung s'éteint (CEC) ; « Jamais » l'empêche | MANUEL | Non testé |
+| L16-11 | Désactiver | Décocher Écran de veille LaunchOS | L'économiseur d'avant revient (`screensaver_components`) | ADB | Non testé |
+| L16-12 | Pendant une vidéo | Netflix, SFR TV, LaunchOS TV en lecture | La veille ne coupe pas une vidéo en cours | MANUEL | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

@@ -93,4 +93,10 @@
         <item name="android:background">@drawable/mibox_pill_bg</item>
         <item name="android:textSize">16sp</item>
     </style>
+
+    <!-- The sleep screen's preview: black from the first frame, no transition. -->
+    <style name="MiboxDreamTheme" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

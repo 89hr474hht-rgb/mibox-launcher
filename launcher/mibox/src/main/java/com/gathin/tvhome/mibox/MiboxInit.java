@@ -167,6 +167,7 @@ public final class MiboxInit extends ContentProvider {
             if (sub instanceof TextView) {
                 ((TextView) sub).setText(activity.getString(R.string.mibox_set_subtitle, BuildConfig.MIBOX_VERSION));
             }
+            SettingsPanes.attach(activity);
             return;
         }
         int anchorId = activity.getResources().getIdentifier("tvSettingsChoice", "id", pkg);

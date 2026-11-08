@@ -39,6 +39,25 @@
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <!-- LaunchOS's sleep screen for OLED; switched on from Settings → Veille (DreamSettings). -->
+        <service
+            android:name=".OledDream"
+            android:exported="true"
+            android:label="@string/mibox_dream_name"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <!-- Settings → Veille → Aperçu. -->
+        <activity
+            android:name=".DreamPreviewActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/MiboxDreamTheme" />
+
         <!-- The updates page, listed in the app library so it can be opened from the remote. -->
         <activity
             android:name=".UpdatesActivity"

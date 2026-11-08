@@ -5,6 +5,14 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.6.0] - 2026-11-08
+
+### Ajouté
+- Veille pour l'écran OLED : après un moment sans télécommande, un écran entièrement noir avec l'heure (et la date, ou le temps restant du minuteur de veille). Le texte change de place chaque minute en fondu, pour ne jamais marquer la dalle, et se fait plus discret la nuit (22 h – 7 h). Réglages → Veille : l'activer, quand il démarre (5 à 30 min), quand la télé s'éteint (1 h, 2 h, 4 h ou jamais), ce qu'il affiche (Horloge, Heure et date, Discret, Noir) et un aperçu. L'activer d'ici demande la permission WRITE_SECURE_SETTINGS (une fois par ADB) ; sinon on le choisit dans les réglages Android de l'économiseur.
+
+### Modifié
+- Réglages de LaunchOS en deux colonnes sur fond noir : les catégories à gauche (Général, Écran d'accueil, Horloge, Veille, Apparence, Démarrage), la page de celle qui est choisie à droite, en fondu. Droite entre dans la page, Gauche revient à la catégorie.
+
 ## [1.5.2] - 2026-11-06
 
 ### Modifié
