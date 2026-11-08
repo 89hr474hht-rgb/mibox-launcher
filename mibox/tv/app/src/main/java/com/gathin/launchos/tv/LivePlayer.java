@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Live TV inside the main screen, so a channel can shrink into the small window at the top right of Chaînes and
+ * Live TV inside the main screen, so a channel can shrink into the small window at the bottom right of Chaînes and
  * grow back without stopping. Full screen: Up/Down (or CH+/CH−) zap inside the list it was started from, OK shows
  * what is on, Back shrinks it (or stops it when the mini player is off). A stream that drops is tried again, then
  * as HLS. The time spent on each channel feeds the favourites.

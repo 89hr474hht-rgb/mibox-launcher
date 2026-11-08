@@ -54,6 +54,9 @@
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity
+            android:name=".GuideActivity"
+            android:exported="false" />
+        <activity
             android:name=".HiddenChannelsActivity"
             android:exported="false" />
         <activity
@@ -69,7 +72,9 @@
         <activity
             android:name=".PlayerActivity"
             android:theme="@style/Theme.LaunchOSTV.Player"
-            android:configChanges="keyboard|keyboardHidden|navigation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="keyboard|keyboardHidden|navigation|screenSize|smallestScreenSize|screenLayout|orientation"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"
             android:exported="false" />
         <activity
             android:name=".RefreshActivity"

@@ -239,4 +239,13 @@ final class Smart {
         });
         return out;
     }
+
+    /** "Action, Aventure" as "Action": a title's first genre, trimmed (empty when there is none). */
+    static String firstGenre(String genre) {
+        if (genre == null) return "";
+        String[] parts = genre.split("[,/|]");
+        if (parts.length == 0) return "";
+        String g = parts[0].trim();
+        return g.length() < 2 ? "" : Character.toUpperCase(g.charAt(0)) + g.substring(1);
+    }
 }

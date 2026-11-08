@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Main screen: the pages (Chaînes, Films, Séries), the live player above them (full screen or the small window at
-     the top right), and the rail on the left: a dark strip of icons that opens over the page only while it has the
+<!-- Main screen: the pages (Accueil, Chaînes, Films, Séries), the live player above them (full screen or the small
+     window at the bottom right), and the rail on the left: a dark strip of icons that opens over the page only while it has the
      focus, so it never mixes with the page's own columns. -->
 <com.gathin.launchos.tv.Root xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,6 +13,11 @@
         android:id="@+id/pages"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/page_home"
+            layout="@layout/page_home"
+            android:visibility="gone" />
 
         <include
             android:id="@+id/page_live"
@@ -96,9 +101,25 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/nav_home"
+            style="@style/RailItem"
+            android:contentDescription="@string/nav_home">
+
+            <include layout="@layout/rail_item" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/nav_live"
             style="@style/RailItem"
             android:contentDescription="@string/nav_live">
+
+            <include layout="@layout/rail_item" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_guide"
+            style="@style/RailItem"
+            android:contentDescription="@string/nav_guide">
 
             <include layout="@layout/rail_item" />
         </LinearLayout>

@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A whole group (or every film or series), with a choice of order. -->
+<!--
+  A whole group (or every film or series): a glass header that stays at the top (title, count, order and genre
+  filters) over a grid of 2:3 posters whose number of columns follows the screen's width.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/page_bg"
-    android:orientation="vertical"
-    android:paddingTop="30dp">
+    android:background="@drawable/ds_page_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ds_header_bar"
+        android:elevation="6dp"
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        android:paddingBottom="14dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="56dp"
@@ -43,6 +56,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/genres_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:paddingStart="48dp"
+        android:paddingEnd="48dp"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/genres"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
     </LinearLayout>
 
     <FrameLayout

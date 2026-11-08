@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Darkens the edges of the poster wall so the card stands out. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient android:type="radial" android:gradientRadius="700dp" android:centerX="0.5" android:centerY="0.5"
+        android:startColor="#000A0A0A" android:centerColor="#660A0A0A" android:endColor="#E60A0A0A" />
+</shape>

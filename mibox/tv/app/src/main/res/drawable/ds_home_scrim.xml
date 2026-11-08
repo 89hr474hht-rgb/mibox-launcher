@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Over the hero's picture: dark at the left for the text, and fading fully to black from the middle down. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <gradient android:angle="0" android:startColor="#F00A0A0A" android:centerColor="#800A0A0A"
+                android:endColor="#1A0A0A0A" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <gradient android:angle="90" android:startColor="#FF0A0A0A" android:centerY="0.55"
+                android:centerColor="#F20A0A0A" android:endColor="#000A0A0A" />
+        </shape>
+    </item>
+</layer-list>

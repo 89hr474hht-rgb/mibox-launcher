@@ -53,18 +53,14 @@
     <string name="next_episode">Épisode suivant : %1$s</string>
 
     <string name="settings_title">Réglages</string>
-    <string name="settings_section_play">Lecture et affichage</string>
-    <string name="settings_section_history">Historique</string>
     <string name="refresh_section_lists">Listes du fournisseur</string>
     <string name="refresh_section_memory">Gardé sur la box</string>
-    <string name="account_section">Identifiants</string>
-    <string name="settings_hint">Les réglages restent sur cette box, pour ce compte.</string>
     <string name="settings_groups_live">Groupes des chaînes</string>
     <string name="settings_groups_movies">Groupes des films</string>
     <string name="settings_groups_series">Groupes des séries</string>
     <string name="settings_groups_sub">Renommer, masquer ou épingler en haut</string>
     <string name="settings_mini">Mini-lecteur</string>
-    <string name="settings_mini_sub">Retour pendant une chaîne la garde en petit, en haut à droite</string>
+    <string name="settings_mini_sub">Retour pendant une chaîne la garde en petit, en bas à droite</string>
     <string name="settings_next">Épisode suivant automatique</string>
     <string name="settings_next_sub">À la fin d\'un épisode, le suivant démarre</string>
     <string name="settings_tidy">Noms de chaînes simplifiés</string>
@@ -95,10 +91,6 @@
     <string name="cancel">Annuler</string>
     <string name="group_options_hint">Appui long sur OK : options du groupe ou de la chaîne</string>
     <string name="nav_settings_update">Réglages · mise à jour</string>
-    <string name="settings_section_app">Compte et application</string>
-    <string name="settings_section_channels">Chaînes</string>
-    <string name="settings_section_vod">Films et séries</string>
-    <string name="settings_refresh_sub">Recharger les listes du fournisseur</string>
     <string name="settings_account_none">Aucun compte : à remplir pour commencer</string>
     <string name="settings_account_user">Connecté en tant que %1$s</string>
     <string name="settings_group_order">Rangement des groupes</string>

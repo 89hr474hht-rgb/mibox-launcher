@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Chaînes: the groups (Favoris first), the group's channels, and on the right the small player (or the focused
-     channel's logo) with what is on now and next. Each column is its own panel. -->
+<!-- Chaînes: the groups (Favoris first), the group's channels, and on the right what is on now and next on the
+     focused channel, with the small player (or the channel's logo) in the bottom-right corner. Each column is its
+     own panel. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -115,51 +116,18 @@
 
     <LinearLayout
         android:id="@+id/detail_column"
-        android:layout_width="342dp"
+        android:layout_width="344dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingStart="12dp"
         android:paddingTop="24dp"
-        android:paddingEnd="24dp">
+        android:paddingEnd="26dp">
 
-        <FrameLayout
-            android:id="@+id/pip_slot"
-            android:layout_width="@dimen/pip_width"
-            android:layout_height="@dimen/pip_height"
-            android:background="@drawable/pip_slot_bg">
-
-            <ImageView
-                android:id="@+id/slot_logo"
-                android:layout_width="150dp"
-                android:layout_height="84dp"
-                android:layout_gravity="center"
-                android:importantForAccessibility="no"
-                android:scaleType="fitCenter" />
-
-            <TextView
-                android:id="@+id/slot_initials"
-                style="@style/Title"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textColor="#4DFFFFFF"
-                android:textSize="40sp" />
-
-            <TextView
-                android:id="@+id/slot_hint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="10dp"
-                android:text="@string/live_ok_hint"
-                android:textColor="@color/text_dim"
-                android:textSize="12sp" />
-        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -242,7 +210,7 @@
                 android:layout_marginTop="10dp"
                 android:ellipsize="end"
                 android:lineSpacingMultiplier="1.2"
-                android:maxLines="4"
+                android:maxLines="3"
                 android:textColor="@color/text_dim"
                 android:textSize="13sp" />
 
@@ -274,5 +242,46 @@
             android:textSize="13sp"
             android:visibility="gone"
             tools:ignore="SelectableText" />
+
+        <!-- The small player sits in the bottom-right corner, 26 dp from the edges (the mini-player's place). -->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:id="@+id/pip_slot"
+            android:layout_width="@dimen/pip_width"
+            android:layout_height="@dimen/pip_height"
+            android:layout_marginBottom="26dp"
+            android:background="@drawable/pip_slot_bg">
+
+            <ImageView
+                android:id="@+id/slot_logo"
+                android:layout_width="150dp"
+                android:layout_height="84dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/slot_initials"
+                style="@style/Title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="#4DFFFFFF"
+                android:textSize="40sp" />
+
+            <TextView
+                android:id="@+id/slot_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="10dp"
+                android:text="@string/live_ok_hint"
+                android:textColor="@color/text_dim"
+                android:textSize="12sp" />
+        </FrameLayout>
     </LinearLayout>
 </LinearLayout>

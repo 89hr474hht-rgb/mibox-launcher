@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A header that stays at the top: glass with a hairline underneath. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="#D90E0F13" />
+        </shape>
+    </item>
+    <item android:gravity="bottom" android:height="1dp">
+        <shape>
+            <solid android:color="@color/ds_stroke" />
+        </shape>
+    </item>
+</layer-list>

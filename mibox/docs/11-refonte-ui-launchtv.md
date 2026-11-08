@@ -6,17 +6,20 @@ Pour revenir en arrière : `git switch main` (la branche n'est jamais fusionnée
 `git reset --hard backup/avant-refonte-ui` sur la branche. Sur la box, la version 0.5.0 publiée reste
 installable depuis sa release.
 
-Méthode : une vue à la fois. Chaque vue est construite, testée (tests unitaires, lint, build), puis
-validée par le propriétaire avant de passer à la suivante.
+Méthode prévue : une vue à la fois, validée par le propriétaire avant la suivante. Le propriétaire a ensuite
+demandé de finir toutes les vues d'un coup, avec l'émulateur pour les essais.
 
 | # | Vue | État |
 |---|---|---|
-| 6 | Paramètres et maintenance (master-detail, Mise à jour et cache) | Codée, à valider sur la box |
-| 1 | Connexion | À faire |
-| 2 | Accueil | À faire |
-| 3 | Films et séries | À faire |
-| 4 | Live TV et guide | À faire |
-| 5 | Lecteur (OSD) | À faire |
+| 6 | Paramètres et maintenance (master-detail, Mise à jour et cache) | Codée, vue à l'émulateur |
+| 1 | Connexion (`AccountActivity`, `PosterWall`) | Codée, vue à l'émulateur |
+| 2 | Accueil (`HomePage`) | Codée, vue à l'émulateur |
+| 3 | Films et séries (`GridActivity`, `MovieActivity`, `Blur`) | Codée, vue à l'émulateur |
+| 4 | Live TV et guide (`GuideActivity`, `Timeline`, mini-lecteur en bas à droite) | Codée, vue à l'émulateur |
+| 5 | Lecteur (`Osd`) | Codée, vue à l'émulateur |
+
+Toutes les vues sont dans LaunchOS TV 0.6.0. Elles ont été essayées sur l'émulateur Android TV avec le faux
+serveur du dépôt, pas encore sur la box : voir la section « C septdecies » du plan de tests.
 
 ## 1. Compréhension du cahier des charges
 
@@ -88,30 +91,29 @@ LaunchTV OS
 │   ├── Xtream, Http (+ Progress ★), JsonStream   l'API du fournisseur, lue en flux
 │   └── Bg                            deux fils de travail, résultat rendu au fil principal
 │
-├── 1. Connexion            AccountActivity  → LoginActivity (vue 1)
-│   ├── LoginBackdrop        affiches assombries à 15 %, en mosaïque lente
-│   ├── BrandPanel           logo et titre en gras (gauche)
-│   └── LoginForm            URL, identifiant, mot de passe (œil), bouton avec état de chargement
+├── 1. Connexion            AccountActivity ★ (refaite)
+│   ├── PosterWall ★         affiches du cache assombries à 15 %, qui défilent lentement
+│   ├── panneau de marque    logo et titre en gras (gauche)
+│   └── formulaire           URL, identifiant, mot de passe (œil), bouton avec état de chargement
 │
-├── 2. Accueil              MainActivity + BrowsePage (vue 2)
+├── 2. Accueil              MainActivity + HomePage ★
 │   ├── SideRail             barre latérale fermée, s'ouvre au focus (existe : rail)
 │   ├── HeroHeader           tiers haut, image plein écran, dégradé vers le noir
 │   ├── ShelfRow ×n          carrousels : Reprendre, Derniers ajouts… (RecyclerView horizontales)
-│   │   └── PosterCard       focus × 1,05 + bordure, squelette tant que l'image n'est pas là
-│   └── MiniPlayer           mini-lecteur ancré en bas à droite
+│       └── PosterCard       focus × 1,05 + bordure, squelette tant que l'image n'est pas là
 │
-├── 3. Films et séries      GridActivity, MovieActivity, SeriesActivity (vue 3)
+├── 3. Films et séries      GridActivity, MovieActivity (refaites), Blur ★
 │   ├── FilterBar            en-tête fixe des filtres
 │   ├── PosterGrid           grille 2:3 fluide
 │   └── DetailSheet          fond = affiche floutée (pré-calculée), métadonnées à gauche, actions à droite
 │
-├── 4. Live TV              LivePage (vue 4)
+├── 4. Live TV              LivePage (mini-lecteur en bas à droite) + GuideActivity ★, Timeline ★
 │   ├── ChannelColumn        chaînes à gauche
 │   ├── TimeAxis             heures en haut
 │   ├── EpgGrid              programmes, avec la ligne « maintenant »
 │   └── (repli)              liste optimisée si la grille est trop lourde pour la box
 │
-├── 5. Lecteur              PlayerActivity, LivePlayer, Players (vue 5)
+├── 5. Lecteur              PlayerActivity + Osd ★ (le direct garde son bandeau, LivePlayer)
 │   ├── OsdHeader            titre et heure
 │   ├── OsdFooter            barre de lecture fine, commandes au centre
 │   ├── OsdTrailing          audio, sous-titres, mini-lecteur (à l'extrême droite)
@@ -195,18 +197,48 @@ system ci-dessus.
   calcule la part de son bas qui tombe dans la zone morte, et ajoute autant de marge pour que la
   dernière ligne puisse remonter au-dessus.
 
+## 6. Vues 1 à 5
+
+- **Connexion.** Carte de verre de 820 dp au centre de l'écran. À gauche le logo et « LaunchTV OS » en gras ;
+  à droite le formulaire, un œil qui montre ou masque le mot de passe, et Se connecter. Le bouton tourne
+  pendant la vérification, puis devient Continuer. En fond, `PosterWall` fait défiler doucement les affiches
+  déjà en cache sur la box, à 15 %. Il ne télécharge rien ; au tout premier lancement, il n'y a que les lueurs.
+  La connexion s'ouvre seule une fois quand il n'y a pas de compte.
+- **Accueil.** Nouvelle entrée Accueil dans le menu de gauche, ouverte au démarrage.
+  - Le héros occupe le tiers haut : ce qui est en cours (Reprendre) ou la dernière nouveauté, sur son image en
+    plein écran, avec un dégradé vers le noir.
+  - En dessous, les rangées : Reprendre la lecture, Vos chaînes, Derniers films, Dernières séries.
+  - Le héros suit la carte qui a le focus après une courte pause. Des squelettes occupent la place tant que
+    les listes chargent.
+- **Films et séries.**
+  - La grille a un en-tête de verre fixe et des colonnes calculées selon l'écran. Les genres les plus
+    courants servent de filtres ; ils n'apparaissent que si le fournisseur donne des genres.
+  - Fiche d'un film : l'affiche floutée en fond (`Blur` : réduite à 48 px puis trois passes de flou, hors du
+    fil principal). Infos à gauche ; à droite un panneau de verre avec l'affiche, Regarder ou Reprendre,
+    Depuis le début et la bande-annonce (YouTube) quand le fournisseur en donne une.
+- **Guide TV.**
+  - Une grille horaire de deux heures à partir de la demi-heure en cours, avec les groupes en pastilles
+    au-dessus.
+  - Les chaînes sont à gauche, les heures en haut, et une ligne bleue marque l'heure actuelle.
+  - Droite au bout de la grille avance d'une demi-heure, jusqu'à six heures. OK lance la chaîne dans
+    Chaînes.
+  - Le guide d'une chaîne n'est demandé (12 programmes) que quand sa ligne est à l'écran. Trois demandes au
+    plus partent en même temps, et le résultat est gardé 30 min.
+  - Si les performances de la box ne suffisent pas, le repli prévu est la liste de Chaînes, qui existe déjà.
+- **Lecteur.** `Osd` remplace les commandes de Media3.
+  - En haut, le titre (et la saison et l'épisode) et l'heure.
+  - En bas, une barre fine avec la partie déjà chargée, les commandes au centre (−10 s, lecture/pause,
+    +30 s, épisode suivant), puis Audio, Sous-titres et Mini-lecteur à droite.
+  - Il disparaît après 3 s. Caché, Gauche et Droite reculent ou avancent tout de suite. Les touches média
+    marchent toujours.
+  - Le mini-lecteur du film utilise le PiP d'Android, et son bouton n'apparaît que si la box le permet.
+- **Mini-lecteur des chaînes.** Il est passé en bas à droite de la page Chaînes, à 26 dp des bords. La zone
+  morte (356 × 222 dp depuis le coin) ne contient rien d'important.
+
 L'ancien écran Actualiser (`RefreshActivity`) n'est plus ouvert depuis les Réglages. Il reste dans le
-code tant que la vue 6 n'est pas validée, pour pouvoir revenir en arrière.
+code tant que la refonte n'est pas validée, pour pouvoir revenir en arrière.
 
-### Tests (section « C septdecies » à ajouter au plan de tests après validation)
+## 7. Tests
 
-| Test | Comment | Statut |
-|---|---|---|
-| TV6-01 | Les catégories s'affichent à gauche ; Haut/Bas change la page de droite | Non testé |
-| TV6-02 | Droite et OK entrent dans la page ; Gauche et Retour reviennent à la catégorie ; Retour ferme | Non testé |
-| TV6-03 | Chaînes / Films / Séries : la jauge se remplit, devient verte, puis revient au repos avec le nouveau nombre | Non testé |
-| TV6-04 | Quitter les Réglages pendant une actualisation, revenir : la jauge a continué | Non testé |
-| TV6-05 | Vider le cache : toast « Cache vidé · … libérés » en haut, la taille des images revient à ~0 | Non testé |
-| TV6-06 | Squelettes visibles un court instant à l'ouverture de Mise à jour & Cache | Non testé |
-| TV6-07 | Tous les réglages de 0.5.0 marchent comme avant (rangement, ordre, doublons, adultes, masquées, lecture, historique) | Non testé |
-| TV6-08 | Calcul de la progression (`SyncStoreTest`) | Test réussi (tests unitaires) |
+Les tests de toutes les vues sont dans la section « C septdecies » du
+[plan de tests](02-plan-de-tests.md) (TV6-01 à TV6-18).

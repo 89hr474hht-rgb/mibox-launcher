@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One channel of the guide: its logo, number and name, then its programmes placed along the hours. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/guide_row_height"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:paddingTop="3dp"
+    android:paddingBottom="3dp">
+
+    <LinearLayout
+        android:id="@+id/guide_channel"
+        android:layout_width="@dimen/guide_channel_width"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/ds_row_bg"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="34dp">
+
+            <com.gathin.launchos.tv.SkeletonView
+                android:id="@+id/guide_logo_skeleton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/guide_initials"
+                style="@style/Title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="#80FFFFFF"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/guide_logo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/guide_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/launchos_medium"
+            android:maxLines="2"
+            android:textColor="@color/ds_text"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/guide_strip"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

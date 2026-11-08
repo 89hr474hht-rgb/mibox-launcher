@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * Cards for films, series and channels: a poster (or a logo) with its title underneath, a quality tag, and how far
  * a film was watched. The rows, the full grids and search all use them. A row can end with a "Tout voir" card.
+ * Focused, a card grows by 5 % with the accent border; while its picture loads, a skeleton holds its place.
  */
 final class Cards {
     enum Shape { POSTER, LOGO, WIDE }
@@ -47,7 +48,7 @@ final class Cards {
         final class Holder extends RecyclerView.ViewHolder {
             final ImageView image;
             final TextView title, initials, badge;
-            final View track, bar;
+            final View track, bar, skeleton;
 
             Holder(View v) {
                 super(v);
@@ -57,9 +58,10 @@ final class Cards {
                 badge = v.findViewById(R.id.badge);
                 track = v.findViewById(R.id.track);
                 bar = v.findViewById(R.id.bar);
+                skeleton = v.findViewById(R.id.skeleton);
                 Ui.roundClip(v.findViewById(R.id.clip));
                 v.setOnFocusChangeListener((view, focused) -> {
-                    float s = focused ? 1.08f : 1f;
+                    float s = focused ? 1.05f : 1f;
                     View frame = view.findViewById(R.id.frame);
                     frame.setPivotY(frame.getHeight());
                     frame.setPivotX(frame.getWidth() / 2f);
@@ -109,6 +111,7 @@ final class Cards {
             if (position >= items.size()) {
                 h.image.setImageDrawable(null);
                 h.image.setTag(R.id.image_url, null);
+                h.skeleton.setVisibility(View.GONE);
                 h.initials.setText(v.getContext().getString(R.string.row_more_count, moreCount));
                 h.initials.setVisibility(View.VISIBLE);
                 h.title.setText("");
@@ -122,7 +125,7 @@ final class Cards {
             h.title.setText(title);
             h.initials.setText(title);
             int width = shape == Shape.LOGO ? 176 : shape == Shape.WIDE ? 236 : 124;
-            Images.load(h.image, item.image, Ui.dp(v.getContext(), width), h.initials);
+            Images.load(h.image, item.image, Ui.dp(v.getContext(), width), h.initials, h.skeleton);
             String badge = item.tag;
             h.badge.setText(badge);
             h.badge.setVisibility(badge.isEmpty() ? View.GONE : View.VISIBLE);

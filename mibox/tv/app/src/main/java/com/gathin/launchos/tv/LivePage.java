@@ -172,7 +172,8 @@ final class LivePage {
         for (Group x : list) if (x.key().equals(groupKey)) keep = x;
         group = null;
         select(keep, true);
-        if (focusDefault && activity.showing(this) && !player.isFull()) focusGroups();
+        // Not while the remote is in the rail: previewing Chaînes from there must not pull the focus away.
+        if (focusDefault && activity.showing(this) && !player.isFull() && !activity.inRail()) focusGroups();
     }
 
     /** What decides how the lists look, apart from the groups themselves: a change means building them again. */
@@ -234,7 +235,7 @@ final class LivePage {
 
     // ---- the player ----
 
-    /** Where the small window goes: over the slot at the top right, in the root's coordinates. */
+    /** Where the small window goes: over the slot at the bottom right, in the root's coordinates. */
     Rect miniBounds() {
         if (root.getVisibility() != View.VISIBLE || pipSlot.getWidth() == 0) return null;
         int[] s = new int[2], r = new int[2];

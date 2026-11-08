@@ -1,10 +1,14 @@
 package com.gathin.launchos.tv;
 
 import android.app.Activity;
+import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Rational;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -21,7 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Films and episodes, full screen with Media3's controls (OK, then Left/Right to seek 10 s back or 30 s on).
+ * Films and episodes, full screen, with LaunchTV OS's own display ({@link Osd}): title and time at the top, a thin
+ * seek bar, the controls and audio, subtitles and picture-in-picture at the bottom, hidden after 3 s. Left and
+ * Right seek 10 s back or 30 s on.
  * Where it was stopped is remembered for Reprendre; at the end of an episode the next one starts (Réglages).
  * Live channels play in the main screen instead ({@link LivePlayer}).
  */
@@ -54,6 +60,7 @@ public final class PlayerActivity extends Activity {
     private View error;
     private TextView errorText, toast;
     private Xtream api;
+    private Osd osd;
     private Item item;
     private String seriesId, seriesName, cover;
     private int season, episodeIndex = -1;
@@ -110,10 +117,50 @@ public final class PlayerActivity extends Activity {
         season = in.getIntExtra(EXTRA_SEASON, 0);
         episodeIndex = in.getIntExtra(EXTRA_EPISODE_INDEX, -1);
         startAt = state != null ? state.getLong(EXTRA_START) : in.getLongExtra(EXTRA_START, 0);
-        // One title at a time: no previous/next buttons. Seeking steps are 10 s back and 30 s forward.
-        view.setShowPreviousButton(false);
-        view.setShowNextButton(false);
         if (seriesId != null) remember();
+        osd = new Osd(this, new Osd.Host() {
+            @Override
+            public boolean hasNext() {
+                return seriesId != null && episodeIndex >= 0 && episodeIndex + 1 < Episodes.list.size();
+            }
+
+            @Override
+            public void next() {
+                if (hasNext()) nextEpisode();
+            }
+
+            @Override
+            public boolean canPip() {
+                return getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
+            }
+
+            @Override
+            public void pip() {
+                try {
+                    enterPictureInPictureMode(new PictureInPictureParams.Builder()
+                            .setAspectRatio(new Rational(16, 9)).build());
+                } catch (IllegalStateException | IllegalArgumentException e) {
+                    GlassToast.show(PlayerActivity.this, getString(R.string.osd_pip_none), false);
+                }
+            }
+        });
+        titles();
+    }
+
+    /** The display's title: the film, or the series with the episode under it. */
+    private void titles() {
+        if (seriesId == null) {
+            osd.setTitle(item.title, "");
+        } else {
+            osd.setTitle(seriesName, getString(R.string.osd_episode, season, item.title));
+        }
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean inPip, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(inPip, newConfig);
+        if (inPip) osd.hide();
+        else osd.show(true);
     }
 
     @Override
@@ -142,6 +189,7 @@ public final class PlayerActivity extends Activity {
             }
         });
         play(getIntent().getStringExtra(EXTRA_URL), startAt);
+        osd.attach(player);
         view.postDelayed(save, SAVE_MS);
     }
 
@@ -149,6 +197,7 @@ public final class PlayerActivity extends Activity {
     protected void onStop() {
         super.onStop();
         view.removeCallbacks(save);
+        if (osd != null) osd.detach();
         if (player != null) {
             savePosition();
             startAt = player.getCurrentPosition();
@@ -193,6 +242,13 @@ public final class PlayerActivity extends Activity {
             finish();
             return;
         }
+        nextEpisode();
+    }
+
+    /** The next episode of the season, at the end of one or from the display's button. */
+    private void nextEpisode() {
+        List<Item> eps = Episodes.list;
+        savePosition();
         episodeIndex++;
         Item next = eps.get(episodeIndex);
         item = next;
@@ -204,6 +260,7 @@ public final class PlayerActivity extends Activity {
         toast.postDelayed(() -> toast.animate().alpha(0f).setDuration(400)
                 .withEndAction(() -> toast.setVisibility(View.GONE)).start(), 4000);
         play(api.episodeUrl(next), 0);
+        titles();
     }
 
     @Override
@@ -216,6 +273,7 @@ public final class PlayerActivity extends Activity {
                 return true;
             }
         }
+        if (osd != null && error.getVisibility() != View.VISIBLE && osd.key(event)) return true;
         return super.dispatchKeyEvent(event);
     }
 }

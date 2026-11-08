@@ -41,6 +41,14 @@ final class Players {
         return p;
     }
 
+    /** "1:52:07" or "52:07": a position on the player's seek bar. */
+    static String elapsed(long ms) {
+        long t = Math.max(0, ms) / 1000;
+        long h = t / 3600, m = (t % 3600) / 60, sec = t % 60;
+        return h > 0 ? String.format(java.util.Locale.FRANCE, "%d:%02d:%02d", h, m, sec)
+                : String.format(java.util.Locale.FRANCE, "%d:%02d", m, sec);
+    }
+
     /** What went wrong, without the address (it holds the account). */
     static String describe(PlaybackException e) {
         Throwable c = e.getCause();

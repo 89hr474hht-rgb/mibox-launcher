@@ -104,9 +104,17 @@ final class Xtream {
         final float rating;
         final int year;
         final int seconds;
+        /** A YouTube video id (or address) for the trailer, or "". */
+        final String trailer;
 
         VodInfo(String plot, String backdrop, String poster, String genre, String director, String cast, float rating,
                 int year, int seconds) {
+            this(plot, backdrop, poster, genre, director, cast, rating, year, seconds, "");
+        }
+
+        VodInfo(String plot, String backdrop, String poster, String genre, String director, String cast, float rating,
+                int year, int seconds, String trailer) {
+            this.trailer = trailer == null || trailer.equals("null") ? "" : trailer.trim();
             this.plot = plot;
             this.backdrop = backdrop;
             this.poster = poster;
@@ -178,7 +186,12 @@ final class Xtream {
 
     /** Now and next for one channel: a few programmes from get_short_epg. */
     List<Epg.Programme> shortEpg(String streamId) throws XtreamException {
-        return Epg.parse(fetch("get_short_epg", "&stream_id=" + enc(streamId) + "&limit=4", MAX_EPG_BYTES));
+        return shortEpg(streamId, 4);
+    }
+
+    /** The next limit programmes of a channel (the guide's timeline asks for a few hours' worth). */
+    List<Epg.Programme> shortEpg(String streamId, int limit) throws XtreamException {
+        return Epg.parse(fetch("get_short_epg", "&stream_id=" + enc(streamId) + "&limit=" + limit, MAX_EPG_BYTES));
     }
 
     private Object fetch(String action, String extra) throws XtreamException {
@@ -407,8 +420,10 @@ final class Xtream {
         if (seconds <= 0) seconds = (int) num(info, "episode_run_time") * 60;
         String plot = str(info, "plot");
         if (plot.isEmpty()) plot = str(info, "description");
+        String trailer = str(info, "youtube_trailer");
+        if (trailer.isEmpty()) trailer = str(info, "trailer");
         return new VodInfo(plot, backdrop, str(info, "movie_image"), str(info, "genre"), str(info, "director"), cast,
-                rating(str(info, "rating"), str(info, "rating_5based")), year(release), seconds);
+                rating(str(info, "rating"), str(info, "rating_5based")), year(release), seconds, trailer);
     }
 
     /** "01:52:00" as seconds. */

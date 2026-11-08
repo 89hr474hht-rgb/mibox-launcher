@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The brand half of the login card: a soft blue-to-violet glow, cut to the card's left corners. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient android:angle="315" android:startColor="#334F7BFF" android:endColor="#0F9A5CFF" />
+    <corners android:topLeftRadius="24dp" android:bottomLeftRadius="24dp" />
+</shape>

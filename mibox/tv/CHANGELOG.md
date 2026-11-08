@@ -6,6 +6,25 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.6.0] - 2026-11-08
+
+Refonte de l'interface : LaunchTV OS. Thème sombre premium sur `#0A0A0A`, panneaux en verre, focus agrandi avec une bordure bleue, squelettes de chargement.
+
+### Ajouté
+- Accueil : un tableau de bord, ouvert au démarrage. En haut, ce qui est en cours (ou la dernière nouveauté) sur son image en plein écran ; en dessous, Reprendre la lecture, Vos chaînes, les derniers films et les dernières séries.
+- Guide TV : une grille horaire. Les chaînes à gauche, les heures en haut, les programmes au milieu et une ligne à l'heure actuelle ; Droite au bout avance d'une demi-heure. OK lance la chaîne.
+- Lecteur : un affichage maison. Titre et heure en haut, barre de lecture fine, commandes au centre, langue audio, sous-titres et mini-lecteur à droite ; il se cache après 3 secondes. Gauche et Droite reculent de 10 s ou avancent de 30 s même quand il est caché ; bouton Épisode suivant.
+- Réglages en deux colonnes (catégories à gauche, page à droite), avec une page Mise à jour & Cache : Chaînes, Films et Séries deviennent des jauges pendant l'actualisation (qui continue si on quitte la page), et Vider le cache annonce la place libérée.
+- Fiche d'un film : l'affiche floutée en fond, les infos à gauche, l'affiche et les actions à droite, et la bande-annonce quand le fournisseur en donne une.
+- Films et séries en grille : l'en-tête reste en haut, le nombre de colonnes suit l'écran, et les genres les plus courants servent de filtres.
+
+### Modifié
+- Connexion : une carte en verre au milieu de l'écran, le logo à gauche et le formulaire à droite, sur les affiches déjà gardées sur la box (assombries à 15 %). Un œil affiche le mot de passe ; Se connecter tourne pendant la vérification, puis devient Continuer. Elle s'ouvre seule au premier lancement sans compte.
+- Le mini-lecteur de Chaînes est en bas à droite ; rien d'important n'est placé dans ce coin.
+
+### Corrigé
+- Survoler Chaînes dans le menu ne fait plus partir la sélection dans la page pendant son chargement.
+
 ## [0.5.0] - 2026-11-08
 
 ### Ajouté

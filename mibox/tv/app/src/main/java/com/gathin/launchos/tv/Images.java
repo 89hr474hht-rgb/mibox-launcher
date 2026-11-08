@@ -37,17 +37,29 @@ final class Images {
 
     /** Same, with a view (initials) shown in place of the image until it is there, and hidden once it is. */
     static void load(ImageView view, String url, int widthPx, android.view.View fallback) {
+        load(view, url, widthPx, fallback, null);
+    }
+
+    /**
+     * Same, with a skeleton (loading) shown while the image is on its way; the fallback then only shows when there
+     * is no image at all.
+     */
+    static void load(ImageView view, String url, int widthPx, android.view.View fallback, android.view.View loading) {
         view.setTag(R.id.image_url, url);
-        if (fallback != null) fallback.setVisibility(android.view.View.VISIBLE);
-        if (url == null || url.isEmpty() || !url.matches("(?i)^https?://.*")) {
+        boolean valid = url != null && !url.isEmpty() && url.matches("(?i)^https?://.*");
+        String key = valid ? url + "@" + widthPx : null;
+        Bitmap hit = key == null ? null : MEMORY.get(key);
+        if (loading != null) loading.setVisibility(valid && hit == null ? android.view.View.VISIBLE : android.view.View.GONE);
+        if (fallback != null) {
+            fallback.setVisibility(hit != null || (loading != null && valid) ? android.view.View.INVISIBLE
+                    : android.view.View.VISIBLE);
+        }
+        if (!valid) {
             view.setImageDrawable(null);
             return;
         }
-        String key = url + "@" + widthPx;
-        Bitmap hit = MEMORY.get(key);
         if (hit != null) {
             view.setImageBitmap(hit);
-            if (fallback != null) fallback.setVisibility(android.view.View.INVISIBLE);
             return;
         }
         view.setImageDrawable(null);
@@ -56,11 +68,15 @@ final class Images {
             Bitmap b = fetch(app, url, widthPx);
             if (b != null) MEMORY.put(key, b);
             Bg.MAIN.post(() -> {
-                if (url.equals(view.getTag(R.id.image_url)) && b != null) {
+                if (!url.equals(view.getTag(R.id.image_url))) return;
+                if (loading != null) loading.setVisibility(android.view.View.GONE);
+                if (b != null) {
                     view.setImageBitmap(b);
                     if (fallback != null) fallback.setVisibility(android.view.View.INVISIBLE);
                     view.setAlpha(0f);
                     view.animate().alpha(1f).setDuration(180).start();
+                } else if (fallback != null) {
+                    fallback.setVisibility(android.view.View.VISIBLE);
                 }
             });
         });

@@ -142,4 +142,28 @@
         <item name="android:textColor">#FFFFFFFF</item>
         <item name="android:drawableTint">#FFFFFFFF</item>
     </style>
+
+    <style name="DsField" parent="android:Widget.Material.EditText">
+        <item name="android:fontFamily">@font/launchos_regular</item>
+        <item name="android:textColor">@color/ds_text</item>
+        <item name="android:textColorHint">@color/ds_text_faint</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/ds_field_bg</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:drawablePadding">14dp</item>
+        <item name="android:drawableTint">@color/field_icon</item>
+    </style>
+
+    <!-- A round control of the player's display. -->
+    <style name="DsOsdButton">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/ds_osd_button</item>
+        <item name="android:focusable">true</item>
+        <item name="android:padding">13dp</item>
+        <item name="android:tint">@color/ds_osd_icon</item>
+    </style>
 </resources>

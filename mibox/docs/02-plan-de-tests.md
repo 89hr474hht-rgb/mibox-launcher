@@ -378,6 +378,34 @@ et noter les valeurs pour pouvoir revenir en arrière.
 | L16-11 | Désactiver | Décocher Écran de veille LaunchOS | L'économiseur d'avant revient (`screensaver_components`) | ADB | Non testé |
 | L16-12 | Pendant une vidéo | Netflix, SFR TV, LaunchOS TV en lecture | La veille ne coupe pas une vidéo en cours | MANUEL | Non testé |
 
+## C septdecies. LaunchOS TV 0.6.0 : refonte LaunchTV OS
+
+**Essayé sur l'émulateur Android TV (API 31, 1920 × 1080) avec le faux serveur du dépôt
+(`mibox/tv/mock/xtream_mock.py`, compte démo), pas sur la box.** Vérifié aussi : 78 tests unitaires, lint sans
+erreur, build release. « Test partiel (émulateur) » veut dire vu fonctionner à l'émulateur, avec des données
+inventées ; l'essai sur la box et à la télécommande reste à faire.
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| TV6-01 | Accueil | Ouvrir LaunchOS TV | Accueil : en haut le titre en cours (ou la nouveauté) sur son image, en dessous Reprendre, Vos chaînes, derniers films et séries | MANUEL | Test partiel (émulateur) |
+| TV6-02 | Rangées de l'Accueil | Bas, Gauche/Droite dans les rangées | Carte agrandie avec bordure bleue ; le haut suit la carte ; la rangée précédente ne déborde pas | MANUEL | Test partiel (émulateur) |
+| TV6-03 | Menu de gauche | Survoler Chaînes puis descendre jusqu'à Guide TV | La sélection reste dans le menu ; Guide TV s'ouvre | MANUEL | Test partiel (émulateur) |
+| TV6-04 | Guide TV | Ouvrir Guide TV, Haut/Bas, Droite au bout de la grille | Programme en cours sélectionné et détaillé en haut ; ligne de l'heure ; Droite avance d'une demi-heure | MANUEL | Test partiel (émulateur) |
+| TV6-05 | Guide → chaîne | OK sur un programme | La chaîne démarre dans Chaînes ; Retour la met en mini-lecteur en bas à droite | MANUEL | Test partiel (émulateur) |
+| TV6-06 | Grille de films | Films → Tous les films | En-tête fixe, colonnes selon l'écran ; filtres de genres si le fournisseur donne des genres | MANUEL | Test partiel (émulateur, sans genres) |
+| TV6-07 | Fiche d'un film | OK sur un film | Affiche floutée en fond, infos à gauche, affiche et Regarder à droite ; Bande-annonce si le fournisseur en donne une | MANUEL | Test partiel (émulateur, sans bande-annonce) |
+| TV6-08 | Affichage du lecteur | Regarder un film | Titre et heure en haut, barre fine, commandes au centre, audio, sous-titres et mini-lecteur à droite ; disparaît après 3 s | MANUEL | Test partiel (émulateur) |
+| TV6-09 | Lecteur à la télécommande | Gauche/Droite caché, Retour, Lecture/Pause, Audio, Sous-titres | Recule de 10 s / avance de 30 s ; Retour cache puis quitte ; les menus listent les pistes | MANUEL | Test partiel (émulateur, une seule piste) |
+| TV6-10 | Mini-lecteur du film | Bouton mini-lecteur dans le lecteur | Le film continue en petit (si la box le permet) | MANUEL | Non testé |
+| TV6-11 | Réglages en deux colonnes | Ouvrir Réglages | Catégories à gauche, page à droite ; Droite/OK entre, Gauche/Retour revient | MANUEL | Test partiel (émulateur) |
+| TV6-12 | Jauges d'actualisation | Mise à jour & Cache → Chaînes, Films, Séries | La jauge se remplit, passe au vert puis revient avec le nouveau nombre | MANUEL | Test partiel (émulateur) |
+| TV6-13 | Actualiser en quittant | Lancer Tout actualiser puis quitter et revenir | Les jauges ont continué | MANUEL | Non testé |
+| TV6-14 | Vider le cache | Mise à jour & Cache → Vider le cache | Message en haut « Cache vidé · … libérés » ; la taille des images revient à ~0 | MANUEL | Test partiel (émulateur) |
+| TV6-15 | Connexion | Réglages → Compte | Carte de verre en deux parties sur les affiches à 15 % ; l'œil montre le mot de passe ; Se connecter puis Continuer | MANUEL | Test partiel (émulateur) |
+| TV6-16 | Premier lancement | Sans compte enregistré | La connexion s'ouvre seule, une fois | MANUEL | Non testé |
+| TV6-17 | Calculs | Guide, flou, genres, progression des jauges | Tests `TimelineTest`, `BlurTest`, `SyncStoreTest` | AUTO | Test réussi (tests unitaires) |
+| TV6-18 | Tout le reste | Rangement, ordre TNT, favoris, chaînes masquées, reprise, épisode suivant | Comme en 0.5.0 | MANUEL | Non testé |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

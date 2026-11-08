@@ -13,7 +13,6 @@
     <string name="field_server">Serveur (http://adresse:port)</string>
     <string name="field_user">Identifiant</string>
     <string name="field_password">Mot de passe</string>
-    <string name="save_test">Enregistrer et tester</string>
     <string name="remove">Supprimer le compte</string>
     <string name="testing">Connexion au serveur…</string>
     <string name="missing_fields">Remplis le serveur, l\'identifiant et le mot de passe.</string>

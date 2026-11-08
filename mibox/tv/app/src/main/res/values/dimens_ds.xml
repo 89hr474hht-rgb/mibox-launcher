@@ -12,4 +12,7 @@
     -->
     <dimen name="ds_pip_zone_width">356dp</dimen>
     <dimen name="ds_pip_zone_height">222dp</dimen>
+    <!-- Guide TV: the channel column and one channel's line. -->
+    <dimen name="guide_channel_width">210dp</dimen>
+    <dimen name="guide_row_height">58dp</dimen>
 </resources>

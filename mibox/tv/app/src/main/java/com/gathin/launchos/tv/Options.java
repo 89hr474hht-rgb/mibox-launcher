@@ -14,7 +14,7 @@ final class Options {
         return c.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
-    /** Back from a channel keeps it playing in a small window at the top right of Chaînes. */
+    /** Back from a channel keeps it playing in a small window at the bottom right of Chaînes. */
     static boolean miniPlayer(Context c) {
         return p(c).getBoolean("mini_player", true);
     }

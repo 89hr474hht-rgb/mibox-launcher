@@ -1,24 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A film: its picture full screen, what it is, and Lecture or Reprendre / Depuis le début. -->
+<!--
+  A film. The background is its poster, blurred and dimmed; the page is split in two: what the film is on the
+  left (title, year, length, genre, summary, people), and on the right a glass panel with the poster and the
+  actions (Lecture or Reprendre, Depuis le début, Bande-annonce). Nothing that acts sits at the bottom right.
+-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/page">
+    android:background="@color/ds_bg">
 
     <ImageView
-        android:id="@+id/backdrop_a"
+        android:id="@+id/blur"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:alpha="0"
-        android:importantForAccessibility="no"
-        android:scaleType="centerCrop" />
-
-    <ImageView
-        android:id="@+id/backdrop_b"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
         android:alpha="0"
         android:importantForAccessibility="no"
         android:scaleType="centerCrop" />
@@ -26,89 +20,140 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/scrim_left" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_gravity="bottom"
-        android:background="@drawable/scrim_page_bottom" />
+        android:background="@drawable/ds_detail_scrim" />
 
     <LinearLayout
-        android:layout_width="600dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="64dp"
-        android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/label"
-        style="@style/Label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/title"
-        style="@style/Title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="end"
-        android:fontFamily="@font/launchos_bold"
-        android:lineSpacingMultiplier="0.95"
-        android:maxLines="2"
-        android:textSize="40sp" />
-
-    <TextView
-        android:id="@+id/meta"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/launchos_medium"
-        android:singleLine="true"
-        android:textColor="#D9FFFFFF"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/plot"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:ellipsize="end"
-        android:lineSpacingMultiplier="1.25"
-        android:maxLines="6"
-        android:textColor="#C7FFFFFF"
-        android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/people"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:ellipsize="end"
-            android:lineSpacingMultiplier="1.25"
-            android:maxLines="2"
-            android:textColor="@color/text_dim"
-            android:textSize="13sp" />
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:clipChildren="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="64dp"
+        android:paddingEnd="48dp">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:orientation="horizontal">
+            android:layout_weight="6"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/label"
+                style="@style/Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/title"
+                style="@style/Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/launchos_bold"
+                android:lineSpacingMultiplier="0.95"
+                android:maxLines="2"
+                android:textSize="40sp" />
+
+            <TextView
+                android:id="@+id/meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/launchos_medium"
+                android:singleLine="true"
+                android:textColor="#D9FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/plot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:ellipsize="end"
+                android:lineSpacingMultiplier="1.3"
+                android:maxLines="7"
+                android:textColor="#C7FFFFFF"
+                android:textSize="15sp" />
+
+            <com.gathin.launchos.tv.SkeletonView
+                android:id="@+id/plot_skeleton"
+                android:layout_width="420dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="14dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/people"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:ellipsize="end"
+                android:lineSpacingMultiplier="1.25"
+                android:maxLines="3"
+                android:textColor="@color/ds_text_dim"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="44dp"
+            android:layout_height="1dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:background="@drawable/ds_glass_panel"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="22dp">
+
+            <FrameLayout
+                android:id="@+id/poster_frame"
+                android:layout_width="140dp"
+                android:layout_height="210dp"
+                android:background="@drawable/clip_round">
+
+                <com.gathin.launchos.tv.SkeletonView
+                    android:id="@+id/poster_skeleton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <ImageView
+                    android:id="@+id/poster"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/play"
-                style="@style/GlassButton"
+                style="@style/DsButtonPrimary"
+                android:layout_width="match_parent"
+                android:layout_marginTop="20dp"
                 android:drawableStart="@drawable/ic_play"
                 android:text="@string/detail_play" />
 
             <TextView
                 android:id="@+id/restart"
-                style="@style/GlassButton"
-                android:layout_marginStart="12dp"
+                style="@style/DsButton"
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
                 android:drawableStart="@drawable/ic_restart"
                 android:text="@string/detail_restart"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/trailer"
+                style="@style/DsButton"
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
+                android:drawableStart="@drawable/ic_movie"
+                android:text="@string/detail_trailer"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>

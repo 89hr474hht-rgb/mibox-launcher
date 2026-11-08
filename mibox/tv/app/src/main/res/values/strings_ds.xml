@@ -62,4 +62,50 @@
         <item quantity="one">%1$s titre</item>
         <item quantity="other">%1$s titres</item>
     </plurals>
+
+    <!-- Connexion -->
+    <string name="login_brand">LaunchTV\nOS</string>
+    <string name="login_tagline">Vos chaînes, films et séries, sur le grand écran.</string>
+    <string name="login_connect">Se connecter</string>
+    <string name="login_continue">Continuer</string>
+    <string name="login_show_password">Afficher le mot de passe</string>
+    <string name="login_hide_password">Masquer le mot de passe</string>
+
+    <!-- Accueil -->
+    <string name="nav_home">Accueil</string>
+    <string name="home_resume">Reprendre la lecture</string>
+    <string name="home_channels">Vos chaînes</string>
+    <string name="home_label_resume">En cours</string>
+    <string name="home_label_new">Nouveauté</string>
+    <string name="home_kind_film">Film</string>
+    <string name="home_kind_series">Série</string>
+    <string name="home_kind_live">Chaîne</string>
+    <string name="home_empty">Rien à montrer pour l\'instant. Les chaînes, films et séries du fournisseur apparaîtront ici.</string>
+
+    <!-- Films -->
+    <string name="grid_all_genres">Tous les genres</string>
+    <string name="detail_trailer">Bande-annonce</string>
+    <string name="detail_trailer_none">Aucune app ne peut ouvrir la bande-annonce</string>
+
+    <!-- Guide TV -->
+    <string name="nav_guide">Guide TV</string>
+    <string name="guide_favourites">Favoris</string>
+    <string name="guide_all">Toutes les chaînes</string>
+    <string name="guide_none">Pas de programme annoncé</string>
+
+    <!-- Lecteur -->
+    <string name="osd_seek">Position de lecture</string>
+    <string name="osd_play">Lecture</string>
+    <string name="osd_pause">Pause</string>
+    <string name="osd_back">Reculer de 10 secondes</string>
+    <string name="osd_forward">Avancer de 30 secondes</string>
+    <string name="osd_next">Épisode suivant</string>
+    <string name="osd_audio">Langue audio</string>
+    <string name="osd_subs">Sous-titres</string>
+    <string name="osd_subs_off">Désactivés</string>
+    <string name="osd_pip">Mini-lecteur</string>
+    <string name="osd_pip_none">Le mini-lecteur n\'est pas disponible sur cette box</string>
+    <string name="osd_no_audio">Une seule piste audio pour ce titre</string>
+    <string name="osd_no_subs">Aucun sous-titre pour ce titre</string>
+    <string name="osd_episode">Saison %1$d · %2$s</string>
 </resources>
