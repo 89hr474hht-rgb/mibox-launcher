@@ -406,6 +406,29 @@ inventées ; l'essai sur la box et à la télécommande reste à faire.
 | TV6-17 | Calculs | Guide, flou, genres, progression des jauges | Tests `TimelineTest`, `BlurTest`, `SyncStoreTest` | AUTO | Test réussi (tests unitaires) |
 | TV6-18 | Tout le reste | Rangement, ordre TNT, favoris, chaînes masquées, reprise, épisode suivant | Comme en 0.5.0 | MANUEL | Non testé |
 
+## C octodecies. LaunchOS 1.7.0 : lecteur de musique
+
+**Essayé sur l'émulateur Android TV (API 31, 1920 × 1080) avec trois MP3 dans le stockage interne, pas sur la
+box ni avec une clé USB.** Vérifié aussi : 368 tests (dont `LrcTest`, `Id3LyricsTest`, `MusicLibraryTest`), lint
+sans erreur, APK de 583 099 octets (limite 737 280). Détail : [12-lecteur-musique.md](12-lecteur-musique.md).
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| M17-01 | Carte sur l'accueil | Ouvrir l'accueil | Carte « Musique » au-dessus du dock à droite, à la hauteur du nom de l'appli | MANUEL | Test partiel (émulateur) |
+| M17-02 | Accès | Haut depuis le dock, OK, « Autoriser l'accès », Autoriser | La carte prend le focus ; Android demande ; la collection apparaît | MANUEL | Test partiel (émulateur) |
+| M17-03 | Clé USB | Brancher une clé avec un dossier de MP3 | La collection apparaît seule, au nom du dossier ; Réglages → Musique montre la clé, sa place et ses pistes | MANUEL | Non testé |
+| M17-04 | Ordre et recherche | Ouvrir la collection, taper un mot ou un numéro | Pistes dans l'ordre des noms ; la recherche filtre | MANUEL | Test partiel (émulateur) |
+| M17-05 | Paroles synchronisées | Lancer une piste avec des paroles dans le MP3 | La ligne en cours en grand, la traduction dessous, le texte défile avec le son | MANUEL | Test partiel (émulateur) |
+| M17-06 | Paroles sur la carte | Revenir à l'accueil pendant la lecture | La carte montre la ligne en cours et la progression ; la lecture continue | MANUEL | Test partiel (émulateur) |
+| M17-07 | Écran de veille | Laisser l'écran de veille LaunchOS démarrer pendant la lecture | L'heure, la ligne de paroles et sa traduction ; la musique continue ; le bloc bouge chaque minute | MANUEL | Test partiel (émulateur) |
+| M17-08 | Reprise | Redémarrer la box, revenir à l'accueil | La carte propose « Reprendre » sur la dernière piste ; OK puis Lecture reprend | MANUEL | Test partiel (émulateur, appli relancée) |
+| M17-09 | Autre son | Lancer Netflix ou SFR TV pendant la musique | La musique se met en pause | MANUEL | Non testé |
+| M17-10 | Mise en veille | Minuteur de veille pendant la musique | La box se met en veille et la musique s'arrête | MANUEL | Non testé |
+| M17-11 | Télécommande | Lecture/Pause de la télécommande, hors du lecteur | Met en pause et reprend | MANUEL | Non testé |
+| M17-12 | Enceinte JBL | Écouter sur l'enceinte Bluetooth | Le son sort sur la JBL ; BT-05 toujours bon | MANUEL | Non testé |
+| M17-13 | Clé retirée | Retirer la clé pendant la lecture | La lecture s'arrête sans planter ; la collection disparaît | MANUEL | Non testé |
+| M17-14 | Réglages | Réglages → Musique | Les 7 catégories sont joignables (la colonne défile) ; la carte se coupe et revient | MANUEL | Test partiel (émulateur) |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

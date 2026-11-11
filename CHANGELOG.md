@@ -5,6 +5,17 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.7.0] - 2026-11-11
+
+### Ajouté
+- Lecteur de musique : une carte au-dessus du dock (à droite) montre ce qui joue et la ligne de paroles en cours ; OK ouvre le lecteur. Chaque dossier de fichiers audio de la box ou d'une clé USB devient une collection, ses pistes dans l'ordre des noms de fichiers, avec une recherche.
+- Paroles synchronisées, comme dans les applis de musique : la ligne en cours en grand, sa traduction en petit dessous, le texte qui défile avec le son. Elles viennent d'un fichier `.lrc` du même nom ou de l'intérieur du MP3 ; les écritures de droite à gauche sont prises en charge.
+- Pendant la lecture, l'écran de veille OLED affiche la ligne de paroles en cours sous l'heure.
+- Réglages → Musique : ouvrir le lecteur, la carte sur l'accueil, l'accès aux fichiers audio, et les espaces de stockage (stockage interne, clés USB) avec leur place libre et le nombre de pistes.
+
+### Modifié
+- La colonne des catégories des réglages défile quand elles ne tiennent pas toutes à l'écran.
+
 ## [1.6.0] - 2026-11-08
 
 ### Ajouté

@@ -168,4 +168,40 @@
     <string name="mibox_hour_2">2 h</string>
     <string name="mibox_hour_4">4 h</string>
     <string name="mibox_never">Never</string>
+
+    <!-- Music player -->
+    <string name="mibox_music_title">Music</string>
+    <string name="mibox_music_search">Search</string>
+    <string name="mibox_music_allow">Allow access</string>
+    <string name="mibox_music_need_access">LaunchOS needs to read the audio files on this box and its USB drives. Only audio: nothing else is read.</string>
+    <string name="mibox_music_nothing">No music found. Plug in a USB drive with a folder of audio files: each folder becomes a collection, its tracks in file name order.</string>
+    <string name="mibox_music_searching">Looking for music…</string>
+    <string name="mibox_music_none">Nothing playing</string>
+    <string name="mibox_music_pick">Pick a track on the left</string>
+    <string name="mibox_music_no_lyrics">No synced lyrics for this track. Put an .lrc file of the same name beside it, or lyrics inside the MP3.</string>
+    <string name="mibox_music_play">Play</string>
+    <string name="mibox_music_pause">Pause</string>
+    <string name="mibox_music_prev">Previous</string>
+    <string name="mibox_music_next">Next</string>
+    <string name="mibox_music_seek">Position in the track</string>
+    <string name="mibox_music_resume">Resume · %1$s</string>
+    <string name="mibox_music_card_access">Allow access to audio files</string>
+    <string name="mibox_music_card_nothing">Plug in a USB drive with music</string>
+    <plurals name="mibox_music_tracks">
+        <item quantity="one">%1$d track</item>
+        <item quantity="other">%1$d tracks</item>
+    </plurals>
+    <string name="mibox_set_section_music">Music</string>
+    <string name="mibox_set_hint_music">The music player, its card above the dock, and the storage it reads.</string>
+    <string name="mibox_music_open">Open the player</string>
+    <string name="mibox_music_card_toggle">Player above the dock</string>
+    <string name="mibox_music_access">Access to audio files</string>
+    <string name="mibox_music_access_on">Allowed: the player reads the box and its USB drives.</string>
+    <string name="mibox_music_access_off">Not allowed yet: OK asks Android.</string>
+    <string name="mibox_music_storage">Storage</string>
+    <string name="mibox_music_storage_hint">A drive plugged in is read on its own. Each folder of audio files becomes a collection in the player.</string>
+    <string name="mibox_music_volume_space">%1$s free of %2$s</string>
+    <string name="mibox_music_volume_usb">USB drive</string>
+    <string name="mibox_music_volume_internal">Internal storage</string>
+    <string name="mibox_music_volume_off">Not available</string>
 </resources>

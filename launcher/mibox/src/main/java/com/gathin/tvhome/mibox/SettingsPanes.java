@@ -23,14 +23,16 @@ import java.util.List;
  */
 final class SettingsPanes {
     private static final String[] CATEGORIES = {"miboxCatGeneral", "miboxCatHome", "miboxCatClock", "miboxCatSleep",
-            "miboxCatLook", "miboxCatStart"};
+            "miboxCatLook", "miboxCatStart", "miboxCatMusic"};
     private static final String[] PANES = {"miboxPaneGeneral", "miboxPaneHome", "miboxPaneClock", "miboxPaneSleep",
-            "miboxPaneLook", "miboxPaneStart"};
+            "miboxPaneLook", "miboxPaneStart", "miboxPaneMusic"};
+    private static final int SLEEP = 3, MUSIC = 6;
 
     private final Activity activity;
     private final View[] categories = new View[CATEGORIES.length];
     private final ViewGroup[] panes = new ViewGroup[PANES.length];
     private int shown = -1;
+    private MusicSettings music;
 
     private SettingsPanes(Activity activity) {
         this.activity = activity;
@@ -49,7 +51,9 @@ final class SettingsPanes {
         if (list == null) return;
         Object done = list.getTag();
         if (done instanceof SettingsPanes) {
-            ((SettingsPanes) done).sleepStates();
+            SettingsPanes again = (SettingsPanes) done;
+            again.sleepStates();
+            if (again.music != null && again.shown == MUSIC) again.music.shown();
             return;
         }
         for (int i = 0; i < CATEGORIES.length; i++) {
@@ -78,6 +82,9 @@ final class SettingsPanes {
         categories[0].setNextFocusUpId(categories[0].getId());
         categories[categories.length - 1].setNextFocusDownId(categories[categories.length - 1].getId());
         sleepPage();
+        music = MusicSettings.attach(activity, () -> {
+            if (shown == MUSIC) wireEdges(panes[MUSIC], categories[MUSIC]);
+        });
         show(0, false);
         categories[0].requestFocus();
     }
@@ -98,7 +105,11 @@ final class SettingsPanes {
             pane.animate().alpha(1f).translationX(0).setDuration(180).start();
         }
         wireEdges(pane, categories[index]);
-        if (index == 3) sleepStates();
+        if (index == SLEEP) sleepStates();
+        if (music != null) {
+            if (index == MUSIC) music.shown();
+            else music.hidden();
+        }
     }
 
     /** Right from a category, or OK: the page's first row. */

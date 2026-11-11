@@ -19,6 +19,13 @@
     <!-- The network menu reads the connections and whether Wi-Fi is on (the app declares them too). -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- The music player reads the audio files on the box's storage and USB drives (asked for from the player, by
+         Android's own dialog). Only audio: no photos, no documents. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <!-- Music keeps playing behind the sleep screen: a foreground service of the media playback kind. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <!-- Same as the app's manifest; repeated so the library lints on its own. -->
     <uses-feature android:name="android.software.leanback" android:required="false" />
@@ -50,6 +57,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
+        <!-- The music player (MusicActivity) and the service that keeps it playing behind other screens. -->
+        <activity
+            android:name=".MusicActivity"
+            android:exported="false"
+            android:theme="@style/MiboxUpdatesTheme"
+            android:windowSoftInputMode="adjustNothing|stateHidden" />
+
+        <service
+            android:name=".MusicService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
 
         <!-- Settings → Veille → Aperçu. -->
         <activity

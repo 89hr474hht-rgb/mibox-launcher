@@ -167,4 +167,41 @@
     <string name="mibox_hour_2">2 h</string>
     <string name="mibox_hour_4">4 h</string>
     <string name="mibox_never">Jamais</string>
+
+    <!-- Lecteur de musique -->
+    <string name="mibox_music_title">Musique</string>
+    <string name="mibox_music_search">Rechercher</string>
+    <string name="mibox_music_allow">Autoriser l\'accès</string>
+    <string name="mibox_music_need_access">LaunchOS doit pouvoir lire les fichiers audio de la box et de ses clés USB. Seulement l\'audio : rien d\'autre n\'est lu.</string>
+    <string name="mibox_music_nothing">Aucune musique trouvée. Branchez une clé USB avec un dossier de fichiers audio : chaque dossier devient une collection, ses pistes dans l\'ordre des noms de fichiers.</string>
+    <string name="mibox_music_searching">Recherche de la musique…</string>
+    <string name="mibox_music_none">Rien en lecture</string>
+    <string name="mibox_music_pick">Choisissez une piste à gauche</string>
+    <string name="mibox_music_no_lyrics">Pas de paroles synchronisées pour cette piste. Ajoutez un fichier .lrc du même nom à côté, ou des paroles dans le MP3.</string>
+    <string name="mibox_music_play">Lecture</string>
+    <string name="mibox_music_pause">Pause</string>
+    <string name="mibox_music_prev">Précédent</string>
+    <string name="mibox_music_next">Suivant</string>
+    <string name="mibox_music_seek">Position dans la piste</string>
+    <string name="mibox_music_resume">Reprendre · %1$s</string>
+    <string name="mibox_music_card_access">Autoriser l\'accès aux fichiers audio</string>
+    <string name="mibox_music_card_nothing">Branchez une clé USB avec de la musique</string>
+    <plurals name="mibox_music_tracks">
+        <item quantity="one">%1$d piste</item>
+        <item quantity="many">%1$d pistes</item>
+        <item quantity="other">%1$d pistes</item>
+    </plurals>
+    <string name="mibox_set_section_music">Musique</string>
+    <string name="mibox_set_hint_music">Le lecteur de musique, sa carte au-dessus du dock et les stockages qu\'il lit.</string>
+    <string name="mibox_music_open">Ouvrir le lecteur</string>
+    <string name="mibox_music_card_toggle">Lecteur au-dessus du dock</string>
+    <string name="mibox_music_access">Accès aux fichiers audio</string>
+    <string name="mibox_music_access_on">Autorisé : le lecteur lit la box et ses clés USB.</string>
+    <string name="mibox_music_access_off">Pas encore autorisé : OK le demande à Android.</string>
+    <string name="mibox_music_storage">Espaces de stockage</string>
+    <string name="mibox_music_storage_hint">Une clé branchée est lue toute seule. Chaque dossier de fichiers audio devient une collection dans le lecteur.</string>
+    <string name="mibox_music_volume_space">%1$s libres sur %2$s</string>
+    <string name="mibox_music_volume_usb">Clé USB</string>
+    <string name="mibox_music_volume_internal">Stockage interne</string>
+    <string name="mibox_music_volume_off">Indisponible</string>
 </resources>

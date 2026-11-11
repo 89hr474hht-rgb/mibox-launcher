@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The home screen's music card, above the dock on the right: the cover, what plays and its current line of
+     lyrics, a thin progress line. OK opens the player. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="460dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/mibox_music_card_bg"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/card_cover"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:background="@drawable/mibox_music_cover_bg"
+        android:gravity="center"
+        android:textColor="#E6FFFFFF"
+        android:textSize="24sp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/card_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#FFFFFFFF"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/card_line"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#B3FFFFFF"
+            android:textSize="14sp" />
+
+        <FrameLayout
+            android:id="@+id/card_track"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/mibox_music_track">
+
+            <View
+                android:id="@+id/card_fill"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/mibox_music_fill" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/card_state"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="12dp"
+        android:importantForAccessibility="no"
+        android:padding="6dp"
+        android:src="@drawable/mibox_ic_play"
+        android:tint="#FFFFFFFF" />
+</LinearLayout>

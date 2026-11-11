@@ -13,14 +13,22 @@
     android:orientation="horizontal">
 
     <!-- The categories: focusing one shows its page on the right (SettingsPanes in the mibox module). -->
-    <LinearLayout
-        android:id="@+id/miboxCategories"
+    <!-- Scrolls when the categories do not all fit (the focused one is always brought into view). -->
+    <ScrollView
         android:layout_width="340dp"
         android:layout_height="match_parent"
         android:background="#FF0B0C10"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+    <LinearLayout
+        android:id="@+id/miboxCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="24dp"
         android:orientation="vertical"
         android:paddingStart="24dp"
-        android:paddingTop="40dp"
+        android:paddingTop="32dp"
         android:paddingEnd="20dp">
 
         <TextView
@@ -38,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="26dp"
+            android:layout_marginBottom="20dp"
             android:paddingStart="12dp"
             android:fontFamily="@font/launchos_regular"
             android:textColor="#80FFFFFF"
@@ -79,7 +87,14 @@
             style="@style/MiboxSetCategory"
             android:drawableStart="@drawable/mibox_tile_start"
             android:text="@string/mibox_set_section_start" />
+
+        <TextView
+            android:id="@+id/miboxCatMusic"
+            style="@style/MiboxSetCategory"
+            android:drawableStart="@drawable/mibox_tile_music"
+            android:text="@string/mibox_set_section_music" />
     </LinearLayout>
+    </ScrollView>
 
     <ScrollView
         android:id="@+id/miboxPanes"
@@ -323,6 +338,49 @@
                         style="@style/MiboxSetHint"
                         android:text="@string/home_settings_help" />
                 </LinearLayout>
+            </LinearLayout>
+
+            <!-- Musique: the player, its card on the home screen, and the storage it reads (MusicSettings). -->
+            <LinearLayout
+                android:id="@+id/miboxPaneMusic"
+                style="@style/MiboxSetPane">
+                <TextView style="@style/MiboxSetPaneTitle" android:text="@string/mibox_set_section_music" />
+                <TextView style="@style/MiboxSetPaneHint" android:text="@string/mibox_set_hint_music" />
+                <LinearLayout style="@style/MiboxSetGroup">
+                    <TextView
+                        android:id="@+id/miboxMusicOpen"
+                        style="@style/MiboxSetRow"
+                        android:drawableStart="@drawable/mibox_tile_music"
+                        android:text="@string/mibox_music_open" />
+                    <View style="@style/MiboxSetDivider" />
+                    <TextView
+                        android:id="@+id/miboxMusicCard"
+                        style="@style/MiboxSetToggle"
+                        android:drawableStart="@drawable/mibox_tile_home"
+                        android:text="@string/mibox_music_card_toggle" />
+                    <View style="@style/MiboxSetDivider" />
+                    <TextView
+                        android:id="@+id/miboxMusicAccess"
+                        style="@style/MiboxSetToggle"
+                        android:drawableStart="@drawable/mibox_tile_storage"
+                        android:text="@string/mibox_music_access" />
+                    <TextView
+                        android:id="@+id/miboxMusicAccessHint"
+                        style="@style/MiboxSetHint" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/MiboxSetSection"
+                    android:text="@string/mibox_music_storage" />
+
+                <LinearLayout
+                    android:id="@+id/miboxStorageList"
+                    style="@style/MiboxSetGroup" />
+
+                <TextView
+                    style="@style/MiboxSetHint"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/mibox_music_storage_hint" />
             </LinearLayout>
 
         </FrameLayout>

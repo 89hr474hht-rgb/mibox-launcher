@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A collection's cover when it has no picture: a deep gradient, its initial on top. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient android:angle="315" android:startColor="#FF2E3A8C" android:endColor="#FF6B2E8C" />
+    <corners android:radius="14dp" />
+</shape>

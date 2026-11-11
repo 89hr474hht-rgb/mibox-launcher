@@ -10,7 +10,8 @@ import java.util.List;
 /**
  * What the Mi Box edition adds to one home screen, attached once when it first comes to the front: the Bluetooth
  * pill and its menu, the network pill's menu, the sleep timer's pill, the sliders icon on LaunchOS's settings pill,
- * round pills that open on focus, the living glow, the rolling clock and the highlighted tile name. Each part is
+ * round pills that open on focus, the living glow, the rolling clock, the highlighted tile name and the music card
+ * above the dock. Each part is
  * skipped on its own when upstream's layout no longer has what it hooks into.
  */
 final class HomeExtras {
@@ -23,6 +24,7 @@ final class HomeExtras {
     private final LivingGlow glow;
     private final ClockRoll clock;
     private final NameHighlight names;
+    private final MusicCard music;
 
     private HomeExtras(Activity home) {
         bluetooth = BluetoothPill.attach(home);
@@ -33,6 +35,7 @@ final class HomeExtras {
         glow = LivingGlow.attach(home);
         clock = ClockRoll.attach(home);
         names = NameHighlight.attach(home);
+        music = MusicCard.attach(home);
     }
 
     static HomeExtras attach(Activity home) {
@@ -68,6 +71,7 @@ final class HomeExtras {
         if (bluetooth != null) bluetooth.resume();
         if (timer != null) timer.resume();
         if (glow != null) glow.resume();
+        if (music != null) music.resume();
     }
 
     void pause() {
@@ -75,6 +79,7 @@ final class HomeExtras {
         if (network != null) network.pause();
         if (timer != null) timer.pause();
         if (glow != null) glow.pause();
+        if (music != null) music.pause();
     }
 
     void destroy() {
@@ -84,5 +89,6 @@ final class HomeExtras {
         if (glow != null) glow.pause();
         if (clock != null) clock.destroy();
         if (names != null) names.destroy();
+        if (music != null) music.destroy();
     }
 }

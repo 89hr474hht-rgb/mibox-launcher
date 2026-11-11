@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings row icon: storage, in a grey rounded square. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="32dp" android:height="32dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FF636366" />
+            <corners android:radius="9dp" />
+        </shape>
+    </item>
+    <item android:width="18dp" android:height="18dp" android:gravity="center"
+        android:drawable="@drawable/mibox_ic_storage" />
+</layer-list>

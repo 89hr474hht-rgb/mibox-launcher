@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One track in the player's list: its number, title and length; a note while it plays. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:background="@drawable/mibox_music_row_bg"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="14dp">
+
+    <TextView
+        android:id="@+id/track_number"
+        android:layout_width="38dp"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:textColor="@color/mibox_music_dim"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/track_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/mibox_music_text"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/track_length"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:duplicateParentState="true"
+        android:textColor="@color/mibox_music_dim"
+        android:textSize="13sp" />
+</LinearLayout>
