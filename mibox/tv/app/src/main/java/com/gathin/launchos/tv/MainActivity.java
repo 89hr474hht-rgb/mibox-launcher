@@ -54,6 +54,8 @@ public final class MainActivity extends Activity {
     /** The last view focused in the page, to go back to when the rail closes. */
     private View pageFocus;
     private boolean resumed;
+    /** The start-up screen, while it shows (opened from the launcher, not when coming back). */
+    private StartScreen start;
     private static String bannerShownFor;
     private final Updater.Listener updates = this::showUpdate;
     private Xtream.Section pendingSection;
@@ -66,6 +68,9 @@ public final class MainActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_main);
+        if (state == null && android.content.Intent.ACTION_MAIN.equals(getIntent().getAction())) {
+            start = StartScreen.show(this);
+        }
         root = findViewById(R.id.root);
         rail = findViewById(R.id.rail);
         railShade = findViewById(R.id.rail_shade);
@@ -446,6 +451,11 @@ public final class MainActivity extends Activity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (start != null && start.showing()) {
+            // Any key ends the start-up screen; it does nothing else.
+            if (event.getAction() == KeyEvent.ACTION_UP) start.leave();
+            return true;
+        }
         if (player.key(event)) return true;
         return super.dispatchKeyEvent(event);
     }

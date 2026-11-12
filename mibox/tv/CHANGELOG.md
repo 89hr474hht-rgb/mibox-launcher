@@ -6,7 +6,10 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
-## [0.6.1] - 2026-11-12
+## [0.7.0] - 2026-11-12
+
+### Ajouté
+- Écran de démarrage à l'ouverture de l'appli : sur noir, le monogramme s'écrit d'un trait, son point corail se pose et « LaunchOS TV » vient à côté, puis l'appli se pose derrière. Environ 2,5 s ; une touche le passe.
 
 ### Modifié
 - Nouvelle icône et nouvelle bannière : le monogramme « lo » de LaunchOS, avec un point corail, sur fond presque noir. Le logo de l'en-tête suit.
