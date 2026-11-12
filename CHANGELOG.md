@@ -8,7 +8,7 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 ## [1.8.0] - 2026-11-12
 
 ### Ajouté
-- Lecteur de musique : un hub à l'ouverture. Derrière, en très grand et en blanc sombre gravé, le nom d'album des étiquettes des fichiers (dans n'importe quelle écriture ; l'arabe en Naskh), ou à défaut le nom du dossier ; une lumière le traverse et il tourne très lentement en perspective. Devant, un menu : en lecture ou reprendre, Favoris, chaque collection, Rechercher, options des paroles. Retour depuis une page ramène au hub.
+- Lecteur de musique : un hub à l'ouverture. Derrière, bien plus grand que l'écran et gravé dans un blanc si sombre qu'on le devine, le nom d'album des étiquettes des fichiers (dans n'importe quelle écriture ; l'arabe en Naskh), ou à défaut le nom du dossier ; il glisse lentement d'un bout à l'autre pour se montrer en entier, et une lumière passe sur ses lettres. Devant, un menu : en lecture ou reprendre, Favoris, chaque collection, Rechercher, options des paroles. Retour depuis une page ramène au hub.
 - Paroles mot par mot : la ligne chantée est grise et s'éclaire mot à mot pendant qu'elle est chantée, d'un blanc à bord doux. Les temps par mot du format LRC enrichi (`<mm:ss.xx>`) sont lus ; sans eux, la ligne s'éclaire à un rythme régulier. Trois points pendant une pause.
 - Options des paroles : taille du texte, traduction affichée ou non, mot par mot, et décalage (± 3 s par pas de 0,1 s) pour une enceinte Bluetooth qui retarde le son.
 - Favoris : le cœur pendant la lecture, ou un appui long sur une piste. Ils reviennent quand la clé est rebranchée.

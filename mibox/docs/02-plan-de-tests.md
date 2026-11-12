@@ -438,7 +438,7 @@ vus sur la box ne sont pas reproduits ici : à revérifier sur la box (M18-03). 
 
 | ID | Test | Action | Attendu | Type | Résultat |
 |---|---|---|---|---|---|
-| M18-01 | Hub | Ouvrir le lecteur | Le hub : le nom d'album (ou du dossier) en très grand derrière, en blanc sombre gravé, entier ; une lumière le traverse ; menu en lecture/reprendre, Favoris, collections, Rechercher, options | MANUEL | Test partiel (émulateur) |
+| M18-01 | Hub | Ouvrir le lecteur | Le hub : le nom d'album (ou du dossier) plus grand que l'écran derrière, presque noir, qui glisse lentement jusqu'à montrer tout le mot ; une lumière passe sur les lettres ; menu en lecture/reprendre, Favoris, collections, Rechercher, options | MANUEL | Test partiel (émulateur) |
 | M18-02 | Hub → page → hub | OK sur une collection, puis Retour | La page de la collection ; Retour revient au hub ; Retour depuis le hub ferme le lecteur | MANUEL | Test partiel (émulateur) |
 | M18-03 | Paroles à l'ouverture | Lancer une longue piste depuis la clé | Les paroles s'affichent tout de suite et suivent le son | MANUEL | Validation manuelle nécessaire |
 | M18-04 | Mot par mot | Écouter une piste aux paroles mot par mot | Chaque mot s'allume pendant qu'il est chanté ; la traduction reste dessous | MANUEL | Test partiel (émulateur) |

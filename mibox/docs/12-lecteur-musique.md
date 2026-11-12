@@ -9,9 +9,11 @@ ajoutée, et le lecteur ne fait aucun appel réseau.
 
 - **Le hub**, à l'ouverture du lecteur.
   - Derrière, en très grand, le nom d'album que donnent les étiquettes des pistes (ID3 `TALB`), dans n'importe quelle
-    écriture, ou à défaut le nom du dossier. Il est gravé en blanc sombre, le menu flotte par-dessus, une lumière le
-    traverse et il tourne très lentement de quelques degrés en perspective. L'arabe est composé dans la police Naskh
-    d'Android ; le mot tient toujours en entier, une lettre coupée pouvant en changer le sens.
+    écriture, ou à défaut le nom du dossier. Il est bien plus grand que l'écran, gravé dans un blanc si sombre qu'on le
+    devine, et le menu flotte par-dessus. Il glisse lentement d'un bout à l'autre et revient (environ 30 s dans chaque
+    sens), en commençant par là où il se lit (la droite pour l'arabe), si bien que tout le mot passe. Une lumière
+    traverse ses lettres de temps en temps. L'arabe est composé dans la police Naskh d'Android. Le mot sculpté est
+    dessiné une fois dans une image à demi-taille, que chaque image ne fait que déplacer.
   - Un menu typographique, avec un trait d'or devant l'entrée choisie :
     - « En lecture » ou « Reprendre » ;
     - Favoris ;
