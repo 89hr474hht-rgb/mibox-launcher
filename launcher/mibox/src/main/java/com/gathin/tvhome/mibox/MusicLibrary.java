@@ -52,15 +52,23 @@ final class MusicLibrary {
         }
     }
 
-    /** A folder of tracks. key is stable across scans (volume and folder). */
+    /**
+     * A folder of tracks. key is stable across scans (volume and folder). album is the album name most of its tracks'
+     * tags give, in whatever script, or "" (the hub shows it large).
+     */
     static final class Collection {
-        final String key, name, volume;
+        final String key, name, volume, album;
         final List<Track> tracks;
 
         Collection(String key, String name, String volume, List<Track> tracks) {
+            this(key, name, volume, "", tracks);
+        }
+
+        Collection(String key, String name, String volume, String album, List<Track> tracks) {
             this.key = key;
             this.name = name;
             this.volume = volume;
+            this.album = album;
             this.tracks = tracks;
         }
 
@@ -280,8 +288,9 @@ final class MusicLibrary {
                 : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String[] cols = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.TRACK};
+                MediaStore.Audio.Media.TRACK, MediaStore.Audio.Media.ALBUM};
         Map<String, List<Object[]>> byFolder = new LinkedHashMap<>();
+        Map<String, Map<String, Integer>> albums = new java.util.HashMap<>();
         try (Cursor c = app.getContentResolver().query(uri, cols, null, null, null)) {
             if (c == null) return Collections.emptyList();
             while (c.moveToNext()) {
@@ -294,6 +303,8 @@ final class MusicLibrary {
                 Track t = new Track(ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id),
                         title(c.getString(1), file), clean(c.getString(2)), file, data, c.getLong(3), c.getInt(6) % 1000);
                 byFolder.computeIfAbsent(parent.getPath(), k -> new ArrayList<>()).add(new Object[]{t});
+                String album = clean(c.getString(7));
+                if (!album.isEmpty()) albums.computeIfAbsent(parent.getPath(), k -> new java.util.HashMap<>()).merge(album, 1, Integer::sum);
             }
         } catch (RuntimeException e) {
             return Collections.emptyList();   // a drive pulled out during the query, or no permission
@@ -305,7 +316,8 @@ final class MusicLibrary {
             tracks.sort((a, b) -> naturalCompare(a.fileName, b.fileName));
             String volume = volumeOf(e.getKey(), vols);
             String name = new File(e.getKey()).getName();
-            out.add(new Collection(e.getKey(), name.isEmpty() ? volume : name, volume, Collections.unmodifiableList(tracks)));
+            out.add(new Collection(e.getKey(), name.isEmpty() ? volume : name, volume, mostOf(albums.get(e.getKey())),
+                    Collections.unmodifiableList(tracks)));
         }
         for (Volume v : vols) {
             for (Collection c : out) if (c.volume.equals(v.name)) v.tracks += c.tracks.size();
@@ -324,6 +336,20 @@ final class MusicLibrary {
     }
 
     // ---- names (plain Java, tested) ----
+
+    /** The name given most often, or "" (none, or a folder name the media index made up). */
+    static String mostOf(Map<String, Integer> counts) {
+        if (counts == null) return "";
+        String best = "";
+        int n = 0;
+        for (Map.Entry<String, Integer> e : counts.entrySet()) {
+            if (e.getValue() > n || e.getValue() == n && e.getKey().compareTo(best) < 0) {
+                best = e.getKey();
+                n = e.getValue();
+            }
+        }
+        return best;
+    }
 
     /** The title from the file's tags, or its file name without the extension and the leading number. */
     static String title(String tagged, String fileName) {

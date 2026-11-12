@@ -341,10 +341,7 @@
         <com.gathin.tvhome.mibox.ShineText
             android:id="@+id/hub_word"
             android:layout_width="match_parent"
-            android:layout_height="280dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="430dp"
-            android:layout_marginEnd="44dp"
+            android:layout_height="match_parent"
             android:importantForAccessibility="no" />
 
         <LinearLayout

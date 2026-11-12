@@ -49,4 +49,16 @@ public class MusicLibraryTest {
         assertEquals("Albums/01 - Song.mp3", MusicLibrary.favoriteKey("/storage/emulated/0/Albums/01 - Song.mp3"));
         assertEquals("", MusicLibrary.favoriteKey(null));
     }
+
+    @Test
+    public void aCollectionTakesTheAlbumNameMostTracksGive() {
+        java.util.Map<String, Integer> counts = new java.util.HashMap<>();
+        assertEquals("", MusicLibrary.mostOf(null));
+        assertEquals("", MusicLibrary.mostOf(counts));
+        counts.put("مرحبا بالعالم", 3);
+        counts.put("Live", 1);
+        assertEquals("مرحبا بالعالم", MusicLibrary.mostOf(counts));
+        counts.put("Best of", 3);
+        assertEquals("Best of", MusicLibrary.mostOf(counts));   // a tie goes to the first in order
+    }
 }

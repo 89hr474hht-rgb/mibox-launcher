@@ -438,7 +438,7 @@ vus sur la box ne sont pas reproduits ici : à revérifier sur la box (M18-03). 
 
 | ID | Test | Action | Attendu | Type | Résultat |
 |---|---|---|---|---|---|
-| M18-01 | Hub | Ouvrir le lecteur | Le hub : nom de la collection en grand derrière, une lumière le traverse ; menu en lecture/reprendre, Favoris, collections, Rechercher, options | MANUEL | Test partiel (émulateur) |
+| M18-01 | Hub | Ouvrir le lecteur | Le hub : le nom d'album (ou du dossier) en très grand derrière, en blanc sombre gravé, entier ; une lumière le traverse ; menu en lecture/reprendre, Favoris, collections, Rechercher, options | MANUEL | Test partiel (émulateur) |
 | M18-02 | Hub → page → hub | OK sur une collection, puis Retour | La page de la collection ; Retour revient au hub ; Retour depuis le hub ferme le lecteur | MANUEL | Test partiel (émulateur) |
 | M18-03 | Paroles à l'ouverture | Lancer une longue piste depuis la clé | Les paroles s'affichent tout de suite et suivent le son | MANUEL | Validation manuelle nécessaire |
 | M18-04 | Mot par mot | Écouter une piste aux paroles mot par mot | Chaque mot s'allume pendant qu'il est chanté ; la traduction reste dessous | MANUEL | Test partiel (émulateur) |
@@ -450,6 +450,7 @@ vus sur la box ne sont pas reproduits ici : à revérifier sur la box (M18-03). 
 | M18-10 | Carte de l'accueil | Accueil pendant la lecture | Carte compacte centrée sur le nom de l'appli : « En lecture », titre, ligne en cours, progression | MANUEL | Test partiel (émulateur) |
 | M18-11 | Démarrage | Redémarrer la box | Écran noir : le monogramme s'écrit, le point se pose, le nom vient ; puis l'accueil | MANUEL | Test partiel (émulateur) |
 | M18-12 | Icônes | Applis d'Android TV, dock | Nouvelles bannières de LaunchOS et LaunchOS TV | MANUEL | Test partiel (émulateur, LaunchOS TV) |
+| M18-14 | Démarrage de LaunchOS TV | Ouvrir LaunchOS TV depuis l'accueil | Le monogramme s'écrit, le point corail, « LaunchOS TV », puis l'appli ; une touche le passe ; rien au retour d'un film | MANUEL | Test partiel (émulateur) |
 | M18-13 | Son | Écouter une longue piste sur la TV et sur la JBL | Aucun grésillement, aucun à-coup | MANUEL | Validation manuelle nécessaire |
 
 ## D. Applications

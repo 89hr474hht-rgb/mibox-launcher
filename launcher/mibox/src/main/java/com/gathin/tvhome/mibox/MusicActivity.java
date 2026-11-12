@@ -363,9 +363,10 @@ public final class MusicActivity extends Activity implements MusicLibrary.Listen
 
     /** The big word behind the hub: the collection playing, or the first one. */
     private void hubWordFor(MusicLibrary.Collection playing) {
-        String w = playing != null && !MusicLibrary.FAVORITES.equals(playing.key) ? playing.name
-                : !library.collections().isEmpty() ? library.collections().get(0).name : getString(R.string.mibox_music_title);
-        hubWord.setText(w);
+        MusicLibrary.Collection c = playing != null && !MusicLibrary.FAVORITES.equals(playing.key) ? playing
+                : !library.collections().isEmpty() ? library.collections().get(0) : null;
+        // The album name from the tags when there is one (it may be in another script), else the folder's.
+        hubWord.setText(c == null ? getString(R.string.mibox_music_title) : !c.album.isEmpty() ? c.album : c.name);
     }
 
     /** From the hub to a page: the hub zooms gently through and the page comes in. */

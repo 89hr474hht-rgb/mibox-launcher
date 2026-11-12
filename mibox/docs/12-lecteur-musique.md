@@ -8,7 +8,10 @@ ajoutée, et le lecteur ne fait aucun appel réseau.
 ## Ce que voit la famille
 
 - **Le hub**, à l'ouverture du lecteur.
-  - Derrière, le nom de la collection en très grand. Il est gravé dans le noir et une lumière le traverse lentement.
+  - Derrière, en très grand, le nom d'album que donnent les étiquettes des pistes (ID3 `TALB`), dans n'importe quelle
+    écriture, ou à défaut le nom du dossier. Il est gravé en blanc sombre, le menu flotte par-dessus, une lumière le
+    traverse et il tourne très lentement de quelques degrés en perspective. L'arabe est composé dans la police Naskh
+    d'Android ; le mot tient toujours en entier, une lettre coupée pouvant en changer le sens.
   - Un menu typographique, avec un trait d'or devant l'entrée choisie :
     - « En lecture » ou « Reprendre » ;
     - Favoris ;
