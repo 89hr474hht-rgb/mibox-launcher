@@ -5,6 +5,22 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [1.8.0] - 2026-11-12
+
+### Ajouté
+- Lecteur de musique : un hub à l'ouverture. Le nom de la collection en très grand derrière, gravé et traversé d'une lumière, et un menu : en lecture ou reprendre, Favoris, chaque collection, Rechercher, options des paroles. Retour depuis une page ramène au hub.
+- Paroles mot par mot : la ligne chantée est grise et s'éclaire mot à mot pendant qu'elle est chantée, d'un blanc à bord doux. Les temps par mot du format LRC enrichi (`<mm:ss.xx>`) sont lus ; sans eux, la ligne s'éclaire à un rythme régulier. Trois points pendant une pause.
+- Options des paroles : taille du texte, traduction affichée ou non, mot par mot, et décalage (± 3 s par pas de 0,1 s) pour une enceinte Bluetooth qui retarde le son.
+- Favoris : le cœur pendant la lecture, ou un appui long sur une piste. Ils reviennent quand la clé est rebranchée.
+- Menu latéral dans le lecteur (icônes fines, qui s'ouvre avec leurs noms) et mode « En lecture » où les paroles prennent toute la largeur.
+- Bulle par-dessus les autres applis pendant la lecture, pour voir d'où vient le son ; elle se décale un peu chaque minute pour l'écran OLED. Elle demande l'autorisation « Afficher par-dessus d'autres applis » (Réglages → Musique).
+- Nouvelle identité : le monogramme « lo » (une ligne du L au o, un point d'or) pour l'icône, la bannière et le logo.
+- Nouvel écran de démarrage sur noir : le monogramme s'écrit d'un trait, son point se pose, puis le nom vient à côté ; seul le point respire pendant le chargement.
+
+### Modifié
+- Le lecteur et la carte de l'accueil sont redessinés : carte plus compacte, centrée sur le nom de l'appli, avec des barres qui dansent et la ligne de paroles ; textes plus légers.
+- Les paroles ne sont plus toutes mises en page à l'ouverture d'une piste, seulement celles à l'écran : une piste de plusieurs centaines de lignes s'affiche tout de suite. Elles sont redessinées seulement quand un mot s'allume.
+
 ## [1.7.0] - 2026-11-11
 
 ### Ajouté

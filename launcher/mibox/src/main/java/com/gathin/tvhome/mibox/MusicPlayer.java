@@ -15,13 +15,16 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -58,7 +61,18 @@ final class MusicPlayer {
     private long startAt;
     private Lrc lyrics;
     private Uri lyricsFor;
+    private boolean lyricsLoading;
+    /** The last tracks' lyrics, so going back to one shows them at once. */
+    private final Map<Uri, Lrc> lyricsCache = new LinkedHashMap<Uri, Lrc>(8, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Uri, Lrc> e) {
+            return size() > 4;
+        }
+    };
     private boolean receiverOn;
+    /** A position read from the player and when, to move smoothly between two reads. */
+    private long anchorPos, anchorAt = -1;
+    private int lyricsOffset;
 
     private final BroadcastReceiver screenOff = new BroadcastReceiver() {
         @Override
@@ -77,6 +91,7 @@ final class MusicPlayer {
 
     private MusicPlayer(Context app) {
         this.app = app;
+        lyricsOffset = LyricsStyle.offset(app);
         audio = app.getSystemService(AudioManager.class);
         session = new MediaSession(app, "LaunchOS");
         session.setCallback(new MediaSession.Callback() {
@@ -152,6 +167,45 @@ final class MusicPlayer {
     Lrc lyrics() {
         MusicLibrary.Track t = track();
         return t != null && t.uri.equals(lyricsFor) ? lyrics : null;
+    }
+
+    /** The current track's lyrics are still being read. */
+    boolean lyricsLoading() {
+        return lyricsLoading && track() != null;
+    }
+
+    /**
+     * Where the lyrics are: the position, moving smoothly between two reads of the player (some boxes only update it
+     * a few times a second), plus the shift set in the lyrics options.
+     */
+    long lyricsPosition() {
+        return smoothPosition() + lyricsOffset;
+    }
+
+    void setLyricsOffset(int ms) {
+        lyricsOffset = ms;
+        LyricsStyle.setOffset(app, ms);
+        changed();
+    }
+
+    int lyricsOffset() {
+        return lyricsOffset;
+    }
+
+    private long smoothPosition() {
+        if (!playing || player == null || !prepared) {
+            anchorAt = -1;
+            return position();
+        }
+        long now = SystemClock.elapsedRealtime();
+        if (anchorAt < 0 || now - anchorAt >= 250) {
+            long real = position();
+            long guess = anchorAt < 0 ? real : anchorPos + (now - anchorAt);
+            // Small differences are eased in, so the highlight never jumps back and forth; a big one is a seek.
+            anchorPos = Math.abs(real - guess) > 150 ? real : guess + (real - guess) / 4;
+            anchorAt = now;
+        }
+        return anchorPos + (now - anchorAt);
     }
 
     long position() {
@@ -307,6 +361,7 @@ final class MusicPlayer {
             }
         }
         startAt = to;
+        anchorAt = -1;
         state();
         changed();
     }
@@ -323,6 +378,7 @@ final class MusicPlayer {
             return;
         }
         playing = true;
+        anchorAt = -1;
         session.setActive(true);
         if (!receiverOn) {
             app.registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
@@ -387,15 +443,24 @@ final class MusicPlayer {
 
     private void loadLyrics(MusicLibrary.Track t) {
         if (t == null || t.uri.equals(lyricsFor)) return;
+        if (lyricsCache.containsKey(t.uri)) {
+            lyrics = lyricsCache.get(t.uri);
+            lyricsFor = t.uri;
+            lyricsLoading = false;
+            return;
+        }
         lyrics = null;
         lyricsFor = null;
+        lyricsLoading = true;
         lyricsWorker.execute(() -> {
             Lrc l = readLyrics(app, t);
             main.post(() -> {
+                lyricsCache.put(t.uri, l);
                 MusicLibrary.Track now = track();
                 if (now == null || !now.uri.equals(t.uri)) return;
                 lyrics = l;
                 lyricsFor = t.uri;
+                lyricsLoading = false;
                 changed();
             });
         });
@@ -461,5 +526,6 @@ final class MusicPlayer {
     private void changed() {
         state();
         for (Listener l : new ArrayList<>(listeners)) l.playerChanged();
+        PlayingBubble.playerChanged(app);
     }
 }

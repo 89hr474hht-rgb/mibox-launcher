@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A track in the player's list: white when focused, softly lit while it plays. -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
+<!-- A track in the player's list: frosted with a fine edge when focused, a faint tint while it plays. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="140">
     <item android:state_focused="true">
-        <shape><solid android:color="#FFF2F4F8" /><corners android:radius="12dp" /></shape>
+        <shape><solid android:color="#2BFFFFFF" /><stroke android:width="1dp" android:color="#59FFFFFF" /><corners android:radius="14dp" /></shape>
     </item>
     <item android:state_activated="true">
-        <shape><solid android:color="#1FFFFFFF" /><corners android:radius="12dp" /></shape>
+        <shape><solid android:color="#0FFFFFFF" /><corners android:radius="14dp" /></shape>
     </item>
-    <item>
-        <shape><solid android:color="#00000000" /><corners android:radius="12dp" /></shape>
-    </item>
+    <item android:drawable="@android:color/transparent" />
 </selector>

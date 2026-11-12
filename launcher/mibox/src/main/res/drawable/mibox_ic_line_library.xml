@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A collection: a thin line icon (tint it). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M9,17.6 A2.4,2.4 0 1,1 4.2,17.6 A2.4,2.4 0 1,1 9,17.6 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M19.8,15.4 A2.4,2.4 0 1,1 15,15.4 A2.4,2.4 0 1,1 19.8,15.4 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M9,17.6 V6 L19.8,3.8 V15.4" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M9,9.2 L19.8,7" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+</vector>

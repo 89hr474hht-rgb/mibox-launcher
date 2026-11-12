@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Now playing: a thin line icon (tint it). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M5,10.5 V13.5" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M9,7 V17" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M13,4 V20" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M17,8 V16" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M21,10.5 V13.5" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.6"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+</vector>

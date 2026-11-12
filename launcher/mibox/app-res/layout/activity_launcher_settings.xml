@@ -360,6 +360,15 @@
                         android:text="@string/mibox_music_card_toggle" />
                     <View style="@style/MiboxSetDivider" />
                     <TextView
+                        android:id="@+id/miboxMusicBubble"
+                        style="@style/MiboxSetToggle"
+                        android:drawableStart="@drawable/mibox_tile_music"
+                        android:text="@string/mibox_music_bubble_toggle" />
+                    <TextView
+                        android:id="@+id/miboxMusicBubbleHint"
+                        style="@style/MiboxSetHint" />
+                    <View style="@style/MiboxSetDivider" />
+                    <TextView
                         android:id="@+id/miboxMusicAccess"
                         style="@style/MiboxSetToggle"
                         android:drawableStart="@drawable/mibox_tile_storage"

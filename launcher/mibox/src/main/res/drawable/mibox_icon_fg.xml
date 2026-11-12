@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- LaunchOS adaptive icon, foreground layer: the glyph inside the 66dp safe zone. -->
+<!-- LaunchOS's icon: the "lo" monogram, one cream line from the L into the o, with a dot at its heart. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <group android:translateX="20.4" android:translateY="20.4" android:scaleX="1.4" android:scaleY="1.4">
-        <path android:pathData="M16.5,13.5 L16.5,33.5 L31.5,33.5" android:strokeColor="#FFFFFFFF" android:strokeWidth="6"
-            android:strokeLineCap="round" android:strokeLineJoin="round" />
-        <path android:pathData="M27.2,16.5 a3.8,3.8 0 1,0 7.6,0 a3.8,3.8 0 1,0 -7.6,0 Z" android:fillColor="#FFFFFFFF" />
-    </group>
+    <path android:pathData="M30,33.5 V67 Q30,74 37,74 H64 A14.5,14.5 0 1,0 64,45.0 A14.5,14.5 0 1,0 64,74" android:strokeColor="#FFF3EEE4" android:strokeWidth="7"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M59.2,59.5 a4.8,4.8 0 1,0 9.6,0 a4.8,4.8 0 1,0 -9.6,0 Z" android:fillColor="#FFF2C879" />
 </vector>

@@ -429,6 +429,29 @@ sans erreur, APK de 583 099 octets (limite 737 280). Détail : [12-lecteur-musiq
 | M17-13 | Clé retirée | Retirer la clé pendant la lecture | La lecture s'arrête sans planter ; la collection disparaît | MANUEL | Non testé |
 | M17-14 | Réglages | Réglages → Musique | Les 7 catégories sont joignables (la colonne défile) ; la carte se coupe et revient | MANUEL | Test partiel (émulateur) |
 
+## C novodecies. LaunchOS 1.8.0 : hub du lecteur, paroles mot par mot, bulle, nouvelle identité
+
+**Essayé sur l'émulateur Android TV (API 31, 1920 × 1080, rendu par la carte graphique du Mac) avec quatre MP3 dans le
+stockage interne, pas sur la box.** Les mots s'allument au bon moment sur les pistes essayées. La lenteur et le décalage
+vus sur la box ne sont pas reproduits ici : à revérifier sur la box (M18-03). Détail :
+[12-lecteur-musique.md](12-lecteur-musique.md).
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| M18-01 | Hub | Ouvrir le lecteur | Le hub : nom de la collection en grand derrière, une lumière le traverse ; menu en lecture/reprendre, Favoris, collections, Rechercher, options | MANUEL | Test partiel (émulateur) |
+| M18-02 | Hub → page → hub | OK sur une collection, puis Retour | La page de la collection ; Retour revient au hub ; Retour depuis le hub ferme le lecteur | MANUEL | Test partiel (émulateur) |
+| M18-03 | Paroles à l'ouverture | Lancer une longue piste depuis la clé | Les paroles s'affichent tout de suite et suivent le son | MANUEL | Validation manuelle nécessaire |
+| M18-04 | Mot par mot | Écouter une piste aux paroles mot par mot | Chaque mot s'allume pendant qu'il est chanté ; la traduction reste dessous | MANUEL | Test partiel (émulateur) |
+| M18-05 | Décalage | Options des paroles → Décalage, Gauche/Droite, OK | Les paroles avancent ou reculent par pas de 0,1 s ; OK remet à zéro | MANUEL | Non testé |
+| M18-06 | Options | Taille, traduction, mot par mot | Le texte change aussitôt ; Haut/Bas restent dans le panneau ; Retour le ferme | MANUEL | Test partiel (émulateur) |
+| M18-07 | Favoris | ♥ pendant la lecture ; appui long sur une piste | La piste rejoint Favoris (hub et menu) ; encore là après avoir rebranché la clé | MANUEL | Test partiel (émulateur, sans clé) |
+| M18-08 | Menu et « En lecture » | Gauche depuis la liste ; « En lecture » | Le menu s'ouvre avec ses noms ; les paroles prennent toute la largeur | MANUEL | Test partiel (émulateur) |
+| M18-09 | Bulle | Autoriser dans Réglages → Musique, lancer une piste, ouvrir YouTube sans vidéo | Bulle en haut à droite avec le titre ; disparaît à la pause, sur LaunchOS et sur l'écran de veille | MANUEL | Test partiel (émulateur, Réglages Android) |
+| M18-10 | Carte de l'accueil | Accueil pendant la lecture | Carte compacte centrée sur le nom de l'appli : « En lecture », titre, ligne en cours, progression | MANUEL | Test partiel (émulateur) |
+| M18-11 | Démarrage | Redémarrer la box | Écran noir : le monogramme s'écrit, le point se pose, le nom vient ; puis l'accueil | MANUEL | Test partiel (émulateur) |
+| M18-12 | Icônes | Applis d'Android TV, dock | Nouvelles bannières de LaunchOS et LaunchOS TV | MANUEL | Test partiel (émulateur, LaunchOS TV) |
+| M18-13 | Son | Écouter une longue piste sur la TV et sur la JBL | Aucun grésillement, aucun à-coup | MANUEL | Validation manuelle nécessaire |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

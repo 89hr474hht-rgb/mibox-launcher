@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- An item of the player's menu: white when focused, a soft pill for the section shown. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="140">
+    <item android:state_focused="true">
+        <shape><solid android:color="#FFF2F4F8" /><corners android:radius="24dp" /></shape>
+    </item>
+    <item android:state_selected="true">
+        <shape><solid android:color="#26FFFFFF" /><corners android:radius="24dp" /></shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

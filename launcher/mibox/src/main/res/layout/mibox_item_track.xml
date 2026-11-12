@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One track in the player's list: its number, title and length; a note while it plays. -->
+<!-- One track in the player's list: its number (dancing bars while it plays), its title, a heart when it is a
+     favourite, and its length. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="52dp"
+    android:layout_height="54dp"
     android:background="@drawable/mibox_music_row_bg"
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="12dp"
-    android:paddingEnd="14dp">
+    android:paddingStart="14dp"
+    android:paddingEnd="16dp">
 
-    <TextView
-        android:id="@+id/track_number"
-        android:layout_width="38dp"
-        android:layout_height="wrap_content"
-        android:duplicateParentState="true"
-        android:textColor="@color/mibox_music_dim"
-        android:textSize="14sp" />
+    <FrameLayout
+        android:layout_width="36dp"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/track_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:duplicateParentState="true"
+            android:textColor="@color/mibox_music_dim"
+            android:textSize="13sp" />
+
+        <com.gathin.tvhome.mibox.EqualizerView
+            android:id="@+id/track_eq"
+            android:layout_width="16dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/track_title"
@@ -26,14 +40,24 @@
         android:duplicateParentState="true"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/mibox_music_text"
+        android:textColor="@color/mibox_music_row_text"
         android:textSize="16sp" />
+
+    <ImageView
+        android:id="@+id/track_fav"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="10dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/mibox_ic_heart"
+        android:tint="#B3FFFFFF"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/track_length"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="12dp"
         android:duplicateParentState="true"
         android:textColor="@color/mibox_music_dim"
         android:textSize="13sp" />

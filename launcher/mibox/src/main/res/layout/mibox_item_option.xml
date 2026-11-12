@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One row of the lyrics options: its name on the left, its value on the right. OK, Left and Right change it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:background="@drawable/mibox_music_row_bg"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp">
+
+    <TextView
+        android:id="@+id/option_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        android:singleLine="true"
+        android:textColor="#E6FFFFFF"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/option_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:duplicateParentState="true"
+        android:singleLine="true"
+        android:textColor="#FFF2C879"
+        android:textSize="15sp" />
+</LinearLayout>

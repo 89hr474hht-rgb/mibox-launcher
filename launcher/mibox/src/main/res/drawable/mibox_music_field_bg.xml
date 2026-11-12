@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The search field: a soft pill, outlined in white while it has the focus. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
     <item android:state_focused="true">
-        <shape><solid android:color="#26FFFFFF" /><stroke android:width="2dp" android:color="#FFF2F4F8" /><corners android:radius="12dp" /></shape>
+        <shape><solid android:color="#1FFFFFFF" /><stroke android:width="1.5dp" android:color="#D9FFFFFF" /><corners android:radius="22dp" /></shape>
     </item>
     <item>
-        <shape><solid android:color="#14FFFFFF" /><corners android:radius="12dp" /></shape>
+        <shape><solid android:color="#12FFFFFF" /><corners android:radius="22dp" /></shape>
     </item>
 </selector>

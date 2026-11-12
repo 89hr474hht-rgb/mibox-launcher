@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The seek bar's frame: an outline only when focused (Left/Right then seek). -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- The seek bar's frame: a faint pill while it has the focus (Left and Right then move through the track). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
     <item android:state_focused="true">
-        <shape><stroke android:width="2dp" android:color="#99FFFFFF" /><corners android:radius="10dp" /></shape>
+        <shape><solid android:color="#14FFFFFF" /><corners android:radius="14dp" /></shape>
     </item>
     <item android:drawable="@android:color/transparent" />
 </selector>

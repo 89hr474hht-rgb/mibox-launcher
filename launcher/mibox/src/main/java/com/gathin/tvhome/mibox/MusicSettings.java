@@ -9,8 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * Settings → Musique: open the player, show its card on the home screen or not, the access to audio files, and the
- * box's storage spaces (internal storage, USB drives) with what each holds. The list follows a drive being plugged in
+ * Settings → Musique: open the player, show its card on the home screen or not, the bubble over other apps while it
+ * plays, the access to audio files, and the box's storage spaces (internal storage, USB drives) with what each holds. The list follows a drive being plugged in
  * or taken out. Run by SettingsPanes; the ids are looked up by name since the app's R is not visible here.
  */
 final class MusicSettings implements MusicLibrary.Listener {
@@ -18,7 +18,7 @@ final class MusicSettings implements MusicLibrary.Listener {
 
     private final Activity activity;
     private final Runnable rewire;
-    private final TextView card, access, accessHint;
+    private final TextView card, bubble, bubbleHint, access, accessHint;
     private final LinearLayout storage;
     private final MusicLibrary library;
     private final int rowStyle, dividerStyle, hintStyle;
@@ -30,6 +30,8 @@ final class MusicSettings implements MusicLibrary.Listener {
         library = MusicLibrary.get(a);
         String pkg = a.getPackageName();
         card = (TextView) find("miboxMusicCard");
+        bubble = (TextView) find("miboxMusicBubble");
+        bubbleHint = (TextView) find("miboxMusicBubbleHint");
         access = (TextView) find("miboxMusicAccess");
         accessHint = (TextView) find("miboxMusicAccessHint");
         storage = (LinearLayout) find("miboxStorageList");
@@ -40,6 +42,23 @@ final class MusicSettings implements MusicLibrary.Listener {
         if (open != null) open.setOnClickListener(v -> a.startActivity(new Intent(a, MusicActivity.class)));
         if (card != null) card.setOnClickListener(v -> {
             MusicCard.setEnabled(a, !MusicCard.enabled(a));
+            states();
+        });
+        if (bubble != null) bubble.setOnClickListener(v -> {
+            if (!PlayingBubble.allowed(a)) {
+                // Android's own screen grants it; the switch is on once it is.
+                PlayingBubble.setEnabled(a, true);
+                Intent screen = PlayingBubble.permissionScreen(a);
+                if (screen != null) {
+                    try {
+                        a.startActivity(screen);
+                    } catch (RuntimeException ignored) {
+                        // the box has no such screen after all: the hint says how else
+                    }
+                }
+            } else {
+                PlayingBubble.setEnabled(a, !PlayingBubble.enabled(a));
+            }
             states();
         });
         if (access != null) access.setOnClickListener(v -> {
@@ -78,6 +97,15 @@ final class MusicSettings implements MusicLibrary.Listener {
 
     void states() {
         if (card != null) card.setSelected(MusicCard.enabled(activity));
+        if (bubble != null) {
+            boolean allowed = PlayingBubble.allowed(activity), on = PlayingBubble.enabled(activity);
+            bubble.setSelected(allowed && on);
+            if (bubbleHint != null) {
+                bubbleHint.setText(!allowed ? (PlayingBubble.permissionScreen(activity) != null
+                        ? R.string.mibox_music_bubble_need : R.string.mibox_music_bubble_manual)
+                        : on ? R.string.mibox_music_bubble_on : R.string.mibox_music_bubble_off);
+            }
+        }
         boolean allowed = MusicLibrary.canRead(activity);
         access.setSelected(allowed);
         if (accessHint != null) {

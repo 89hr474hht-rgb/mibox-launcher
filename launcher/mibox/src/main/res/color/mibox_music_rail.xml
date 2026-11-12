@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Text on the player's rows and chips: dark on the white focused background, white otherwise. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:color="#FF0B0D12" android:state_focused="true" />
     <item android:color="#FFFFFFFF" android:state_selected="true" />
-    <item android:color="#D9FFFFFF" />
+    <item android:color="#99FFFFFF" />
 </selector>

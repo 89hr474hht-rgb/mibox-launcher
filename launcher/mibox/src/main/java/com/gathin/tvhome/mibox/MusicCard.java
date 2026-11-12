@@ -16,21 +16,24 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * The music card on the home screen, above the dock on the right, level with the dock app's name on the left: the
- * cover, what plays and the line of lyrics being sung, a thin progress line. Up from the dock reaches it; OK opens the
- * player; the remote's play/pause key works on it. It follows the dock when the dock moves, and steps aside with the
- * dock's name when the app grid scrolls. Switched off in Settings → Musique.
+ * The music card on the home screen, above the dock on the right, centred on the dock app's name on the left: the
+ * cover in the collection's colour with bars dancing while it plays, "Now playing", the title, the line of lyrics
+ * being sung, the play state and a thin progress line. Up from the dock reaches it; OK opens the player; the remote's
+ * play/pause key works on it. It follows the dock when the dock moves, and steps aside with the dock's name when the
+ * app grid scrolls. Switched off in Settings → Musique.
  */
 final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
     private static final String PREFS = "mibox_music";
-    private static final long TICK_MS = 500;
+    private static final long TICK_MS = 400;
 
     private final Activity home;
-    private final View card, hero, fill;
-    private final TextView cover, title, line;
+    private final View card, hero, cover, track, fill;
+    private final TextView label, title, line;
     private final ImageView state;
+    private final EqualizerView eq;
     private final MusicPlayer player;
     private final MusicLibrary library;
+    private float hue = -1;
     private boolean resumed, shown;
     private final ViewTreeObserver.OnPreDrawListener follow = this::place;
     private final Runnable tick = new Runnable() {
@@ -48,16 +51,20 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
         library = MusicLibrary.get(home);
         card = LayoutInflater.from(home).inflate(R.layout.mibox_music_card, root, false);
         cover = card.findViewById(R.id.card_cover);
+        eq = card.findViewById(R.id.card_eq);
+        label = card.findViewById(R.id.card_label);
         title = card.findViewById(R.id.card_title);
         line = card.findViewById(R.id.card_line);
         state = card.findViewById(R.id.card_state);
+        track = card.findViewById(R.id.card_track);
         fill = card.findViewById(R.id.card_fill);
         fill.setPivotX(0);
         UiFonts.apply(card);
         if (UiFonts.semibold(home) != null) title.setTypeface(UiFonts.semibold(home));
+        if (UiFonts.medium(home) != null) label.setTypeface(UiFonts.medium(home));
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(card.getLayoutParams().width,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END);
-        lp.setMarginEnd(Math.round(56 * home.getResources().getDisplayMetrics().density));
+        lp.setMarginEnd(Math.round(60 * home.getResources().getDisplayMetrics().density));
         card.setAlpha(0f);
         card.setVisibility(View.INVISIBLE);
         root.addView(card, lp);
@@ -72,7 +79,7 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
             return code == KeyEvent.KEYCODE_DPAD_LEFT || code == KeyEvent.KEYCODE_DPAD_RIGHT;
         });
         card.setOnFocusChangeListener((v, focused) ->
-                v.animate().scaleX(focused ? 1.04f : 1f).scaleY(focused ? 1.04f : 1f).setDuration(160).start());
+                v.animate().scaleX(focused ? 1.05f : 1f).scaleY(focused ? 1.05f : 1f).setDuration(180).start());
         root.getViewTreeObserver().addOnPreDrawListener(follow);
     }
 
@@ -111,6 +118,7 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
         player.removeListener(this);
         library.removeListener(this);
         card.removeCallbacks(tick);
+        eq.setPlaying(false);
     }
 
     void destroy() {
@@ -130,14 +138,17 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
         fillIn();
     }
 
-    /** Level with the dock app's name, its bottom on the name's bottom; shown while the name is. */
+    /** Centred on the dock app's name, on the right; shown while the name is. */
     private boolean place() {
+        // A very long app name would run into the card: the card steps aside while it shows.
+        float gap = 16 * home.getResources().getDisplayMetrics().density;
+        boolean clash = card.getWidth() > 0 && hero.getX() + hero.getWidth() * hero.getScaleX() > card.getLeft() - gap;
         boolean want = enabled(home) && hero.getVisibility() == View.VISIBLE && hero.getHeight() > 0
-                && (hero.getAlpha() > 0.5f || card.hasFocus());
+                && (hero.getAlpha() > 0.5f && !clash || card.hasFocus());
         if (want && hero.getAlpha() > 0.5f && card.getHeight() > 0) {
             // A real layout position, not a translation: the remote's focus search reads the layout, and finds the
             // card just above the dock only if it is laid out there.
-            int y = Math.round(hero.getY() + hero.getHeight() - card.getHeight());
+            int y = Math.round(hero.getY() + (hero.getHeight() - card.getHeight()) / 2f);
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) card.getLayoutParams();
             if (lp.topMargin != y) {
                 lp.topMargin = y;
@@ -150,7 +161,8 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
             if (want) {
                 card.setVisibility(View.VISIBLE);
                 card.setFocusable(true);
-                card.animate().alpha(1f).setDuration(260).start();
+                card.setTranslationY(card.getHeight() * 0.15f);
+                card.animate().alpha(1f).translationY(0).setDuration(280).start();
             } else {
                 card.setFocusable(false);
                 card.animate().alpha(0f).setDuration(160)
@@ -166,32 +178,40 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
         MusicLibrary.Track t = player.track();
         MusicLibrary.Collection c = player.collection();
         boolean playing = player.isPlaying();
-        state.setImageResource(playing ? R.drawable.mibox_ic_pause : t != null || player.lastTitle() != null
-                ? R.drawable.mibox_ic_play : R.drawable.mibox_ic_music);
+        eq.setPlaying(playing && resumed);
+        state.setImageResource(playing ? R.drawable.mibox_ic_pause : R.drawable.mibox_ic_play);
         if (t != null) {
-            cover.setText(MusicActivity.initial(c.name));
+            tint(c.key, c.name);
+            label.setText(playing ? R.string.mibox_music_card_playing : R.string.mibox_music_card_paused);
             title.setText(t.title);
             line.setText(currentLine(c.name));
             long d = player.duration();
+            track.setVisibility(View.VISIBLE);
             fill.setScaleX(d > 0 ? Math.max(0f, Math.min(1f, player.position() / (float) d)) : 0f);
+            state.setVisibility(View.VISIBLE);
             return;
         }
-        fill.setScaleX(0f);
+        track.setVisibility(View.GONE);
         String last = player.lastTitle();
         if (last != null) {
-            cover.setText(MusicActivity.initial(player.lastCollectionName()));
+            tint(null, player.lastCollectionName());
+            label.setText(R.string.mibox_music_card_resume);
             title.setText(last);
-            line.setText(home.getString(R.string.mibox_music_resume, player.lastCollectionName()));
+            line.setText(player.lastCollectionName());
+            state.setVisibility(View.VISIBLE);
             return;
         }
-        cover.setText("");
-        title.setText(R.string.mibox_music_title);
+        tint(null, "");
+        label.setText(R.string.mibox_music_title);
+        state.setVisibility(View.GONE);
         if (!MusicLibrary.canRead(home)) {
+            title.setText(R.string.mibox_music_card_access_title);
             line.setText(R.string.mibox_music_card_access);
             return;
         }
         List<MusicLibrary.Collection> all = library.collections();
         if (all.isEmpty()) {
+            title.setText(R.string.mibox_music_card_empty_title);
             line.setText(library.scanned() ? R.string.mibox_music_card_nothing : R.string.mibox_music_searching);
             return;
         }
@@ -200,14 +220,22 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
             if (names.length() > 0) names.append(", ");
             names.append(x.name);
         }
+        title.setText(R.string.mibox_music_card_pick);
         line.setText(names);
+    }
+
+    private void tint(String key, String name) {
+        float h = MusicArt.hue(key, name);
+        if (h == hue) return;
+        hue = h;
+        cover.setBackground(MusicArt.cover(h, 14 * home.getResources().getDisplayMetrics().density));
     }
 
     /** The line of lyrics being sung (its first line when it is long), or the collection's name. */
     private String currentLine(String fallback) {
         Lrc l = player.lyrics();
         if (l == null) return fallback;
-        int i = l.indexAt(player.position());
+        int i = l.indexAt(player.lyricsPosition());
         if (i < 0) return fallback;
         Lrc.Line ln = l.lines.get(i);
         String s = !ln.text.isEmpty() ? ln.text : ln.sub;

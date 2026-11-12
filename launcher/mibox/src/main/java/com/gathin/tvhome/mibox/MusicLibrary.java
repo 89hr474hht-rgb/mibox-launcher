@@ -91,6 +91,10 @@ final class MusicLibrary {
         void libraryChanged();
     }
 
+    /** The key of the Favoris collection: never a folder's path. */
+    static final String FAVORITES = "\u2605favorites";
+    private static final String PREFS = "mibox_music";
+
     /** Holds the application context only, never an activity. */
     @android.annotation.SuppressLint("StaticFieldLeak")
     private static MusicLibrary instance;
@@ -153,8 +157,52 @@ final class MusicLibrary {
     }
 
     Collection find(String key) {
+        if (FAVORITES.equals(key)) {
+            Collection f = favorites();
+            return f.tracks.isEmpty() ? null : f;
+        }
         for (Collection c : collections) if (c.key.equals(key)) return c;
         return null;
+    }
+
+    // ---- favourites: kept by folder and file name, so they come back when the drive is plugged in again ----
+
+    boolean isFavorite(Track t) {
+        return t != null && favoriteKeys().contains(favoriteKey(t.path));
+    }
+
+    void toggleFavorite(Track t) {
+        if (t == null) return;
+        java.util.Set<String> keys = new java.util.HashSet<>(favoriteKeys());
+        String k = favoriteKey(t.path);
+        if (!keys.remove(k)) keys.add(k);
+        app.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putStringSet("favorites", keys).apply();
+        for (Listener l : new ArrayList<>(listeners)) l.libraryChanged();
+    }
+
+    /** The favourite tracks found on the drives now, in folder then file name order. */
+    Collection favorites() {
+        java.util.Set<String> keys = favoriteKeys();
+        List<Track> tracks = new ArrayList<>();
+        if (!keys.isEmpty()) {
+            for (Collection c : collections) for (Track t : c.tracks) if (keys.contains(favoriteKey(t.path))) tracks.add(t);
+        }
+        tracks.sort((a, b) -> naturalCompare(favoriteKey(a.path), favoriteKey(b.path)));
+        return new Collection(FAVORITES, app.getString(R.string.mibox_music_favorites), "",
+                Collections.unmodifiableList(tracks));
+    }
+
+    private java.util.Set<String> favoriteKeys() {
+        return app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getStringSet("favorites", Collections.emptySet());
+    }
+
+    /** "Folder/file.mp3": the same track on the same drive, whatever Android numbers it this time. */
+    static String favoriteKey(String path) {
+        if (path == null) return "";
+        File f = new File(path);
+        File parent = f.getParentFile();
+        return (parent == null ? "" : parent.getName() + "/") + f.getName();
     }
 
     void addListener(Listener l) {

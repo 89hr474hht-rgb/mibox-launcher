@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The music player: on the left the collections, a search field and the tracks; on the right the track playing,
-     the seek bar with previous / play-pause / next, and its synced lyrics. True black for the OLED screen. -->
+<!-- The music player. On the far left a menu of icons that opens with its names when it has the focus: Now playing,
+     Favourites, each collection, Search, Lyrics. Then the section shown: its name, a search field and the tracks.
+     On the right what plays: the cover and title with the favourite and lyrics options buttons, the lyrics large in
+     the middle, and the seek bar with previous / play / next at the bottom. "Now playing" slides the tracks away and
+     gives the lyrics the whole width. A soft glow in the collection's colour at the top, true black below it. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/music_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View
+        android:id="@+id/music_glow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <LinearLayout
+        android:id="@+id/music_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:baselineAligned="false"
         android:clipChildren="false"
         android:orientation="horizontal"
-        android:paddingStart="48dp"
-        android:paddingTop="34dp"
-        android:paddingEnd="48dp"
-        android:paddingBottom="24dp">
+        android:paddingStart="104dp"
+        android:paddingTop="36dp"
+        android:paddingEnd="52dp"
+        android:paddingBottom="26dp">
 
+        <!-- The section shown. -->
         <LinearLayout
-            android:layout_width="380dp"
+            android:id="@+id/music_library"
+            android:layout_width="330dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="48dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:orientation="vertical">
@@ -27,57 +40,41 @@
                 android:id="@+id/music_heading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:text="@string/mibox_music_title"
                 android:textColor="#FFFFFFFF"
-                android:textSize="30sp" />
+                android:textSize="26sp" />
 
             <TextView
                 android:id="@+id/music_source"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:drawablePadding="8dp"
+                android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="#80FFFFFF"
-                android:textSize="14sp" />
-
-            <HorizontalScrollView
-                android:id="@+id/music_collections_scroll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:clipToPadding="false"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/music_collections"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clipChildren="false"
-                    android:orientation="horizontal"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp" />
-            </HorizontalScrollView>
+                android:textColor="#73FFFFFF"
+                android:textSize="13sp" />
 
             <EditText
                 android:id="@+id/music_search"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
+                android:layout_height="44dp"
+                android:layout_marginTop="16dp"
                 android:autofillHints=""
                 android:background="@drawable/mibox_music_field_bg"
                 android:drawableStart="@drawable/mibox_ic_search"
-                android:drawablePadding="12dp"
-                android:drawableTint="#99FFFFFF"
+                android:drawablePadding="10dp"
+                android:drawableTint="#80FFFFFF"
                 android:hint="@string/mibox_music_search"
                 android:imeOptions="actionSearch|flagNoExtractUi"
                 android:inputType="text|textNoSuggestions"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:singleLine="true"
                 android:textColor="#FFFFFFFF"
-                android:textColorHint="#66FFFFFF"
-                android:textSize="16sp" />
+                android:textColorHint="#59FFFFFF"
+                android:textSize="15sp" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -90,18 +87,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
+                    android:clipChildren="false"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp"
                     android:descendantFocusability="afterDescendants"
                     android:divider="@null"
-                    android:dividerHeight="2dp"
+                    android:dividerHeight="3dp"
+                    android:fadingEdgeLength="40dp"
                     android:listSelector="@android:color/transparent"
-                    android:paddingBottom="12dp"
+                    android:paddingBottom="16dp"
+                    android:requiresFadingEdge="vertical"
                     android:scrollbars="none" />
 
                 <LinearLayout
                     android:id="@+id/music_empty_box"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="18dp"
                     android:orientation="vertical"
                     android:visibility="gone">
 
@@ -110,8 +112,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:lineSpacingMultiplier="1.25"
-                        android:textColor="#B3FFFFFF"
-                        android:textSize="16sp" />
+                        android:textColor="#A6FFFFFF"
+                        android:textSize="15sp" />
 
                     <TextView
                         android:id="@+id/music_allow"
@@ -123,37 +125,42 @@
             </FrameLayout>
         </LinearLayout>
 
-        <Space
-            android:layout_width="44dp"
-            android:layout_height="match_parent" />
-
+        <!-- What plays. -->
         <LinearLayout
+            android:id="@+id/music_now"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:clipChildren="false"
+            android:clipToPadding="false"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:baselineAligned="false"
+                android:clipChildren="false"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <TextView
+                <FrameLayout
                     android:id="@+id/music_cover"
-                    android:layout_width="76dp"
-                    android:layout_height="76dp"
-                    android:background="@drawable/mibox_music_cover_bg"
-                    android:gravity="center"
-                    android:textColor="#E6FFFFFF"
-                    android:textSize="30sp" />
+                    android:layout_width="84dp"
+                    android:layout_height="84dp"
+                    android:elevation="10dp">
+
+                    <com.gathin.tvhome.mibox.EqualizerView
+                        android:id="@+id/music_eq"
+                        android:layout_width="34dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center" />
+                </FrameLayout>
 
                 <LinearLayout
+                    android:id="@+id/music_titles"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
+                    android:layout_marginStart="20dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -162,49 +169,81 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
-                        android:singleLine="true"
+                        android:maxLines="2"
                         android:textColor="#FFFFFFFF"
-                        android:textSize="22sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/music_artist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
+                        android:layout_marginTop="3dp"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:textColor="#99FFFFFF"
+                        android:textColor="#8CFFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
 
+                <ImageView
+                    android:id="@+id/music_fav"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/mibox_music_round_bg"
+                    android:contentDescription="@string/mibox_music_favorite_add"
+                    android:focusable="true"
+                    android:padding="12dp"
+                    android:src="@drawable/mibox_ic_heart_outline"
+                    android:tint="@color/mibox_music_icon" />
+
+                <ImageView
+                    android:id="@+id/music_options"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/mibox_music_round_bg"
+                    android:contentDescription="@string/mibox_music_lyrics_options"
+                    android:focusable="true"
+                    android:padding="12dp"
+                    android:src="@drawable/mibox_ic_lyrics"
+                    android:tint="@color/mibox_music_icon" />
             </LinearLayout>
+
+            <com.gathin.tvhome.mibox.LyricsView
+                android:id="@+id/music_lyrics"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_weight="1"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/music_time"
-                    android:layout_width="62dp"
+                    android:layout_width="58dp"
                     android:layout_height="wrap_content"
-                    android:textColor="#B3FFFFFF"
+                    android:textColor="#A6FFFFFF"
                     android:textSize="13sp" />
 
                 <FrameLayout
                     android:id="@+id/music_seek"
                     android:layout_width="0dp"
-                    android:layout_height="22dp"
+                    android:layout_height="28dp"
                     android:layout_weight="1"
                     android:background="@drawable/mibox_music_seek_bg"
                     android:contentDescription="@string/mibox_music_seek"
                     android:focusable="true"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp">
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
 
                     <View
+                        android:id="@+id/music_track"
                         android:layout_width="match_parent"
                         android:layout_height="4dp"
                         android:layout_gravity="center_vertical"
@@ -220,73 +259,197 @@
 
                 <TextView
                     android:id="@+id/music_length"
-                    android:layout_width="62dp"
+                    android:layout_width="58dp"
                     android:layout_height="wrap_content"
                     android:gravity="end"
-                    android:textColor="#80FFFFFF"
+                    android:textColor="#73FFFFFF"
                     android:textSize="13sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="6dp"
+                android:clipChildren="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/music_prev"
-                    android:layout_marginStart="18dp"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:background="@drawable/mibox_music_round_bg"
                     android:contentDescription="@string/mibox_music_prev"
                     android:focusable="true"
-                    android:padding="12dp"
+                    android:padding="13dp"
                     android:src="@drawable/mibox_ic_prev"
                     android:tint="@color/mibox_music_icon" />
 
                 <ImageView
                     android:id="@+id/music_play"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/mibox_music_round_bg"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="22dp"
+                    android:layout_marginEnd="22dp"
+                    android:background="@drawable/mibox_music_play_bg"
                     android:contentDescription="@string/mibox_music_play"
                     android:focusable="true"
-                    android:padding="16dp"
+                    android:padding="21dp"
                     android:src="@drawable/mibox_ic_play"
-                    android:tint="@color/mibox_music_icon" />
+                    android:tint="@color/mibox_music_play_icon" />
 
                 <ImageView
                     android:id="@+id/music_next"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:background="@drawable/mibox_music_round_bg"
                     android:contentDescription="@string/mibox_music_next"
                     android:focusable="true"
-                    android:padding="12dp"
+                    android:padding="13dp"
                     android:src="@drawable/mibox_ic_next"
                     android:tint="@color/mibox_music_icon" />
             </LinearLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="10dp"
-                android:layout_weight="1">
-
-                <com.gathin.tvhome.mibox.LyricsView
-                    android:id="@+id/music_lyrics"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:background="@drawable/mibox_music_fade_top" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="90dp"
-                    android:layout_gravity="bottom"
-                    android:background="@drawable/mibox_music_fade_bottom" />
-            </FrameLayout>
         </LinearLayout>
+    </LinearLayout>
+
+    <!-- The menu: icons only, opening with their names over the page while it has the focus. -->
+    <View
+        android:id="@+id/music_rail_scrim"
+        android:layout_width="460dp"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="@drawable/mibox_music_rail_scrim" />
+
+    <LinearLayout
+        android:id="@+id/music_rail"
+        android:layout_width="76dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp" />
+
+    <!-- The hub, the player's first page: the collection's name very large behind, carved and crossed by light, and
+         a menu: what plays or what to resume, Favourites, each collection, Search, Lyrics. Below on the right, what
+         plays. OK on an entry opens it; Back from a page comes back here. -->
+    <FrameLayout
+        android:id="@+id/music_hub"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.gathin.tvhome.mibox.ShineText
+            android:id="@+id/hub_word"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="430dp"
+            android:layout_marginEnd="44dp"
+            android:importantForAccessibility="no" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingStart="72dp">
+
+            <TextView
+                android:id="@+id/hub_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:layout_marginBottom="18dp"
+                android:letterSpacing="0.22"
+                android:text="@string/mibox_music_title"
+                android:textAllCaps="true"
+                android:textColor="#80FFFFFF"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/hub_items"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/hub_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="64dp"
+            android:layout_marginBottom="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <com.gathin.tvhome.mibox.EqualizerView
+                android:id="@+id/hub_eq"
+                android:layout_width="16dp"
+                android:layout_height="14dp" />
+
+            <TextView
+                android:id="@+id/hub_now_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:maxWidth="420dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="#B3FFFFFF"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Lyrics options, over the lyrics. -->
+    <LinearLayout
+        android:id="@+id/music_panel"
+        android:layout_width="380dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginEnd="52dp"
+        android:background="@drawable/mibox_music_panel_bg"
+        android:elevation="12dp"
+        android:orientation="vertical"
+        android:padding="18dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/music_panel_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/mibox_music_lyrics_options"
+            android:textColor="#FFFFFFFF"
+            android:textSize="19sp" />
+
+        <include
+            android:id="@+id/music_opt_size"
+            layout="@layout/mibox_item_option" />
+
+        <include
+            android:id="@+id/music_opt_translation"
+            layout="@layout/mibox_item_option" />
+
+        <include
+            android:id="@+id/music_opt_words"
+            layout="@layout/mibox_item_option" />
+
+        <include
+            android:id="@+id/music_opt_offset"
+            layout="@layout/mibox_item_option" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="12dp"
+            android:lineSpacingMultiplier="1.2"
+            android:text="@string/mibox_music_opt_hint"
+            android:textColor="#80FFFFFF"
+            android:textSize="13sp" />
     </LinearLayout>
 </FrameLayout>

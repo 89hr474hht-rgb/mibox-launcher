@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One entry of the player's hub: a gold mark while it has the focus, a thin icon, a name and a line under it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="68dp"
+    android:alpha="0.55"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <View
+        android:id="@+id/hub_mark"
+        android:layout_width="3dp"
+        android:layout_height="30dp"
+        android:alpha="0"
+        android:background="@drawable/mibox_music_hub_mark" />
+
+    <ImageView
+        android:id="@+id/hub_icon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="22dp"
+        android:importantForAccessibility="no"
+        android:tint="#FFFFFFFF" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/hub_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="420dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#FFFFFFFF"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/hub_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:maxWidth="420dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#8CFFFFFF"
+            android:textSize="13sp" />
+    </LinearLayout>
+</LinearLayout>

@@ -79,6 +79,7 @@ public final class MiboxInit extends ContentProvider {
     private static final class Callbacks implements Application.ActivityLifecycleCallbacks {
         @Override
         public void onActivityResumed(Activity activity) {
+            PlayingBubble.screenIn(activity);
             // A LaunchOS screen is in front, so no app that refuses accessibility is: the helpers come back.
             A11yPause.resume(activity);
             RemoteKeysService.refreshPause();
@@ -100,6 +101,7 @@ public final class MiboxInit extends ContentProvider {
 
         @Override
         public void onActivityPaused(Activity activity) {
+            PlayingBubble.screenOut(activity);
             HomeExtras extras = EXTRAS.get(activity);
             if (extras != null) extras.pause();
             if (resumedHome.get() == activity) {

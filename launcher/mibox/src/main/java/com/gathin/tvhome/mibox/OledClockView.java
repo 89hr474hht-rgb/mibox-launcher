@@ -185,7 +185,7 @@ final class OledClockView extends View {
         MusicPlayer p = playing();
         if (p == null) return -2;
         Lrc l = p.lyrics();
-        return l == null ? -1 : l.indexAt(p.position());
+        return l == null ? -1 : l.indexAt(p.lyricsPosition());
     }
 
     private static String musicTitle() {
@@ -200,7 +200,7 @@ final class OledClockView extends View {
         if (p == null || p.track() == null) return null;
         String main = "\u266A  " + p.track().title, sub = "";
         Lrc l = p.lyrics();
-        int i = l == null ? -1 : l.indexAt(p.position());
+        int i = l == null ? -1 : l.indexAt(p.lyricsPosition());
         if (i >= 0) {
             Lrc.Line ln = l.lines.get(i);
             main = ln.text;

@@ -42,4 +42,11 @@ public class MusicLibraryTest {
         assertFalse(MusicLibrary.matches("Ouverture", "001 - Ouverture.mp3", "fete"));
         assertTrue(MusicLibrary.matches("Anything", "x.mp3", "  "));
     }
+
+    @Test
+    public void aFavouriteIsItsFolderAndFileName() {
+        assertEquals("Albums/01 - Song.mp3", MusicLibrary.favoriteKey("/storage/1A2B-3C4D/Albums/01 - Song.mp3"));
+        assertEquals("Albums/01 - Song.mp3", MusicLibrary.favoriteKey("/storage/emulated/0/Albums/01 - Song.mp3"));
+        assertEquals("", MusicLibrary.favoriteKey(null));
+    }
 }

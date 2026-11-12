@@ -26,6 +26,8 @@
     <!-- Music keeps playing behind the sleep screen: a foreground service of the media playback kind. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- The music player's bubble over other apps while it plays (PlayingBubble); granted by the owner. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- Same as the app's manifest; repeated so the library lints on its own. -->
     <uses-feature android:name="android.software.leanback" android:required="false" />

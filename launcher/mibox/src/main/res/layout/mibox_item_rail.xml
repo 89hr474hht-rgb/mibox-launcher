@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One item of the player's menu: its icon, and its name while the menu is open. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_marginTop="4dp"
+    android:background="@drawable/mibox_music_rail_item_bg"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="14dp"
+    android:paddingEnd="16dp">
+
+    <ImageView
+        android:id="@+id/rail_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:duplicateParentState="true"
+        android:importantForAccessibility="no"
+        android:tint="@color/mibox_music_rail" />
+
+    <TextView
+        android:id="@+id/rail_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_weight="1"
+        android:alpha="0"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/mibox_music_rail"
+        android:textSize="15sp" />
+</LinearLayout>
