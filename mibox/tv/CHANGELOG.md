@@ -6,6 +6,11 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.6.1] - 2026-11-12
+
+### Modifié
+- Nouvelle icône et nouvelle bannière : le monogramme « lo » de LaunchOS, avec un point corail, sur fond presque noir. Le logo de l'en-tête suit.
+
 ## [0.6.0] - 2026-11-08
 
 Refonte de l'interface : LaunchTV OS. Thème sombre premium sur `#0A0A0A`, panneaux en verre, focus agrandi avec une bordure bleue, squelettes de chargement.

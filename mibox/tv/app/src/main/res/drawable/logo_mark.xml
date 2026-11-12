@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- LaunchOS TV's logo: the monogram on its rounded near-black tile. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:width="36dp" android:height="36dp" android:viewportWidth="36" android:viewportHeight="36">
-    <path android:pathData="M8,0h20a8,8 0,0 1,8 8v20a8,8 0,0 1,-8 8h-20a8,8 0,0 1,-8 -8v-20a8,8 0,0 1,8 -8z">
+    android:width="36dp" android:height="36dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:pathData="M25,0 H83 A25,25 0 0,1 108,25 V83 A25,25 0 0,1 83,108 H25 A25,25 0 0,1 0,83 V25 A25,25 0 0,1 25,0 Z">
         <aapt:attr name="android:fillColor">
-            <gradient android:type="linear" android:startX="0" android:startY="0" android:endX="36" android:endY="36"
-                android:startColor="#FF4F7BFF" android:centerColor="#FF9A5CFF" android:endColor="#FFFF5C9A" />
+            <gradient android:type="linear" android:startX="0" android:startY="0" android:endX="0" android:endY="108"
+                android:startColor="#FF17181B" android:endColor="#FF0B0C0E" />
         </aapt:attr>
     </path>
-    <path android:fillColor="#FFFFFFFF" android:pathData="M14,10.5L26,18L14,25.5Z" />
+    <path android:pathData="M30,33.5 V67 Q30,74 37,74 H64 A14.5,14.5 0 1,0 64,45.0 A14.5,14.5 0 1,0 64,74" android:strokeColor="#FFF3EEE4" android:strokeWidth="7"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M59.2,59.5 a4.8,4.8 0 1,0 9.6,0 a4.8,4.8 0 1,0 -9.6,0 Z" android:fillColor="#FFFF5A4A" />
 </vector>
