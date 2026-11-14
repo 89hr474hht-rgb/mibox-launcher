@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="false"
+        android:duplicateParentState="true"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -37,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="14dp"
             android:layout_weight="1"
+            android:duplicateParentState="true"
             android:orientation="vertical">
 
             <TextView
@@ -82,7 +84,7 @@
             android:importantForAccessibility="no"
             android:padding="9dp"
             android:src="@drawable/mibox_ic_play"
-            android:tint="@color/lo_icon_on_focus" />
+            android:tint="@color/lo_text" />
     </LinearLayout>
 
     <FrameLayout

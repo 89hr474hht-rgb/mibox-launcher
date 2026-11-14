@@ -320,6 +320,22 @@ public final class MusicActivity extends Activity implements MusicLibrary.Listen
         if (had && rail.getChildCount() > 0) rail.getChildAt(0).requestFocus();
     }
 
+    /**
+     * Left from the page into the menu starts on the section shown, not on whichever entry is nearest. True when the
+     * focus was moved.
+     */
+    private boolean enteringRail() {
+        View from = getCurrentFocus();
+        if (from == null) return false;
+        View next = from.focusSearch(View.FOCUS_LEFT);
+        if (next == null || !LyricsOptionsPanel.inside(next, rail)) return false;
+        for (int i = 0; i < rail.getChildCount(); i++) {
+            View item = rail.getChildAt(i);
+            if (item.isActivated()) return item.requestFocus();
+        }
+        return false;
+    }
+
     private void railItem(String key, int icon, String name) {
         View item = LayoutInflater.from(this).inflate(R.layout.mibox_item_rail, rail, false);
         ((ImageView) item.findViewById(R.id.rail_icon)).setImageResource(icon);
@@ -556,6 +572,7 @@ public final class MusicActivity extends Activity implements MusicLibrary.Listen
                     break;
             }
             if (options.onKeyDown(e, getCurrentFocus())) return true;
+            if (e.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT && !railOpen && enteringRail()) return true;
             if (e.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT && railOpen) {
                 // Right from the menu goes to the page: the track playing, the first track, or the controls.
                 View to = immersive ? play : rowAt(Math.max(list.getFirstVisiblePosition(), adapter.positionOf(player.track())));

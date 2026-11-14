@@ -5,7 +5,10 @@
      the page of the focused one on the right, its rows grouped in cards, white when focused like the launcher's
      menus. SettingsPanes (mibox module) switches the pages and runs the Veille page; MiboxInit fills in
      miboxUpdatesChoice, miboxRemoteChoice and miboxSettingsSubtitle. -->
+<!-- The segments' numbers (4, 5, 100%) are the same in every language, as in upstream's layout. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="HardcodedText"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lo_black"

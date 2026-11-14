@@ -16,6 +16,7 @@
         android:layout_height="match_parent"
         android:baselineAligned="false"
         android:clipChildren="false"
+        android:clipToPadding="false"
         android:orientation="horizontal"
         android:paddingStart="104dp"
         android:paddingTop="@dimen/lo_space_6"

@@ -92,6 +92,8 @@ final class MiboxMenu {
 
     /** The launcher's drop-in: a short fade down from the top edge, hanging right-aligned under the pill. */
     void show() {
+        // No information rows (the timer): one line under the title, not two.
+        panel.findViewById(R.id.mibox_bt_rows_line).setVisibility(rows.getChildCount() == 0 ? View.GONE : View.VISIBLE);
         panel.setAlpha(0f);
         panel.setTranslationY(-8 * density);
         popup.showAsDropDown(anchor, 0, Math.round(10 * density), Gravity.END);

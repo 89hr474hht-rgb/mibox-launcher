@@ -31,7 +31,7 @@ final class LivingGlow extends BitmapDrawable {
     /** About thirty frames a second while the colour fades; none otherwise. */
     private static final long FRAME_NS = 1_000_000_000L / 30;
     /** How dark the lights are kept, so the glow stays behind the tiles. */
-    private static final float DIM = 0.55f;
+    private static final float DIM = 0.30f;
 
     private final View ambient;
     private final Bitmap bitmap;

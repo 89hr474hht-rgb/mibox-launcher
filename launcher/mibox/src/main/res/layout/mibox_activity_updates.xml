@@ -10,10 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingStart="56dp"
-        android:paddingTop="36dp"
-        android:paddingEnd="56dp"
-        android:paddingBottom="36dp">
+        android:paddingStart="@dimen/lo_page_x"
+        android:paddingTop="@dimen/lo_page_y"
+        android:paddingEnd="@dimen/lo_page_x"
+        android:paddingBottom="@dimen/lo_page_y">
 
         <LinearLayout
             android:id="@+id/mibox_left"
@@ -24,13 +24,13 @@
 
             <com.gathin.tvhome.mibox.UpdateHalo
                 android:id="@+id/mibox_halo"
-                android:layout_width="220dp"
-                android:layout_height="220dp" />
+                android:layout_width="168dp"
+                android:layout_height="168dp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/lo_space_4"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/mibox_updates_title"
                 android:src="@drawable/mibox_wordmark" />

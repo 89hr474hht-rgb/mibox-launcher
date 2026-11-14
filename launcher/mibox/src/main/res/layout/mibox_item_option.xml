@@ -17,7 +17,7 @@
         android:layout_weight="1"
         android:duplicateParentState="true"
         android:singleLine="true"
-        android:textColor="@color/lo_text"
+        android:textColor="@color/lo_text_on_focus"
         android:textSize="@dimen/lo_text_body" />
 
     <TextView
@@ -27,6 +27,6 @@
         android:layout_marginStart="12dp"
         android:duplicateParentState="true"
         android:singleLine="true"
-        android:textColor="@color/lo_accent"
+        android:textColor="@color/lo_accent_on_focus"
         android:textSize="@dimen/lo_text_body" />
 </LinearLayout>

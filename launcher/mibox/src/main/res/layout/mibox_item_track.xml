@@ -13,7 +13,8 @@
 
     <FrameLayout
         android:layout_width="36dp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:duplicateParentState="true">
 
         <TextView
             android:id="@+id/track_number"
@@ -50,7 +51,8 @@
         android:layout_marginStart="10dp"
         android:importantForAccessibility="no"
         android:src="@drawable/mibox_ic_heart"
-        android:tint="@color/lo_text_2"
+        android:duplicateParentState="true"
+        android:tint="@color/lo_text_2_on_focus"
         android:visibility="gone" />
 
     <TextView

@@ -137,18 +137,25 @@ public final class RemoteKeysActivity extends Activity {
             ImageView icon = (ImageView) ((ViewGroup) row).getChildAt(2);
             if (RemoteRemap.NONE.equals(target)) {
                 sub.setText(R.string.mibox_rk_none_sub);
-                icon.setImageResource(R.drawable.mibox_ic_block);
+                blockIcon(icon);
                 continue;
             }
             try {
                 ApplicationInfo ai = pm.getApplicationInfo(target, 0);
                 sub.setText(ai.loadLabel(pm));
+                icon.setImageTintList(null);
                 icon.setImageDrawable(ai.loadIcon(pm));
             } catch (PackageManager.NameNotFoundException e) {
                 sub.setText(R.string.mibox_rk_missing);
-                icon.setImageResource(R.drawable.mibox_ic_block);
+                blockIcon(icon);
             }
         }
+    }
+
+    /** The "does nothing" sign, grey, and dark on the white focus. */
+    private void blockIcon(ImageView icon) {
+        icon.setImageResource(R.drawable.mibox_ic_block);
+        icon.setImageTintList(getColorStateList(R.color.lo_text_2_on_focus));
     }
 
     // The app list for one button.
@@ -178,12 +185,15 @@ public final class RemoteKeysActivity extends Activity {
         ImageView iv = new ImageView(this);
         iv.setImageDrawable(icon);
         iv.setDuplicateParentStateEnabled(true);
+        if (RemoteRemap.NONE.equals(pkg)) iv.setImageTintList(getColorStateList(R.color.lo_text_2_on_focus));
         row.addView(iv, new LinearLayout.LayoutParams(px(40), px(40)));
         LinearLayout texts = texts(row, label, null);
         texts.setPadding(px(16), 0, 0, 0);
         if (selected) {
             ImageView tick = new ImageView(this);
             tick.setImageResource(R.drawable.mibox_check_on);
+            tick.setDuplicateParentStateEnabled(true);
+            tick.setImageTintList(getColorStateList(R.color.lo_accent_on_focus));
             row.addView(tick, new LinearLayout.LayoutParams(px(28), px(28)));
         }
         row.setOnClickListener(v -> {

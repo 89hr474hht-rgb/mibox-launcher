@@ -46,6 +46,7 @@
         android:orientation="vertical" />
 
     <View
+        android:id="@+id/mibox_bt_rows_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="12dp"

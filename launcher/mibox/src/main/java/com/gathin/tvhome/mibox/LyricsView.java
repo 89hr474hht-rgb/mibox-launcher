@@ -280,10 +280,13 @@ public final class LyricsView extends View {
         canvas.restore();
     }
 
-    /** Lines fade out near the top and the bottom. */
+    /**
+     * Lines fade out near the top and the bottom, measured from their own edges: a line that reaches the view's top
+     * (and the title above it) is gone, one a fifth of the way down is whole.
+     */
     private float edgeFade(float top, float height) {
-        float mid = top + height / 2f, h = getHeight();
-        float in = Math.min((mid - h * 0.02f) / (h * 0.22f), (h - mid) / (h * 0.2f));
+        float h = getHeight();
+        float in = Math.min(top / (h * 0.2f), (h - top - height) / (h * 0.16f));
         return Math.max(0f, Math.min(1f, in));
     }
 
