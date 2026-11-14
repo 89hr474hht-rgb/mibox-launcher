@@ -95,4 +95,19 @@
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowAnimationStyle">@null</item>
     </style>
+    <!-- Window motion of the Mi Box screens, set on each window by MiboxInit (the launcher's own theme has none).
+         Android scales or skips them with the system's animation settings. -->
+    <style name="LoWindowPage">
+        <item name="android:activityOpenEnterAnimation">@anim/lo_page_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/lo_hold</item>
+        <item name="android:activityCloseEnterAnimation">@anim/lo_hold</item>
+        <item name="android:activityCloseExitAnimation">@anim/lo_page_exit</item>
+    </style>
+
+    <style name="LoWindowSub">
+        <item name="android:activityOpenEnterAnimation">@anim/lo_sub_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/lo_hold</item>
+        <item name="android:activityCloseEnterAnimation">@anim/lo_hold</item>
+        <item name="android:activityCloseExitAnimation">@anim/lo_sub_exit</item>
+    </style>
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A screen opened from a settings row (Mises à jour, Boutons de la télécommande): comes in from the right. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="220" android:interpolator="@anim/lo_enter_curve" android:shareInterpolator="true">
+    <alpha android:fromAlpha="0" android:toAlpha="1" />
+    <translate android:fromXDelta="4%" android:toXDelta="0" />
+</set>

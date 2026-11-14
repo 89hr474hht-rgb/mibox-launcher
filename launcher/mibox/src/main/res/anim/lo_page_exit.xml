@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The same screen closing (Back): fades out while sinking a little, a bit faster than it came. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="160" android:interpolator="@anim/lo_move_curve" android:shareInterpolator="true">
+    <alpha android:fromAlpha="1" android:toAlpha="0" />
+    <translate android:fromYDelta="0" android:toYDelta="2%" />
+</set>

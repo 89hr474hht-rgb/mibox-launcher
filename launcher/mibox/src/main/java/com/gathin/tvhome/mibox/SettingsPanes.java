@@ -18,7 +18,7 @@ import com.gathin.launchos.design.Motion;
 
 /**
  * The two columns of the Mi Box settings page (mibox/app-res/layout/activity_launcher_settings.xml): focusing a
- * category on the left shows its page on the right, with a short fade; Right goes into the page, Left from the
+ * category on the left shows its page on the right, fading in from the side the remote moved to; Right goes into the page, Left from the
  * page's first column comes back to the category. Also runs the Veille page, which the upstream code knows nothing
  * of. The ids are looked up by name, since the app's R is not visible from this library; when the page is the
  * upstream one (no categories), nothing is done.
@@ -100,6 +100,7 @@ final class SettingsPanes {
 
     private void show(int index, boolean fade) {
         if (index == shown) return;
+        int from = shown;
         shown = index;
         for (int i = 0; i < panes.length; i++) {
             panes[i].setVisibility(i == index ? View.VISIBLE : View.GONE);
@@ -114,10 +115,17 @@ final class SettingsPanes {
             });
         }
         ViewGroup pane = panes[index];
-        if (fade) {
+        pane.animate().cancel();
+        pane.setAlpha(1f);
+        pane.setTranslationY(0);
+        if (fade && Motion.on()) {
+            // The page comes from the side the remote moved towards: from below when going down the categories.
+            float d = activity.getResources().getDisplayMetrics().density;
             pane.setAlpha(0f);
-            pane.setTranslationX(24 * activity.getResources().getDisplayMetrics().density);
-            pane.animate().alpha(1f).translationX(0).setDuration(Motion.MEDIUM).setInterpolator(Motion.ENTER).start();
+            pane.setTranslationX(0);
+            pane.setTranslationY((index > from ? 16 : -16) * d);
+            pane.animate().cancel();
+            pane.animate().alpha(1f).translationY(0).setDuration(Motion.MEDIUM).setInterpolator(Motion.ENTER).start();
         }
         optionalRows();
         wireEdges(pane, categories[index]);

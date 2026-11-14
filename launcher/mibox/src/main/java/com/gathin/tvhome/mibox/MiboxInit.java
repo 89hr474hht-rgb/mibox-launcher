@@ -136,6 +136,23 @@ public final class MiboxInit extends ContentProvider {
             if (HOME.equals(activity.getClass().getName()) && BootSplash.firstHomeOfBoot(activity)) {
                 BootSplash.show(activity, MiboxInit::promptIfHomeVisible);
             }
+            windowMotion(activity);
+        }
+
+        /**
+         * How each screen opens and closes: Réglages, the player and the screensaver preview fade in rising a
+         * little; the screens opened from a settings row come in from the right. Set on the window before it is
+         * shown, so the launcher's own theme (no window motion) stays as it is.
+         */
+        private void windowMotion(Activity activity) {
+            String name = activity.getClass().getName();
+            int style = 0;
+            if (SETTINGS.equals(name) || activity instanceof MusicActivity || activity instanceof DreamPreviewActivity) {
+                style = R.style.LoWindowPage;
+            } else if (activity instanceof UpdatesActivity || activity instanceof RemoteKeysActivity) {
+                style = R.style.LoWindowSub;
+            }
+            if (style != 0) activity.getWindow().setWindowAnimations(style);
         }
 
         @Override

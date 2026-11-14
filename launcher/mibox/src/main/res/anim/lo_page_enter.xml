@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A screen opening (Réglages, the player): fades in while rising a little, in Motion.MEDIUM. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="220" android:interpolator="@anim/lo_enter_curve" android:shareInterpolator="true">
+    <alpha android:fromAlpha="0" android:toAlpha="1" />
+    <translate android:fromYDelta="2.5%" android:toYDelta="0" />
+</set>
