@@ -461,15 +461,15 @@ disponibles à l'émulateur : ces lignes restent à valider sur la box. Système
 
 | ID | Test | Action | Attendu | Type | Résultat |
 |---|---|---|---|---|---|
-| M20-01 | Accueil | Passer d'une appli à l'autre au D-pad | La lueur change de couleur en un tiers de seconde puis reste fixe ; nom de l'appli sans reflet | MANUEL | Non testé |
-| M20-02 | Pastilles du haut | Parcourir les pastilles | Blanches au focus, sombres sinon ; le nom s'ouvre à côté de l'icône | MANUEL | Non testé |
-| M20-03 | Menus Bluetooth et réseau | Ouvrir chaque menu | Apparition courte ; appareil connecté dans un disque doré ; Retour ferme | MANUEL | Non testé |
-| M20-04 | Réglages | Parcourir toutes les catégories | Icônes au trait fin, focus blanc, coches dorées ; aucune ligne coupée | MANUEL | Non testé |
-| M20-05 | Lecteur | Hub, collection, recherche, En lecture, options | Focus visible partout ; Retour revient au hub ; aucune animation en boucle | MANUEL | Non testé |
+| M20-01 | Accueil | Passer d'une appli à l'autre au D-pad | La lueur change de couleur en un tiers de seconde puis reste fixe ; nom de l'appli sans reflet | MANUEL | Test réussi (émulateur) |
+| M20-02 | Pastilles du haut | Parcourir les pastilles | Blanches au focus, sombres sinon ; le nom s'ouvre à côté de l'icône | MANUEL | Test réussi (émulateur) |
+| M20-03 | Menus Bluetooth et réseau | Ouvrir chaque menu | Apparition courte ; appareil connecté dans un disque doré ; Retour ferme | MANUEL | Test partiel (émulateur, aucun appareil Bluetooth) |
+| M20-04 | Réglages | Parcourir toutes les catégories | Icônes au trait fin, focus blanc, coches dorées ; aucune ligne coupée | MANUEL | Test partiel (émulateur, Général et Écran d'accueil) |
+| M20-05 | Lecteur | Hub, collection, recherche, En lecture, options | Focus visible partout ; Retour revient au hub ; aucune animation en boucle | MANUEL | Test partiel (émulateur, après corrections ; recherche non testée) |
 | M20-06 | Lecteur, erreurs | Fichier illisible, fin de liste | La lecture s'arrête proprement ; l'appli reste utilisable | MANUEL | Non testé |
-| M20-07 | Télécommande illustrée | Boutons de la télécommande → changer de bouton | Le projecteur glisse vers le bouton puis tout s'arrête | MANUEL | Non testé |
-| M20-08 | Mises à jour | Vérifier sans réseau | Anneau rouge et message « GitHub ne répond pas… » | MANUEL | Non testé |
-| M20-09 | Animations coupées | Options pour les développeurs → échelles à 0 | Tout s'affiche, rien ne bouge | MANUEL | Non testé |
+| M20-07 | Télécommande illustrée | Boutons de la télécommande → changer de bouton | Le projecteur glisse vers le bouton puis tout s'arrête | MANUEL | Test réussi (émulateur) |
+| M20-08 | Mises à jour | Vérifier sans réseau | Anneau rouge et message « GitHub ne répond pas… » | MANUEL | Test réussi (émulateur, réseau coupé) |
+| M20-09 | Animations coupées | Options pour les développeurs → échelles à 0 | Tout s'affiche, rien ne bouge | MANUEL | Test réussi (émulateur, accueil et lecteur) |
 | M20-10 | Sur la box | Bluetooth (JBL), CEC, volume, SFR TV après installation | Comme avant | MANUEL | Validation manuelle nécessaire |
 
 ## C unvicies. LaunchOS TV 0.8.0 : système de design commun, stabilité, vie privée
@@ -479,15 +479,15 @@ n'est pas testé.
 
 | ID | Test | Action | Attendu | Type | Résultat |
 |---|---|---|---|---|---|
-| T08-01 | Démarrage | OK ou Retour pendant l'écran de démarrage | Il se ferme et la touche agit | MANUEL | Non testé |
-| T08-02 | Menu latéral | Ouvrir, fermer, parcourir | Rubrique choisie en corail ; Droite revient dans la page | MANUEL | Non testé |
-| T08-03 | Connexion | Se connecter, puis supprimer le compte | Pas de saisie automatique ; Supprimer demande un second OK ; tout est effacé | MANUEL | Non testé |
-| T08-04 | Accueil, Films, Séries | Haut et Bas entre les rangées, vite | Le focus suit sans se perdre | MANUEL | Non testé |
-| T08-05 | Erreurs | Couper le serveur, puis Réessayer | Message simple et bouton Réessayer qui marche | MANUEL | Non testé |
-| T08-06 | Guide TV | Parcourir, Gauche et Droite | Premier programme choisi, textes lisibles | MANUEL | Non testé |
-| T08-07 | Film et Série | Ouvrir une fiche de chaque | Même mise en page ; bande-annonce seulement si YouTube | MANUEL | Non testé |
-| T08-08 | Lecteur | Lecture, avance, épisode suivant | Comme avant | MANUEL | Non testé |
-| T08-09 | Réglages | Jauges, Vider le cache, effacer les favoris | Second OK demandé ; textes lisibles sur le focus blanc | MANUEL | Non testé |
+| T08-01 | Démarrage | OK ou Retour pendant l'écran de démarrage | Il se ferme et la touche agit | MANUEL | Test réussi (émulateur) |
+| T08-02 | Menu latéral | Ouvrir, fermer, parcourir | Rubrique choisie en corail ; Droite revient dans la page | MANUEL | Test réussi (émulateur) |
+| T08-03 | Connexion | Se connecter, puis supprimer le compte | Pas de saisie automatique ; Supprimer demande un second OK ; tout est effacé | MANUEL | Non testé (la suppression du compte n'a pas été lancée) |
+| T08-04 | Accueil, Films, Séries | Haut et Bas entre les rangées, vite | Le focus suit sans se perdre | MANUEL | Test réussi (émulateur, après correction) |
+| T08-05 | Erreurs | Couper le serveur, puis Réessayer | Message simple et bouton Réessayer qui marche | MANUEL | Test partiel (message et bouton vus ; la page se recharge seule au retour du serveur ; appui sur Réessayer non testé) |
+| T08-06 | Guide TV | Parcourir, Gauche et Droite | Premier programme choisi, textes lisibles | MANUEL | Test réussi (émulateur, après corrections) |
+| T08-07 | Film et Série | Ouvrir une fiche de chaque | Même mise en page ; bande-annonce seulement si YouTube | MANUEL | Test partiel (bande-annonce non vue) |
+| T08-08 | Lecteur | Lecture, avance, épisode suivant | Comme avant | MANUEL | Test partiel (film lu ; épisode suivant et mini-lecteur non testés ; le direct factice s'arrête à la fin de son extrait) |
+| T08-09 | Réglages | Jauges, Vider le cache, effacer les favoris | Second OK demandé ; textes lisibles sur le focus blanc | MANUEL | Test partiel (double confirmation des favoris vérifiée ; Vider le cache non testé) |
 | T08-10 | Vrai serveur | Chaînes, films, séries sur la box | Comme avant | MANUEL | Validation manuelle nécessaire |
 
 ## D. Applications
