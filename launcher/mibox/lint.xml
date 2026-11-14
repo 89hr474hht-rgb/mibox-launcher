@@ -3,4 +3,8 @@
 <lint>
     <issue id="MissingTvBanner" severity="ignore" />
     <issue id="MissingTranslation" severity="informational" />
+    <!-- The design system's floor: no text under 12 sp, sizes in sp, every visible text from resources. -->
+    <issue id="SmallSp" severity="error" />
+    <issue id="SpUsage" severity="error" />
+    <issue id="HardcodedText" severity="error" />
 </lint>
