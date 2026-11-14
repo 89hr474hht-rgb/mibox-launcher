@@ -2,7 +2,7 @@ package com.gathin.launchos.tv;
 
 /** A failed call, with a French message for the screen. It never carries the address, which holds the account. */
 final class XtreamException extends Exception {
-    enum Kind { BAD_ADDRESS, UNKNOWN_HOST, TIMEOUT, NETWORK, REFUSED, SERVER, BAD_ANSWER, AUTH, ACCOUNT_STATUS }
+    enum Kind { BAD_ADDRESS, UNKNOWN_HOST, TIMEOUT, NETWORK, REFUSED, SERVER, BAD_ANSWER, TOO_BIG, AUTH, ACCOUNT_STATUS }
 
     final Kind kind;
     final int code;
@@ -35,6 +35,8 @@ final class XtreamException extends Exception {
                 return "Le serveur a répondu avec une erreur (code " + code + ").";
             case BAD_ANSWER:
                 return "Le serveur a envoyé une réponse illisible. Ce n'est peut-être pas un serveur Xtream Codes.";
+            case TOO_BIG:
+                return "Cette liste est trop grande pour la mémoire de la box.";
             case AUTH:
                 return "Identifiant ou mot de passe refusé par le serveur.";
             case ACCOUNT_STATUS:

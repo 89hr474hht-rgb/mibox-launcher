@@ -26,12 +26,10 @@ final class TimerPill {
     }
 
     /** Adds the pill; null when the upstream layout has changed and it cannot be placed. */
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
     static TimerPill attach(Activity home) {
-        String pkg = home.getPackageName();
-        int wifiId = home.getResources().getIdentifier("btnWifi", "id", pkg);
-        int settingsId = home.getResources().getIdentifier("btnSettings", "id", pkg);
-        int styleId = home.getResources().getIdentifier("TopButton", "style", pkg);
+        int wifiId = UpstreamViews.id(home, "btnWifi");
+        int settingsId = UpstreamViews.id(home, "btnSettings");
+        int styleId = UpstreamViews.style(home, "TopButton");
         if (wifiId == 0 || settingsId == 0 || styleId == 0) return null;
         View wifi = home.findViewById(wifiId), settings = home.findViewById(settingsId);
         if (wifi == null || settings == null || !(settings.getParent() instanceof LinearLayout)) return null;

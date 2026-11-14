@@ -307,6 +307,7 @@ final class MusicLibrary {
                 if (!album.isEmpty()) albums.computeIfAbsent(parent.getPath(), k -> new java.util.HashMap<>()).merge(album, 1, Integer::sum);
             }
         } catch (RuntimeException e) {
+            Logs.failed("MusicLibrary.scan", e);
             return Collections.emptyList();   // a drive pulled out during the query, or no permission
         }
         List<Collection> out = new ArrayList<>();

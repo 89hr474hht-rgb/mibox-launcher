@@ -36,9 +36,8 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     /** The big name above the dock: heavier, glowing, and swept by a sheen when it changes. */
-    @SuppressWarnings("DiscouragedApi")
     private void attachHero(Activity home) {
-        int id = home.getResources().getIdentifier("heroName", "id", home.getPackageName());
+        int id = UpstreamViews.id(home, "heroName");
         View v = id == 0 ? null : home.findViewById(id);
         if (!(v instanceof TextView)) return;
         hero = (TextView) v;
@@ -110,10 +109,9 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
         sheen.start();
     }
 
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
     static NameHighlight attach(Activity home) {
-        int gridId = home.getResources().getIdentifier("grid", "id", home.getPackageName());
-        int nameId = home.getResources().getIdentifier("name", "id", home.getPackageName());
+        int gridId = UpstreamViews.id(home, "grid");
+        int nameId = UpstreamViews.id(home, "name");
         View grid = gridId == 0 ? null : home.findViewById(gridId);
         if (!(grid instanceof ViewGroup) || nameId == 0) return null;
         NameHighlight h = new NameHighlight(home, (ViewGroup) grid, nameId);

@@ -30,3 +30,7 @@ audits/
 *.keystore
 keystore.properties
 launcher/mibox/build/
+# Private IPTV server scripts and data: never commit.
+mibox/scripts/xtream/
+# Local editor/agent tooling state.
+.serena/

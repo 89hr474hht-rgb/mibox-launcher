@@ -144,6 +144,7 @@ final class PlayingBubble {
             try {
                 wm.addView(view, params);
             } catch (RuntimeException e) {
+                Logs.failed("PlayingBubble.show", e);
                 // Not allowed after all, or no window possible now: no bubble.
                 view = null;
                 return;

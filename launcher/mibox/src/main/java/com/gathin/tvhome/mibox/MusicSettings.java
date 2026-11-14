@@ -23,22 +23,20 @@ final class MusicSettings implements MusicLibrary.Listener {
     private final MusicLibrary library;
     private final int rowStyle, dividerStyle, hintStyle;
 
-    @SuppressWarnings("DiscouragedApi") // the app's R and styles are not visible from this library
     private MusicSettings(Activity a, Runnable rewire) {
         activity = a;
         this.rewire = rewire;
         library = MusicLibrary.get(a);
-        String pkg = a.getPackageName();
-        card = (TextView) find("miboxMusicCard");
-        bubble = (TextView) find("miboxMusicBubble");
-        bubbleHint = (TextView) find("miboxMusicBubbleHint");
-        access = (TextView) find("miboxMusicAccess");
-        accessHint = (TextView) find("miboxMusicAccessHint");
-        storage = (LinearLayout) find("miboxStorageList");
-        rowStyle = a.getResources().getIdentifier("MiboxSetRow", "style", pkg);
-        dividerStyle = a.getResources().getIdentifier("MiboxSetDivider", "style", pkg);
-        hintStyle = a.getResources().getIdentifier("MiboxSetHint", "style", pkg);
-        View open = find("miboxMusicOpen");
+        card = (TextView) UpstreamViews.find(activity, "miboxMusicCard");
+        bubble = (TextView) UpstreamViews.find(activity, "miboxMusicBubble");
+        bubbleHint = (TextView) UpstreamViews.find(activity, "miboxMusicBubbleHint");
+        access = (TextView) UpstreamViews.find(activity, "miboxMusicAccess");
+        accessHint = (TextView) UpstreamViews.find(activity, "miboxMusicAccessHint");
+        storage = (LinearLayout) UpstreamViews.find(activity, "miboxStorageList");
+        rowStyle = UpstreamViews.style(a, "MiboxSetRow");
+        dividerStyle = UpstreamViews.style(a, "MiboxSetDivider");
+        hintStyle = UpstreamViews.style(a, "MiboxSetHint");
+        View open = UpstreamViews.find(activity, "miboxMusicOpen");
         if (open != null) open.setOnClickListener(v -> a.startActivity(new Intent(a, MusicActivity.class)));
         if (card != null) card.setOnClickListener(v -> {
             MusicCard.setEnabled(a, !MusicCard.enabled(a));
@@ -52,7 +50,8 @@ final class MusicSettings implements MusicLibrary.Listener {
                 if (screen != null) {
                     try {
                         a.startActivity(screen);
-                    } catch (RuntimeException ignored) {
+                    } catch (RuntimeException e) {
+                        Logs.failed("MusicSettings.bubbleScreen", e);
                         // the box has no such screen after all: the hint says how else
                     }
                 }
@@ -71,12 +70,6 @@ final class MusicSettings implements MusicLibrary.Listener {
         MusicSettings m = new MusicSettings(a, rewire);
         if (m.storage == null || m.access == null) return null;
         return m;
-    }
-
-    @SuppressWarnings("DiscouragedApi")
-    private View find(String name) {
-        int id = activity.getResources().getIdentifier(name, "id", activity.getPackageName());
-        return id == 0 ? null : activity.findViewById(id);
     }
 
     /** The page is shown: read the storage again and listen while it is. */

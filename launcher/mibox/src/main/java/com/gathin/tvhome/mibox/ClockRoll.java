@@ -40,9 +40,8 @@ final class ClockRoll implements TextWatcher {
         this.clock = clock;
     }
 
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
     static ClockRoll attach(Activity home) {
-        int id = home.getResources().getIdentifier("clock", "id", home.getPackageName());
+        int id = UpstreamViews.id(home, "clock");
         View v = id == 0 ? null : home.findViewById(id);
         if (!(v instanceof TextView)) return null;
         ClockRoll r = new ClockRoll((TextView) v);

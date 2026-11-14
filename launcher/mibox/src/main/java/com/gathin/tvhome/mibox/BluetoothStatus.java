@@ -126,6 +126,7 @@ final class BluetoothStatus implements BluetoothProfile.ServiceListener {
         try {
             return available() && adapter.isEnabled();
         } catch (RuntimeException e) {
+            Logs.failed("BluetoothStatus.enabled", e);
             return false;
         }
     }
@@ -167,6 +168,7 @@ final class BluetoothStatus implements BluetoothProfile.ServiceListener {
             list.sort((a, b) -> name(a).compareToIgnoreCase(name(b)));
             return list;
         } catch (RuntimeException e) {
+            Logs.failed("BluetoothStatus.bonded", e);
             return Collections.emptyList();
         }
     }

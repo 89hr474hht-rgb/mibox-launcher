@@ -42,15 +42,9 @@ final class HomeExtras {
         return new HomeExtras(home);
     }
 
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
-    private static View find(Activity home, String name) {
-        int id = home.getResources().getIdentifier(name, "id", home.getPackageName());
-        return id == 0 ? null : home.findViewById(id);
-    }
-
     /** LaunchOS's settings pill shows sliders rather than the launcher's house. */
     private static void settingsIcon(Activity home) {
-        View s = find(home, "btnSettings");
+        View s = UpstreamViews.find(home, "btnSettings");
         if (s instanceof TextView) {
             ((TextView) s).setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.mibox_ic_tune, 0, 0, 0);
         }
@@ -59,7 +53,7 @@ final class HomeExtras {
     private void roundPills(Activity home) {
         List<TextView> pills = new ArrayList<>();
         for (String name : ROUND) {
-            View v = find(home, name);
+            View v = UpstreamViews.find(home, name);
             if (v instanceof TextView) pills.add((TextView) v);
         }
         if (bluetooth != null) pills.add(bluetooth.view());

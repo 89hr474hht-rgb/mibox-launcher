@@ -290,6 +290,7 @@ final class MusicPlayer {
             mp.setDataSource(app, track().uri);
             mp.prepareAsync();
         } catch (Exception e) {
+            Logs.failed("MusicPlayer.play", e);
             playing = false;
             release();
             changed();
@@ -479,12 +480,14 @@ final class MusicPlayer {
                 Lrc l = Lrc.parse(new String(b, StandardCharsets.UTF_8));
                 if (l != null) return l;
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            Logs.failed("MusicPlayer.readLyrics.lrc", e);
             // not readable: the tag inside the file is tried next
         }
         try (InputStream in = c.getContentResolver().openInputStream(t.uri)) {
             return in == null ? null : Lrc.parse(Id3Lyrics.read(new java.io.BufferedInputStream(in, 64 * 1024)));
         } catch (Exception e) {
+            Logs.failed("MusicPlayer.readLyrics.tag", e);
             return null;
         }
     }

@@ -63,6 +63,7 @@ final class UiFonts {
         try {
             return context.getResources().getFont(id);
         } catch (RuntimeException e) {
+            Logs.failed("UiFonts.get", e);
             return null;
         }
     }

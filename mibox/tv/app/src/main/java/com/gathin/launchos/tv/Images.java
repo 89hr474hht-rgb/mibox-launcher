@@ -161,6 +161,7 @@ final class Images {
         try {
             return BitmapFactory.decodeByteArray(data, 0, data.length, o);
         } catch (OutOfMemoryError e) {
+            Logs.failed("Images.decode", e);
             return null;
         }
     }

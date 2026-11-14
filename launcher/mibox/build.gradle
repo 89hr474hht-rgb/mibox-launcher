@@ -1,6 +1,6 @@
-// mibox-launcher fork: GitHub Releases updater for the Mi Box edition of the launcher.
-// Plain Java and the platform's own APIs (HttpURLConnection, org.json, JobScheduler, PackageInstaller):
-// no library, so the APK stays small on a 2 GB box.
+// mibox-launcher fork: the Mi Box edition (LaunchOS) as a library merged into the launcher's release build: updater,
+// settings panes, home screen extras, sleep screen, music player. Plain Java and the platform's own APIs, no library,
+// so the APK stays small on a 2 GB box.
 plugins {
     id 'com.android.library'
 }
@@ -27,6 +27,13 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+}
+
+// UpstreamHooksTest reads the launcher's own resources and this module's sources: rerun it when they change.
+tasks.withType(Test).configureEach {
+    inputs.dir(rootProject.file('app/src/main/res')).withPropertyName('launcherRes')
+    inputs.dir(rootProject.file('mibox/app-res')).withPropertyName('forkRes')
+    inputs.dir(file('src/main/java')).withPropertyName('libraryJava')
 }
 
 dependencies {

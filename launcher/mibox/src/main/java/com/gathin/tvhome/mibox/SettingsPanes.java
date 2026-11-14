@@ -38,16 +38,10 @@ final class SettingsPanes {
         this.activity = activity;
     }
 
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
-    private View find(String name) {
-        int id = activity.getResources().getIdentifier(name, "id", activity.getPackageName());
-        return id == 0 ? null : activity.findViewById(id);
-    }
-
     /** Once per page: sets up the columns and shows the first category. */
     static void attach(Activity activity) {
         SettingsPanes p = new SettingsPanes(activity);
-        View list = p.find("miboxCategories");
+        View list = UpstreamViews.find(activity, "miboxCategories");
         if (list == null) return;
         Object done = list.getTag();
         if (done instanceof SettingsPanes) {
@@ -57,8 +51,8 @@ final class SettingsPanes {
             return;
         }
         for (int i = 0; i < CATEGORIES.length; i++) {
-            p.categories[i] = p.find(CATEGORIES[i]);
-            View pane = p.find(PANES[i]);
+            p.categories[i] = UpstreamViews.find(activity, CATEGORIES[i]);
+            View pane = UpstreamViews.find(activity, PANES[i]);
             if (p.categories[i] == null || !(pane instanceof ViewGroup)) return;
             p.panes[i] = (ViewGroup) pane;
         }
@@ -96,7 +90,7 @@ final class SettingsPanes {
             panes[i].setVisibility(i == index ? View.VISIBLE : View.GONE);
             categories[i].setSelected(i == index);
         }
-        View scroll = find("miboxPanes");
+        View scroll = UpstreamViews.find(activity, "miboxPanes");
         if (scroll != null) scroll.scrollTo(0, 0);
         ViewGroup pane = panes[index];
         if (fade) {
@@ -173,27 +167,27 @@ final class SettingsPanes {
     private final View[] styles = new View[DreamSettings.Style.values().length];
 
     private void sleepPage() {
-        View on = find("miboxDreamChoice");
+        View on = UpstreamViews.find(activity, "miboxDreamChoice");
         if (!(on instanceof TextView)) return;
         dreamChoice = (TextView) on;
-        dreamState = (TextView) find("miboxDreamState");
-        night = (TextView) find("miboxDreamNight");
+        dreamState = (TextView) UpstreamViews.find(activity, "miboxDreamState");
+        night = (TextView) UpstreamViews.find(activity, "miboxDreamNight");
         String[] afterIds = {"miboxDreamAfter5", "miboxDreamAfter10", "miboxDreamAfter15", "miboxDreamAfter30"};
         String[] offIds = {"miboxDreamOff1", "miboxDreamOff2", "miboxDreamOff4", "miboxDreamOffNever"};
         String[] styleIds = {"miboxDreamStyleClock", "miboxDreamStyleDate", "miboxDreamStyleSmall", "miboxDreamStyleBlack"};
         for (int i = 0; i < after.length; i++) {
             int minutes = DreamSettings.START_MIN[i];
-            after[i] = find(afterIds[i]);
+            after[i] = UpstreamViews.find(activity, afterIds[i]);
             if (after[i] != null) after[i].setOnClickListener(v -> refused(DreamSettings.setStartMinutes(activity, minutes)));
         }
         for (int i = 0; i < off.length; i++) {
             int hours = DreamSettings.OFF_HOURS[i];
-            off[i] = find(offIds[i]);
+            off[i] = UpstreamViews.find(activity, offIds[i]);
             if (off[i] != null) off[i].setOnClickListener(v -> refused(DreamSettings.setOffHours(activity, hours)));
         }
         for (int i = 0; i < styles.length; i++) {
             DreamSettings.Style s = DreamSettings.Style.values()[i];
-            styles[i] = find(styleIds[i]);
+            styles[i] = UpstreamViews.find(activity, styleIds[i]);
             if (styles[i] != null) styles[i].setOnClickListener(v -> {
                 DreamSettings.setStyle(activity, s);
                 sleepStates();
@@ -204,11 +198,11 @@ final class SettingsPanes {
             DreamSettings.setNightDim(activity, !DreamSettings.nightDim(activity));
             sleepStates();
         });
-        View preview = find("miboxDreamPreview");
+        View preview = UpstreamViews.find(activity, "miboxDreamPreview");
         if (preview != null) {
             preview.setOnClickListener(v -> activity.startActivity(new Intent(activity, DreamPreviewActivity.class)));
         }
-        View system = find("miboxDreamSystem");
+        View system = UpstreamViews.find(activity, "miboxDreamSystem");
         if (system != null) system.setOnClickListener(v -> {
             try {
                 activity.startActivity(new Intent(Settings.ACTION_DREAM_SETTINGS));

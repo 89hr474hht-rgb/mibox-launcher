@@ -151,20 +151,18 @@ public final class MiboxInit extends ContentProvider {
      * settings row stays last. The launcher hides its own package from its app library, so this row and the prompt
      * are the way in. When the upstream layout changes and the anchor row is not found, nothing is added.
      */
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
     static void addSettingsRow(Activity activity) {
-        String pkg = activity.getPackageName();
         // The Mi Box settings page (mibox/app-res) has its own row and subtitle: fill those in.
-        int ownId = activity.getResources().getIdentifier("miboxUpdatesChoice", "id", pkg);
+        int ownId = UpstreamViews.id(activity, "miboxUpdatesChoice");
         View own = ownId == 0 ? null : activity.findViewById(ownId);
         if (own != null) {
             own.setOnClickListener(v -> activity.startActivity(new Intent(activity, UpdatesActivity.class)));
-            int remoteId = activity.getResources().getIdentifier("miboxRemoteChoice", "id", pkg);
+            int remoteId = UpstreamViews.id(activity, "miboxRemoteChoice");
             View remote = remoteId == 0 ? null : activity.findViewById(remoteId);
             if (remote != null) {
                 remote.setOnClickListener(v -> activity.startActivity(new Intent(activity, RemoteKeysActivity.class)));
             }
-            int subId = activity.getResources().getIdentifier("miboxSettingsSubtitle", "id", pkg);
+            int subId = UpstreamViews.id(activity, "miboxSettingsSubtitle");
             View sub = subId == 0 ? null : activity.findViewById(subId);
             if (sub instanceof TextView) {
                 ((TextView) sub).setText(activity.getString(R.string.mibox_set_subtitle, BuildConfig.MIBOX_VERSION));
@@ -172,8 +170,8 @@ public final class MiboxInit extends ContentProvider {
             SettingsPanes.attach(activity);
             return;
         }
-        int anchorId = activity.getResources().getIdentifier("tvSettingsChoice", "id", pkg);
-        int styleId = activity.getResources().getIdentifier("SettingsRow", "style", pkg);
+        int anchorId = UpstreamViews.id(activity, "tvSettingsChoice");
+        int styleId = UpstreamViews.style(activity, "SettingsRow");
         if (anchorId == 0 || styleId == 0) return;
         View anchor = activity.findViewById(anchorId);
         if (anchor == null || !(anchor.getParent() instanceof LinearLayout)) return;

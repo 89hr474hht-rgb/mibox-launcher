@@ -80,10 +80,9 @@ final class LivingGlow extends BitmapDrawable {
     }
 
     /** Puts the living glow in the home screen's "ambient" view; null when upstream's layout has no such view. */
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
     static LivingGlow attach(Activity home) {
         if (!home.getResources().getBoolean(R.bool.mibox_living_glow)) return null;
-        int id = home.getResources().getIdentifier("ambient", "id", home.getPackageName());
+        int id = UpstreamViews.id(home, "ambient");
         View ambient = id == 0 ? null : home.findViewById(id);
         if (ambient == null || ambient.getVisibility() == View.GONE) return null;   // ambient_glow is off
         LivingGlow glow = new LivingGlow(home, ambient, Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888));

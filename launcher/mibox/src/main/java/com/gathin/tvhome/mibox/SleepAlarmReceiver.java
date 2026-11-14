@@ -29,7 +29,8 @@ public final class SleepAlarmReceiver extends BroadcastReceiver {
             try {
                 context.startActivity(new Intent(context, SleepWarningActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION));
-            } catch (RuntimeException ignored) {
+            } catch (RuntimeException e) {
+                Logs.failed("SleepAlarmReceiver.open", e);
                 // Android refused to open it over the app in front: the end alarm still puts the box to sleep.
             }
         } else if (SleepTimer.ACTION_SLEEP.equals(action)) {

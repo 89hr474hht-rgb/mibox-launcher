@@ -94,6 +94,7 @@ final class Updater {
             } catch (UpdateException e) {
                 state.checked(null, e.text(app));
             } catch (RuntimeException e) {
+                Logs.failed("Updater.check", e);
                 state.checked(null, app.getString(R.string.upd_err_format));
             }
             set(Phase.IDLE, 0);

@@ -84,11 +84,9 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
     }
 
     /** Adds the card; null when the home screen no longer has the dock's name to line up with. */
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
     static MusicCard attach(Activity home) {
-        String pkg = home.getPackageName();
-        int rootId = home.getResources().getIdentifier("root", "id", pkg);
-        int heroId = home.getResources().getIdentifier("hero", "id", pkg);
+        int rootId = UpstreamViews.id(home, "root");
+        int heroId = UpstreamViews.id(home, "hero");
         if (rootId == 0 || heroId == 0) return null;
         View root = home.findViewById(rootId), hero = home.findViewById(heroId);
         if (!(root instanceof FrameLayout) || hero == null) return null;

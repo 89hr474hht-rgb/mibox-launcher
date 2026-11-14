@@ -59,9 +59,8 @@ final class NetworkPill {
     }
 
     /** Takes over the pill's OK; null when the upstream layout has changed and the pill is not found. */
-    @SuppressWarnings("DiscouragedApi") // the app's R is not visible from this library
     static NetworkPill attach(Activity home) {
-        int id = home.getResources().getIdentifier("btnWifi", "id", home.getPackageName());
+        int id = UpstreamViews.id(home, "btnWifi");
         View pill = id == 0 ? null : home.findViewById(id);
         if (pill == null) return null;
         NetworkPill p = new NetworkPill(home, pill);
@@ -134,7 +133,8 @@ final class NetworkPill {
         ConnectivityManager cm = home.getSystemService(ConnectivityManager.class);
         try {
             if (cm != null) cm.registerDefaultNetworkCallback(callback);
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException e) {
+            Logs.failed("NetworkPill.listen", e);
             // Too many callbacks for the app: the menu just stays as first read.
         }
         IntentFilter f = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);

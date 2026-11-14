@@ -63,7 +63,8 @@ public final class ShineText extends View {
         Typeface naskh = null;
         try {
             if (new File(NASKH).canRead()) naskh = Typeface.createFromFile(NASKH);
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException e) {
+            Logs.failed("ShineText.font", e);
             // the system's own Arabic fallback is used
         }
         arabic = naskh;

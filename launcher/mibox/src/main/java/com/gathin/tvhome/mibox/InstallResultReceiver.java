@@ -25,6 +25,7 @@ public final class InstallResultReceiver extends BroadcastReceiver {
                 try {
                     context.startActivity(confirm);
                 } catch (RuntimeException e) {
+                    Logs.failed("InstallResultReceiver.receive", e);
                     Updater.get().finished(context, version, false, e.getClass().getSimpleName());
                 }
                 return;

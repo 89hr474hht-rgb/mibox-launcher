@@ -22,7 +22,8 @@ public final class MusicService extends Service {
     static void start(Context c) {
         try {
             c.startForegroundService(new Intent(c, MusicService.class));
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException e) {
+            Logs.failed("MusicService.start", e);
             // Android refused a foreground start from the background: the music still plays while LaunchOS is open.
         }
     }

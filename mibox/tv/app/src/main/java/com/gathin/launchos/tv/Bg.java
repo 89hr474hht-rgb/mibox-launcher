@@ -30,7 +30,11 @@ final class Bg {
                 result = task.run();
             } catch (XtreamException e) {
                 error = e;
-            } catch (RuntimeException | OutOfMemoryError e) {   // a list too big for the box, or a panel's odd JSON
+            } catch (OutOfMemoryError e) {   // a list too big for the box
+                Logs.failed("Bg.run", e);
+                error = new XtreamException(XtreamException.Kind.TOO_BIG, 0);
+            } catch (RuntimeException e) {   // a panel's odd JSON
+                Logs.failed("Bg.run", e);
                 error = new XtreamException(XtreamException.Kind.BAD_ANSWER, 0);
             }
             T r = result;

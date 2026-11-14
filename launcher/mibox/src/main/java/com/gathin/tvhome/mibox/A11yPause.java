@@ -64,7 +64,8 @@ final class A11yPause {
             paused.addAll(removed);
             prefs(c).edit().putString(KEY_PAUSED, String.join(":", paused)).commit();
             Settings.Secure.putString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, kept);
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException e) {
+            Logs.failed("A11yPause.pause", e);
             // The settings are the system's; a refusal leaves the helpers as they were.
         }
     }
@@ -86,7 +87,8 @@ final class A11yPause {
             prefs(c).edit().remove(KEY_PAUSED).commit();
             // The warning needs RemoteKeysService to put the box to sleep; the app stays behind it.
             if (warning) restoredByWarning = true;
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException e) {
+            Logs.failed("A11yPause.resume", e);
             // Left noted: the next LaunchOS screen tries again.
         }
     }
