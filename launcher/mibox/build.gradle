@@ -38,6 +38,8 @@ tasks.withType(Test).configureEach {
     inputs.dir(rootProject.file('app/src/main/res')).withPropertyName('launcherRes')
     inputs.dir(rootProject.file('mibox/app-res')).withPropertyName('forkRes')
     inputs.dir(file('src/main/java')).withPropertyName('libraryJava')
+    // PreferenceKeysTest reads the launcher's own sources too.
+    inputs.dir(rootProject.file('app/src/main/java')).withPropertyName('launcherJava')
     // MonogramTest reads the mark's vectors in both apps.
     inputs.dir(rootProject.file('../mibox/design')).withPropertyName('designSystem')
     inputs.dir(rootProject.file('../mibox/tv/app/src/main/res/drawable')).withPropertyName('tvDrawables')

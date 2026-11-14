@@ -50,11 +50,8 @@
     <string name="mibox_screen_unavailable">This screen does not exist on this device.</string>
     <string name="mibox_bt_more">Bluetooth settings…</string>
     <string name="mibox_bt_pair_more">Pair a device…</string>
-    <string name="mibox_set_section_general">General</string>
     <string name="mibox_set_section_home">Home screen</string>
-    <string name="mibox_set_section_clock">Clock</string>
     <string name="mibox_set_section_look">Appearance</string>
-    <string name="mibox_set_section_start">Startup</string>
     <string name="mibox_set_time_format">Time format</string>
     <string name="mibox_set_subtitle">Mi Box edition · version %1$s</string>
     <string name="mibox_net_title">Network</string>
@@ -129,12 +126,9 @@
     <string name="mibox_sleep_stopped">Sleep timer stopped</string>
     <string name="mibox_sleep_failed">LaunchOS cannot put the box to sleep: turn on “LaunchOS remote buttons” in Accessibility.</string>
     <string name="mibox_set_section_sleep">Sleep</string>
-    <string name="mibox_set_hint_general">Updates, the remote\'s buttons and the device settings.</string>
-    <string name="mibox_set_hint_home">How many apps per row, rows under the dock, and the dock\'s glass.</string>
-    <string name="mibox_set_hint_clock">The clock in the top bar and on the sleep screen.</string>
+    <string name="mibox_set_hint_home">How the apps are laid out, the clock and the order of the apps.</string>
     <string name="mibox_set_hint_sleep">After a while without the remote, a clean black screen made for OLED.</string>
     <string name="mibox_set_hint_look">Wallpaper, motion and theme.</string>
-    <string name="mibox_set_hint_start">What happens when the box starts.</string>
     <string name="mibox_dream_on">LaunchOS sleep screen</string>
     <string name="mibox_dream_after">Starts after</string>
     <string name="mibox_dream_off">Then turns the TV off after</string>
@@ -150,7 +144,7 @@
     <string name="mibox_dream_system">Android screensaver settings…</string>
     <string name="mibox_dream_active">On: the box goes to it on its own.</string>
     <string name="mibox_dream_other">Off: Android uses another screensaver.</string>
-    <string name="mibox_dream_no_permission">To switch it on from here, LaunchOS needs the WRITE_SECURE_SETTINGS permission (granted once over ADB). Without it, choose LaunchOS in Android\'s screensaver settings.</string>
+    <string name="mibox_dream_no_permission">To set the screensaver from here, LaunchOS needs the WRITE_SECURE_SETTINGS permission, granted once over ADB. Otherwise, open Android\'s screensaver setting at the bottom of this page.</string>
     <string name="mibox_dream_name">LaunchOS sleep</string>
     <string name="mibox_dream_timer">Sleep in %1$d min</string>
     <string name="mibox_min_5">5 min</string>
@@ -232,4 +226,15 @@
     <string name="mibox_music_volume_usb">USB drive</string>
     <string name="mibox_music_volume_internal">Internal storage</string>
     <string name="mibox_music_volume_off">Not available</string>
+    <string name="mibox_settings_title">Settings</string>
+    <string name="mibox_set_section_system">System</string>
+    <string name="mibox_set_hint_system">Connections, the remote, start-up, updates and the device.</string>
+    <string name="mibox_set_group_layout">Layout</string>
+    <string name="mibox_set_group_clock">Clock</string>
+    <string name="mibox_set_group_apps">Apps</string>
+    <string name="mibox_set_group_connections">Connections</string>
+    <string name="mibox_set_group_remote">Remote and start-up</string>
+    <string name="mibox_set_group_device">LaunchOS and the device</string>
+    <string name="mibox_set_wifi">Wi-Fi and network</string>
+    <string name="mibox_set_bluetooth">Bluetooth</string>
 </resources>

@@ -24,11 +24,11 @@ import com.gathin.launchos.design.Motion;
  * upstream one (no categories), nothing is done.
  */
 final class SettingsPanes {
-    private static final String[] CATEGORIES = {"miboxCatGeneral", "miboxCatHome", "miboxCatClock", "miboxCatSleep",
-            "miboxCatLook", "miboxCatStart", "miboxCatMusic"};
-    private static final String[] PANES = {"miboxPaneGeneral", "miboxPaneHome", "miboxPaneClock", "miboxPaneSleep",
-            "miboxPaneLook", "miboxPaneStart", "miboxPaneMusic"};
-    private static final int SLEEP = 3, MUSIC = 6;
+    private static final String[] CATEGORIES = {"miboxCatHome", "miboxCatLook", "miboxCatSleep", "miboxCatMusic",
+            "miboxCatSystem"};
+    private static final String[] PANES = {"miboxPaneHome", "miboxPaneLook", "miboxPaneSleep", "miboxPaneMusic",
+            "miboxPaneSystem"};
+    private static final int SLEEP = 2, MUSIC = 3;
 
     private final Activity activity;
     private final View[] categories = new View[CATEGORIES.length];
@@ -59,6 +59,7 @@ final class SettingsPanes {
         if (done instanceof SettingsPanes) {
             SettingsPanes again = (SettingsPanes) done;
             again.sleepStates();
+            again.optionalRows();
             if (again.music != null && again.shown == MUSIC) again.music.shown();
             return;
         }
@@ -88,6 +89,8 @@ final class SettingsPanes {
         categories[0].setNextFocusUpId(categories[0].getId());
         categories[categories.length - 1].setNextFocusDownId(categories[categories.length - 1].getId());
         sleepPage();
+        systemPage();
+        optionalRows();
         music = MusicSettings.attach(activity, () -> {
             if (shown == MUSIC) wireEdges(panes[MUSIC], categories[MUSIC]);
         });
@@ -103,13 +106,20 @@ final class SettingsPanes {
             categories[i].setSelected(i == index);
         }
         View scroll = UpstreamViews.find(activity, "miboxPanes");
-        if (scroll != null) scroll.scrollTo(0, 0);
+        if (scroll != null) {
+            // Every page opens at its title; again after the layout pass, which may have scrolled to a focused row.
+            scroll.scrollTo(0, 0);
+            scroll.post(() -> {
+                if (!LyricsOptionsPanel.inside(activity.getCurrentFocus(), scroll)) scroll.scrollTo(0, 0);
+            });
+        }
         ViewGroup pane = panes[index];
         if (fade) {
             pane.setAlpha(0f);
             pane.setTranslationX(24 * activity.getResources().getDisplayMetrics().density);
             pane.animate().alpha(1f).translationX(0).setDuration(Motion.MEDIUM).setInterpolator(Motion.ENTER).start();
         }
+        optionalRows();
         wireEdges(pane, categories[index]);
         if (index == SLEEP) sleepStates();
         if (music != null) {
@@ -169,6 +179,44 @@ final class SettingsPanes {
             }
             if (c instanceof ViewGroup) collect((ViewGroup) c, out);
         }
+    }
+
+    // ---- Système ----
+
+    /** Wi-Fi and Bluetooth open Android's own screens, as the top bar's menus do; the settings home when absent. */
+    private void systemPage() {
+        View wifi = UpstreamViews.find(activity, "miboxWifiChoice");
+        if (wifi != null) wifi.setOnClickListener(v -> openSystem(Settings.ACTION_WIFI_SETTINGS));
+        View bt = UpstreamViews.find(activity, "miboxBluetoothChoice");
+        if (bt != null) bt.setOnClickListener(v -> openSystem(Settings.ACTION_BLUETOOTH_SETTINGS));
+    }
+
+    private void openSystem(String action) {
+        try {
+            activity.startActivity(new Intent(action));
+        } catch (ActivityNotFoundException | SecurityException e) {
+            try {
+                activity.startActivity(new Intent(Settings.ACTION_SETTINGS));
+            } catch (ActivityNotFoundException | SecurityException e2) {
+                Toast.makeText(activity, R.string.mibox_screen_unavailable, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    /**
+     * Upstream shows "Réorganiser" and "Ouvrir au démarrage" only where they apply. While one is hidden, so are the
+     * line before it and, for Réorganiser (alone in its group), the group and its title.
+     */
+    private void optionalRows() {
+        View reorder = UpstreamViews.find(activity, "reorderChoice");
+        int apps = reorder != null && reorder.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE;
+        for (String name : new String[]{"miboxAppsSection", "miboxAppsGroup"}) {
+            View v = UpstreamViews.find(activity, name);
+            if (v != null) v.setVisibility(apps);
+        }
+        View start = UpstreamViews.find(activity, "openOnStartChoice");
+        View line = UpstreamViews.find(activity, "miboxOpenOnStartLine");
+        if (line != null) line.setVisibility(start != null && start.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
     }
 
     // ---- Veille ----
@@ -247,5 +295,10 @@ final class SettingsPanes {
         DreamSettings.Style s = DreamSettings.style(activity);
         for (int i = 0; i < styles.length; i++) if (styles[i] != null) styles[i].setSelected(i == s.ordinal());
         if (night != null) night.setSelected(DreamSettings.nightDim(activity));
+        // Without WRITE_SECURE_SETTINGS (granted once over ADB) Android refuses these: they are dimmed, still
+        // focusable so the remote moves as usual, and the state line says why; Android's own screen stays at hand.
+        float a = DreamSettings.canWrite(activity) ? 1f : 0.45f;
+        dreamChoice.setAlpha(a);
+        for (View[] row : new View[][]{after, off}) for (View v : row) if (v != null) v.setAlpha(a);
     }
 }

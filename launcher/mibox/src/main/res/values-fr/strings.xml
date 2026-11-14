@@ -49,11 +49,8 @@
     <string name="mibox_screen_unavailable">Cet écran n\'existe pas sur cet appareil.</string>
     <string name="mibox_bt_more">Réglages Bluetooth…</string>
     <string name="mibox_bt_pair_more">Associer un appareil…</string>
-    <string name="mibox_set_section_general">Général</string>
     <string name="mibox_set_section_home">Écran d\'accueil</string>
-    <string name="mibox_set_section_clock">Horloge</string>
     <string name="mibox_set_section_look">Apparence</string>
-    <string name="mibox_set_section_start">Démarrage</string>
     <string name="mibox_set_time_format">Format de l\'heure</string>
     <string name="mibox_set_subtitle">Édition Mi Box · version %1$s</string>
     <string name="mibox_net_title">Réseau</string>
@@ -128,12 +125,9 @@
     <string name="mibox_sleep_stopped">Minuteur arrêté</string>
     <string name="mibox_sleep_failed">LaunchOS ne peut pas mettre la box en veille : activez « Boutons de la télécommande LaunchOS » dans Accessibilité.</string>
     <string name="mibox_set_section_sleep">Veille</string>
-    <string name="mibox_set_hint_general">Mises à jour, boutons de la télécommande et paramètres de l\'appareil.</string>
-    <string name="mibox_set_hint_home">Nombre d\'applis par ligne, lignes sous le dock et transparence du dock.</string>
-    <string name="mibox_set_hint_clock">L\'horloge de la barre du haut et de l\'écran de veille.</string>
+    <string name="mibox_set_hint_home">Disposition des applis, horloge et ordre des applis.</string>
     <string name="mibox_set_hint_sleep">Après un moment sans télécommande, un écran noir et sobre, pensé pour l\'OLED.</string>
     <string name="mibox_set_hint_look">Fond d\'écran, animations et thème.</string>
-    <string name="mibox_set_hint_start">Ce qui se passe au démarrage de la box.</string>
     <string name="mibox_dream_on">Écran de veille LaunchOS</string>
     <string name="mibox_dream_after">Démarre après</string>
     <string name="mibox_dream_off">Puis éteint la télé après</string>
@@ -149,7 +143,7 @@
     <string name="mibox_dream_system">Réglages Android de l\'économiseur…</string>
     <string name="mibox_dream_active">Activé : la box y passe toute seule.</string>
     <string name="mibox_dream_other">Désactivé : Android utilise un autre économiseur.</string>
-    <string name="mibox_dream_no_permission">Pour l\'activer d\'ici, LaunchOS a besoin de la permission WRITE_SECURE_SETTINGS (donnée une fois par ADB). Sinon, choisis LaunchOS dans les réglages Android de l\'économiseur.</string>
+    <string name="mibox_dream_no_permission">Pour régler la veille d\'ici, LaunchOS a besoin de la permission WRITE_SECURE_SETTINGS, donnée une fois par ADB. Sinon, ouvrez le réglage Android de l\'économiseur, en bas de cette page.</string>
     <string name="mibox_dream_name">Veille LaunchOS</string>
     <string name="mibox_dream_timer">Veille dans %1$d min</string>
     <string name="mibox_min_5">5 min</string>
@@ -231,4 +225,15 @@
     <string name="mibox_music_volume_usb">Clé USB</string>
     <string name="mibox_music_volume_internal">Stockage interne</string>
     <string name="mibox_music_volume_off">Indisponible</string>
+    <string name="mibox_settings_title">Réglages</string>
+    <string name="mibox_set_section_system">Système</string>
+    <string name="mibox_set_hint_system">Connexions, télécommande, démarrage, mises à jour et appareil.</string>
+    <string name="mibox_set_group_layout">Disposition</string>
+    <string name="mibox_set_group_clock">Horloge</string>
+    <string name="mibox_set_group_apps">Applis</string>
+    <string name="mibox_set_group_connections">Connexions</string>
+    <string name="mibox_set_group_remote">Télécommande et démarrage</string>
+    <string name="mibox_set_group_device">LaunchOS et appareil</string>
+    <string name="mibox_set_wifi">Wi-Fi et réseau</string>
+    <string name="mibox_set_bluetooth">Bluetooth</string>
 </resources>
