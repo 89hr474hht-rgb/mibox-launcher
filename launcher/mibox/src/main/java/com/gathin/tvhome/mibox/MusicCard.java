@@ -13,7 +13,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gathin.launchos.design.Focus;
+
 import java.util.List;
+
+import com.gathin.launchos.design.Motion;
 
 /**
  * The music card on the home screen, above the dock on the right, centred on the dock app's name on the left: the
@@ -79,8 +83,11 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
             // Left and Right stay on the card; Up goes to the top bar and Down back to the dock as usual.
             return code == KeyEvent.KEYCODE_DPAD_LEFT || code == KeyEvent.KEYCODE_DPAD_RIGHT;
         });
+        // White when focused (the card's background): the bars turn dark with the text.
+        eq.setColor(home.getColor(R.color.lo_accent));
         card.setOnFocusChangeListener((v, focused) ->
-                v.animate().scaleX(focused ? 1.05f : 1f).scaleY(focused ? 1.05f : 1f).setDuration(180).start());
+                eq.setColor(home.getColor(focused ? R.color.lo_on_focus : R.color.lo_accent)));
+        Focus.lift(card, Focus.SCALE_LARGE);
         root.getViewTreeObserver().addOnPreDrawListener(follow);
     }
 
@@ -162,10 +169,10 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
                 card.setVisibility(View.VISIBLE);
                 card.setFocusable(true);
                 card.setTranslationY(card.getHeight() * 0.15f);
-                card.animate().alpha(1f).translationY(0).setDuration(280).start();
+                card.animate().alpha(1f).translationY(0).setDuration(Motion.MEDIUM).setInterpolator(Motion.ENTER).start();
             } else {
                 card.setFocusable(false);
-                card.animate().alpha(0f).setDuration(160)
+                card.animate().alpha(0f).setDuration(Motion.SHORT)
                         .withEndAction(() -> {
                             if (!shown) card.setVisibility(View.INVISIBLE);
                         }).start();

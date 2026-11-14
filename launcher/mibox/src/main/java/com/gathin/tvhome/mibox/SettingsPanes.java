@@ -14,6 +14,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gathin.launchos.design.Motion;
+
 /**
  * The two columns of the Mi Box settings page (mibox/app-res/layout/activity_launcher_settings.xml): focusing a
  * category on the left shows its page on the right, with a short fade; Right goes into the page, Left from the
@@ -106,7 +108,7 @@ final class SettingsPanes {
         if (fade) {
             pane.setAlpha(0f);
             pane.setTranslationX(24 * activity.getResources().getDisplayMetrics().density);
-            pane.animate().alpha(1f).translationX(0).setDuration(180).start();
+            pane.animate().alpha(1f).translationX(0).setDuration(Motion.MEDIUM).setInterpolator(Motion.ENTER).start();
         }
         wireEdges(pane, categories[index]);
         if (index == SLEEP) sleepStates();

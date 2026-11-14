@@ -18,8 +18,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:textColor="#99FFFFFF"
-        android:textSize="15sp" />
+        android:textColor="@color/lo_text_2"
+        android:textSize="@dimen/lo_text_body" />
 
     <TextView
         android:id="@+id/mibox_ir_value"
@@ -30,6 +30,6 @@
         android:ellipsize="end"
         android:gravity="end"
         android:singleLine="true"
-        android:textColor="#FFFFFFFF"
-        android:textSize="15sp" />
+        android:textColor="@color/lo_text"
+        android:textSize="@dimen/lo_text_body" />
 </LinearLayout>

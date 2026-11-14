@@ -4,7 +4,7 @@
     android:id="@+id/mibox_ai_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#99000000">
+    android:background="@color/lo_surface_1">
 
     <LinearLayout
         android:id="@+id/mibox_ai_panel"
@@ -41,8 +41,8 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textColor="#FFFFFFFF"
-                    android:textSize="24sp" />
+                    android:textColor="@color/lo_text"
+                    android:textSize="@dimen/lo_text_title" />
 
                 <TextView
                     android:id="@+id/mibox_ai_package"
@@ -51,8 +51,8 @@
                     android:layout_marginTop="2dp"
                     android:ellipsize="middle"
                     android:singleLine="true"
-                    android:textColor="#73FFFFFF"
-                    android:textSize="13sp" />
+                    android:textColor="@color/lo_text_3"
+                    android:textSize="@dimen/lo_text_small" />
             </LinearLayout>
         </LinearLayout>
 
@@ -61,7 +61,7 @@
             android:layout_height="1dp"
             android:layout_marginTop="18dp"
             android:layout_marginBottom="6dp"
-            android:background="#1FFFFFFF" />
+            android:background="@color/lo_line" />
 
         <LinearLayout
             android:id="@+id/mibox_ai_rows"

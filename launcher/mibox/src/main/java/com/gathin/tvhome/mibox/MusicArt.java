@@ -5,7 +5,7 @@ import android.graphics.drawable.GradientDrawable;
 
 /**
  * The colours of a collection, since music files on a drive seldom carry a picture: each collection gets its own hue
- * from its name, always the same, for its cover (a gradient) and the player's glow. Favourites are rose.
+ * from its name, always the same, for its cover. Favourites are rose.
  */
 final class MusicArt {
     private MusicArt() {
@@ -23,21 +23,11 @@ final class MusicArt {
         return Color.HSVToColor(alpha, new float[]{hue, sat, value});
     }
 
-    /** A rounded square from a light to a deep tone of the hue. */
+    /** A rounded square in a muted, dark tone of the hue: it tells collections apart without pulling the eye. */
     static GradientDrawable cover(float hue, float radiusPx) {
-        GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{
-                color(hue, 0.50f, 0.78f, 255), color((hue + 35) % 360, 0.62f, 0.36f, 255)});
-        g.setCornerRadius(radiusPx);
-        return g;
-    }
-
-    /** The player's glow: the hue at the top left, fading to the black page. */
-    static GradientDrawable glow(float hue, float radiusPx) {
         GradientDrawable g = new GradientDrawable();
-        g.setGradientType(GradientDrawable.RADIAL_GRADIENT);
-        g.setColors(new int[]{color(hue, 0.65f, 0.42f, 150), color(hue, 0.65f, 0.25f, 50), 0x00000000});
-        g.setGradientCenter(0.18f, 0f);
-        g.setGradientRadius(Math.max(1f, radiusPx));
+        g.setColor(color(hue, 0.42f, 0.40f, 255));
+        g.setCornerRadius(radiusPx);
         return g;
     }
 }

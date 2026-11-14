@@ -14,8 +14,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -176,12 +174,12 @@ public final class AppInfoActivity extends Activity {
         if (reducedMotion()) return;
         float dp = getResources().getDisplayMetrics().density;
         root.setAlpha(0f);
-        root.animate().alpha(1f).setDuration(160).start();
+        root.animate().alpha(1f).setDuration(Motion.SHORT).start();
         panel.setScaleX(0.94f);
         panel.setScaleY(0.94f);
         panel.setTranslationY(16 * dp);
-        panel.animate().scaleX(1f).scaleY(1f).translationY(0f).setDuration(260)
-                .setInterpolator(new DecelerateInterpolator(1.8f)).start();
+        panel.animate().scaleX(1f).scaleY(1f).translationY(0f).setDuration(Motion.MEDIUM)
+                .setInterpolator(Motion.ENTER).start();
     }
 
     private void close() {
@@ -193,9 +191,9 @@ public final class AppInfoActivity extends Activity {
             return;
         }
         float dp = getResources().getDisplayMetrics().density;
-        panel.animate().scaleX(0.96f).scaleY(0.96f).translationY(10 * dp).setDuration(150)
-                .setInterpolator(new AccelerateInterpolator(1.4f)).start();
-        root.animate().alpha(0f).setDuration(160).withEndAction(() -> {
+        panel.animate().scaleX(0.96f).scaleY(0.96f).translationY(10 * dp).setDuration(Motion.SHORT)
+                .setInterpolator(Motion.MOVE).start();
+        root.animate().alpha(0f).setDuration(Motion.SHORT).withEndAction(() -> {
             finish();
             overridePendingTransition(0, 0);
         }).start();

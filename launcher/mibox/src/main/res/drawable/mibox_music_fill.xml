@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The played part of a progress line: the accent. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FFFFFFFF" />
+    <solid android:color="@color/lo_accent" />
     <corners android:radius="2dp" />
 </shape>

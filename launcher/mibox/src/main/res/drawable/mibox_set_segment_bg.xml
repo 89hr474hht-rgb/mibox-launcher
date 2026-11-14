@@ -1,23 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One choice of a segmented control: white when focused, outlined when it is the current value. -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- One choice of a segmented setting: white when focused, outlined in the accent when it is the current value. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
     <item android:state_focused="true">
-        <shape android:shape="rectangle">
-            <solid android:color="#F5FFFFFF" />
-            <corners android:radius="12dp" />
-        </shape>
+        <shape><solid android:color="@color/lo_focus" /><corners android:radius="@dimen/lo_radius_row" /></shape>
     </item>
     <item android:state_selected="true">
-        <shape android:shape="rectangle">
-            <solid android:color="#38FFFFFF" />
-            <corners android:radius="12dp" />
-            <stroke android:width="1.5dp" android:color="#8CFFFFFF" />
-        </shape>
+        <shape><solid android:color="@color/lo_surface_3" /><stroke android:width="2dp" android:color="@color/lo_accent" /><corners android:radius="@dimen/lo_radius_row" /></shape>
     </item>
     <item>
-        <shape android:shape="rectangle">
-            <solid android:color="#12FFFFFF" />
-            <corners android:radius="12dp" />
-        </shape>
+        <shape><solid android:color="@color/lo_surface_2" /><corners android:radius="@dimen/lo_radius_row" /></shape>
     </item>
 </selector>

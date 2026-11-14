@@ -12,7 +12,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -87,16 +86,14 @@ final class BluetoothPopover implements BluetoothStatus.Listener {
         if (popup.isShowing()) popup.dismiss();
     }
 
-    /** The launcher's drop-in: fade and unfold from the top edge, hanging right-aligned under the pill. */
+    /** The launcher's drop-in: a short fade down from the top edge, hanging right-aligned under the pill. */
     private void dropIn() {
         panel.setAlpha(0f);
-        panel.setPivotY(0f);
-        panel.setScaleY(0.92f);
         panel.setTranslationY(-8 * density);
         popup.showAsDropDown(anchor, 0, Math.round(10 * density), Gravity.END);
         boolean reduced = !Motion.on();
-        panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(reduced ? 0 : 220)
-                .setInterpolator(new DecelerateInterpolator(1.6f)).start();
+        panel.animate().alpha(1f).translationY(0f).setDuration(reduced ? 0 : Motion.MEDIUM)
+                .setInterpolator(Motion.ENTER).start();
         View first = rows.getChildCount() > 0 ? rows.getChildAt(0) : null;
         if (first != null && first.isFocusable()) first.requestFocus();
         else panel.findViewById(R.id.mibox_bt_actions).requestFocus();
@@ -120,8 +117,9 @@ final class BluetoothPopover implements BluetoothStatus.Listener {
         if (on.isEmpty()) {
             TextView none = new TextView(home);
             none.setText(R.string.mibox_bt_none);
-            none.setTextColor(0x73FFFFFF);
-            none.setTextSize(13);
+            none.setTextColor(home.getColor(R.color.lo_text_3));
+            none.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                    home.getResources().getDimension(R.dimen.lo_text_small));
             if (body != null) none.setTypeface(body);
             int pad = Math.round(12 * density);
             none.setPadding(pad, pad / 2, pad, pad / 2);
@@ -144,7 +142,10 @@ final class BluetoothPopover implements BluetoothStatus.Listener {
         View row = LayoutInflater.from(home).inflate(R.layout.mibox_item_bt_row, parent, false);
         row.findViewById(R.id.mibox_bt_disc).setBackgroundResource(
                 connected ? R.drawable.mibox_bt_circle_on : R.drawable.mibox_bt_circle_off);
-        ((ImageView) row.findViewById(R.id.mibox_bt_icon)).setImageResource(icon);
+        ImageView glyph = row.findViewById(R.id.mibox_bt_icon);
+        glyph.setImageResource(icon);
+        glyph.setImageTintList(android.content.res.ColorStateList.valueOf(
+                home.getColor(connected ? R.color.lo_on_accent : R.color.lo_text)));
         TextView title = row.findViewById(R.id.mibox_bt_name);
         title.setText(name);
         if (medium != null) title.setTypeface(medium);

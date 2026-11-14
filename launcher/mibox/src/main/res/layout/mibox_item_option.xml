@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="52dp"
-    android:background="@drawable/mibox_music_row_bg"
+    android:background="@drawable/lo_focus_row"
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
@@ -17,8 +17,8 @@
         android:layout_weight="1"
         android:duplicateParentState="true"
         android:singleLine="true"
-        android:textColor="#E6FFFFFF"
-        android:textSize="16sp" />
+        android:textColor="@color/lo_text"
+        android:textSize="@dimen/lo_text_body" />
 
     <TextView
         android:id="@+id/option_value"
@@ -27,6 +27,6 @@
         android:layout_marginStart="12dp"
         android:duplicateParentState="true"
         android:singleLine="true"
-        android:textColor="#FFF2C879"
-        android:textSize="15sp" />
+        android:textColor="@color/lo_accent"
+        android:textSize="@dimen/lo_text_body" />
 </LinearLayout>

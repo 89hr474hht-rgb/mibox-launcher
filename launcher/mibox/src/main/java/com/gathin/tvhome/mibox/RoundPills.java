@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import java.util.List;
@@ -72,7 +71,7 @@ final class RoundPills {
             boolean reduced = !Motion.on();
             anim = ValueAnimator.ofFloat(0f, 1f);
             anim.setDuration(reduced ? 0 : target > 0 ? OPEN_MS : CLOSE_MS);
-            anim.setInterpolator(new DecelerateInterpolator(1.5f));
+            anim.setInterpolator(Motion.MOVE);
             anim.addUpdateListener(a -> {
                 float f = (float) a.getAnimatedValue();
                 apply(start + (target - start) * f, Math.round(from + (to - from) * f));

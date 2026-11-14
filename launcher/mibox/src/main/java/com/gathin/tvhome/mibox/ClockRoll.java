@@ -15,9 +15,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
-import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
 import com.gathin.launchos.design.Motion;
@@ -156,7 +154,7 @@ final class ClockRoll implements TextWatcher {
         final ForegroundColorSpan[] hidden;
         final int[] order;       // stagger rank of each changed index, rightmost first
         final TextPaint paint;
-        final Interpolator in = new OvershootInterpolator(1.3f), out = new DecelerateInterpolator(1.4f);
+        final Interpolator in = Motion.ENTER, out = Motion.MOVE;
         float ms;
 
         Roll(String old, float[] oldX, String now, float[] newX, boolean[] changed, ForegroundColorSpan[] hidden) {

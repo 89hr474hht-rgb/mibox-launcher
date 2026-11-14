@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Long texts are focusable so the D-pad can scroll the page down to them; this shows where focus is. -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- A text link on the updates page: white when focused. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
     <item android:state_focused="true">
-        <shape android:shape="rectangle">
-            <solid android:color="#22FFFFFF" />
-            <corners android:radius="10dp" />
-        </shape>
+        <shape><solid android:color="@color/lo_focus" /><corners android:radius="@dimen/lo_radius_row" /></shape>
     </item>
     <item android:drawable="@android:color/transparent" />
 </selector>

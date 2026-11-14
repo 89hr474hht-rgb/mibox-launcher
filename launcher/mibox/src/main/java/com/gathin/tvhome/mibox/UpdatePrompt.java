@@ -10,8 +10,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
 import com.gathin.launchos.design.Motion;
@@ -83,21 +81,8 @@ final class UpdatePrompt extends Dialog {
     private void enter(float dp) {
         if (still()) return;
         card.setAlpha(0f);
-        card.setTranslationX(70 * dp);
-        card.setScaleX(0.94f);
-        card.setScaleY(0.94f);
-        card.animate().alpha(1f).translationX(0f).scaleX(1f).scaleY(1f).setDuration(520)
-                .setInterpolator(new OvershootInterpolator(1.15f)).start();
-        View logo = findViewById(R.id.mibox_prompt_logo);
-        logo.setScaleX(0.4f);
-        logo.setScaleY(0.4f);
-        logo.setRotation(-25f);
-        logo.animate().scaleX(1f).scaleY(1f).rotation(0f).setStartDelay(220).setDuration(560)
-                .setInterpolator(new OvershootInterpolator(2.4f))
-                .withEndAction(() -> logo.animate().rotation(-8f).setDuration(120).withEndAction(() ->
-                        logo.animate().rotation(0f).setDuration(260).setInterpolator(new OvershootInterpolator(3f)).start())
-                        .start())
-                .start();
+        card.setTranslationX(24 * dp);
+        card.animate().alpha(1f).translationX(0f).setDuration(Motion.LONG).setInterpolator(Motion.ENTER).start();
     }
 
     /** Slides the card out to the right, then closes; then runs next, if any. */
@@ -110,8 +95,8 @@ final class UpdatePrompt extends Dialog {
             return;
         }
         float dp = getContext().getResources().getDisplayMetrics().density;
-        card.animate().alpha(0f).translationX(60 * dp).scaleX(0.96f).scaleY(0.96f).setStartDelay(0).setDuration(240)
-                .setInterpolator(new AccelerateInterpolator(1.5f)).withEndAction(() -> {
+        card.animate().alpha(0f).translationX(24 * dp).setStartDelay(0).setDuration(Motion.MEDIUM)
+                .setInterpolator(Motion.MOVE).withEndAction(() -> {
                     if (isShowing()) dismiss();
                     if (next != null) next.run();
                 }).start();

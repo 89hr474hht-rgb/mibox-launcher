@@ -26,10 +26,10 @@
     <string name="mibox_updated_toast">LaunchOS mis à jour : version %1$s</string>
     <string name="mibox_permission_open">Ouvrir les réglages</string>
     <string name="mibox_permission_no_screen">Ce téléviseur n\'a pas d\'écran pour ce réglage. Accordez-le une fois depuis un ordinateur : adb shell appops set com.gathin.tvhome REQUEST_INSTALL_PACKAGES allow</string>
-    <string name="mibox_err_network">Impossible de joindre GitHub (%1$s).</string>
-    <string name="mibox_err_http">GitHub a répondu %1$d.</string>
+    <string name="mibox_err_network">GitHub ne répond pas. Vérifiez la connexion de la box, puis réessayez.</string>
+    <string name="mibox_err_http">GitHub n\'a pas répondu comme prévu (code %1$d). Réessayez plus tard.</string>
     <string name="mibox_err_rate">Trop de vérifications : GitHub en autorise 60 par heure. Réessayez plus tard.</string>
-    <string name="mibox_err_format">Réponse de GitHub illisible.</string>
+    <string name="mibox_err_format">La réponse de GitHub est illisible. Réessayez plus tard.</string>
     <string name="mibox_err_space">Espace insuffisant : %1$d Mo nécessaires.</string>
     <string name="mibox_err_size">Le fichier n\'a pas la taille annoncée.</string>
     <string name="mibox_err_checksum">L\'empreinte SHA-256 ne correspond pas : fichier refusé.</string>
@@ -91,7 +91,7 @@
     <string name="mibox_state_download">Téléchargement…</string>
     <string name="mibox_state_verify">Vérification…</string>
     <string name="mibox_state_wait">Confirmez l\'installation</string>
-    <string name="mibox_state_error">La vérification a échoué</string>
+    <string name="mibox_state_error">La dernière vérification n\'a pas abouti</string>
     <string name="mibox_available_card">LaunchOS %1$s · %2$d Ko</string>
     <string name="mibox_about_kicker">À propos</string>
     <string name="mibox_about_title">Des mises à jour vérifiées</string>

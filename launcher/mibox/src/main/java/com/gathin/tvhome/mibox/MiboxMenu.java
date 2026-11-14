@@ -12,7 +12,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -91,16 +90,14 @@ final class MiboxMenu {
         if (popup.isShowing()) popup.dismiss();
     }
 
-    /** The launcher's drop-in: fade and unfold from the top edge, hanging right-aligned under the pill. */
+    /** The launcher's drop-in: a short fade down from the top edge, hanging right-aligned under the pill. */
     void show() {
         panel.setAlpha(0f);
-        panel.setPivotY(0f);
-        panel.setScaleY(0.92f);
         panel.setTranslationY(-8 * density);
         popup.showAsDropDown(anchor, 0, Math.round(10 * density), Gravity.END);
         boolean reduced = !Motion.on();
-        panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(reduced ? 0 : 220)
-                .setInterpolator(new DecelerateInterpolator(1.6f)).start();
+        panel.animate().alpha(1f).translationY(0f).setDuration(reduced ? 0 : Motion.MEDIUM)
+                .setInterpolator(Motion.ENTER).start();
         if (actions.getChildCount() > 0) actions.getChildAt(0).requestFocus();
     }
 
@@ -123,7 +120,10 @@ final class MiboxMenu {
         View row = LayoutInflater.from(home).inflate(R.layout.mibox_item_bt_row, parent, false);
         row.findViewById(R.id.mibox_bt_disc).setBackgroundResource(
                 good ? R.drawable.mibox_bt_circle_on : R.drawable.mibox_bt_circle_off);
-        ((ImageView) row.findViewById(R.id.mibox_bt_icon)).setImageResource(icon);
+        ImageView glyph = row.findViewById(R.id.mibox_bt_icon);
+        glyph.setImageResource(icon);
+        glyph.setImageTintList(android.content.res.ColorStateList.valueOf(
+                home.getColor(good ? R.color.lo_on_accent : R.color.lo_text)));
         TextView title = row.findViewById(R.id.mibox_bt_name);
         title.setText(name);
         if (medium != null) title.setTypeface(medium);

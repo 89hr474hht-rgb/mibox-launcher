@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Settings row icon: a white reorder glyph in a coloured rounded square. -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:width="32dp" android:height="32dp">
-        <shape android:shape="rectangle">
-            <solid android:color="#FF5E5CE6" />
-            <corners android:radius="9dp" />
-        </shape>
-    </item>
-    <item android:width="20dp" android:height="20dp" android:gravity="center"
-        android:drawable="@drawable/mibox_sym_reorder" />
-</layer-list>
+<!-- Settings icon (reorder): a thin line, tinted by the row (white, dark when focused). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M7,4v16M3.5,16.5l3.5,3.5l3.5,-3.5M14,6h7M14,11h5M14,16h3" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+</vector>

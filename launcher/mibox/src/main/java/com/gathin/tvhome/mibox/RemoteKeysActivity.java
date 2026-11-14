@@ -13,7 +13,6 @@ import android.provider.Settings;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -184,7 +183,7 @@ public final class RemoteKeysActivity extends Activity {
         texts.setPadding(px(16), 0, 0, 0);
         if (selected) {
             ImageView tick = new ImageView(this);
-            tick.setImageResource(R.drawable.mibox_check_green);
+            tick.setImageResource(R.drawable.mibox_check_on);
             row.addView(tick, new LinearLayout.LayoutParams(px(28), px(28)));
         }
         row.setOnClickListener(v -> {
@@ -209,7 +208,7 @@ public final class RemoteKeysActivity extends Activity {
                 // The new choice lands with a small flash of its row.
                 r.setScaleX(0.97f);
                 r.setScaleY(0.97f);
-                r.animate().scaleX(1f).scaleY(1f).setDuration(320).setInterpolator(new DecelerateInterpolator(2f)).start();
+                r.animate().scaleX(1f).scaleY(1f).setDuration(Motion.MEDIUM).setInterpolator(Motion.ENTER).start();
             }
         }
     }
@@ -256,7 +255,7 @@ public final class RemoteKeysActivity extends Activity {
         t.setText(name);
         t.setTextSize(18);
         t.setSingleLine(true);
-        t.setTextColor(getColorStateList(R.color.mibox_row_text));
+        t.setTextColor(getColorStateList(R.color.lo_text_on_focus));
         t.setDuplicateParentStateEnabled(true);
         if (semibold != null) t.setTypeface(semibold);
         box.addView(t);
@@ -266,7 +265,7 @@ public final class RemoteKeysActivity extends Activity {
             s.setText(sub);
             s.setTextSize(14);
             s.setSingleLine(true);
-            s.setTextColor(getColorStateList(R.color.mibox_row_text_dim));
+            s.setTextColor(getColorStateList(R.color.lo_text_2_on_focus));
             s.setDuplicateParentStateEnabled(true);
             if (regular != null) s.setTypeface(regular);
             box.addView(s);
@@ -277,10 +276,10 @@ public final class RemoteKeysActivity extends Activity {
 
     private void swapTexts(String head, String sub) {
         title.animate().cancel();
-        title.animate().alpha(0f).setDuration(120).withEndAction(() -> {
+        title.animate().alpha(0f).setDuration(Motion.SHORT).withEndAction(() -> {
             title.setText(head);
             subtitle.setText(sub);
-            title.animate().alpha(1f).setDuration(200).start();
+            title.animate().alpha(1f).setDuration(Motion.MEDIUM).start();
         }).start();
     }
 
@@ -292,7 +291,7 @@ public final class RemoteKeysActivity extends Activity {
             return;
         }
         float d = 50 * dp * (forward ? 1 : -1);
-        out.animate().alpha(0f).translationX(-d).setDuration(180).withEndAction(() -> {
+        out.animate().alpha(0f).translationX(-d).setDuration(Motion.SHORT).withEndAction(() -> {
             out.setVisibility(View.GONE);
             out.setTranslationX(0f);
             out.setAlpha(1f);
@@ -300,8 +299,8 @@ public final class RemoteKeysActivity extends Activity {
         in.setVisibility(View.VISIBLE);
         in.setAlpha(0f);
         in.setTranslationX(d);
-        in.animate().alpha(1f).translationX(0f).setStartDelay(90).setDuration(300)
-                .setInterpolator(new DecelerateInterpolator(2f)).start();
+        in.animate().alpha(1f).translationX(0f).setStartDelay(60).setDuration(Motion.MEDIUM)
+                .setInterpolator(Motion.ENTER).start();
     }
 
     private void enterSide() {
@@ -309,8 +308,8 @@ public final class RemoteKeysActivity extends Activity {
         View side = findViewById(R.id.mibox_rk_side);
         side.setAlpha(0f);
         side.setTranslationX(36 * dp);
-        side.animate().alpha(1f).translationX(0f).setStartDelay(150).setDuration(480)
-                .setInterpolator(new DecelerateInterpolator(2f)).start();
+        side.animate().alpha(1f).translationX(0f).setStartDelay(120).setDuration(Motion.LONG)
+                .setInterpolator(Motion.ENTER).start();
     }
 
     private boolean still() {

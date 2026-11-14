@@ -6,9 +6,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.gathin.launchos.design.Motion;
 
 /**
  * The sleep timer's last minute, opened over whatever is playing: a chip at the top counts down, and the screen asks
@@ -44,12 +45,12 @@ public final class SleepWarningActivity extends Activity {
         View chip = findViewById(R.id.mibox_sleep_chip);
         float d = getResources().getDisplayMetrics().density;
         root.setAlpha(0f);
-        root.animate().alpha(1f).setDuration(260).start();
+        root.animate().alpha(1f).setDuration(Motion.MEDIUM).start();
         panel.setScaleX(0.94f);
         panel.setScaleY(0.94f);
-        panel.animate().scaleX(1f).scaleY(1f).setDuration(320).setInterpolator(new DecelerateInterpolator(1.6f)).start();
+        panel.animate().scaleX(1f).scaleY(1f).setDuration(Motion.LONG).setInterpolator(Motion.ENTER).start();
         chip.setTranslationY(-40 * d);
-        chip.animate().translationY(0f).setDuration(360).setInterpolator(new DecelerateInterpolator(1.6f)).start();
+        chip.animate().translationY(0f).setDuration(Motion.LONG).setInterpolator(Motion.ENTER).start();
     }
 
     @Override
@@ -92,7 +93,7 @@ public final class SleepWarningActivity extends Activity {
     private void close() {
         handler.removeCallbacks(tick);
         View root = findViewById(R.id.mibox_sleep_root);
-        root.animate().alpha(0f).setDuration(200).withEndAction(this::finish).start();
+        root.animate().alpha(0f).setDuration(Motion.MEDIUM).withEndAction(this::finish).start();
     }
 
     @Override

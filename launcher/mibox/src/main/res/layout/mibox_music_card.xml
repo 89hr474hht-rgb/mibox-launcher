@@ -43,11 +43,10 @@
                 android:id="@+id/card_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:letterSpacing="0.12"
                 android:singleLine="true"
-                android:textAllCaps="true"
-                android:textColor="#8CFFFFFF"
-                android:textSize="11sp" />
+                android:textColor="@color/lo_text_2_on_focus"
+                android:duplicateParentState="true"
+                android:textSize="@dimen/lo_text_small" />
 
             <TextView
                 android:id="@+id/card_title"
@@ -56,8 +55,9 @@
                 android:layout_marginTop="1dp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="#FFFFFFFF"
-                android:textSize="16sp" />
+                android:textColor="@color/lo_text_on_focus"
+                android:duplicateParentState="true"
+                android:textSize="@dimen/lo_text_body" />
 
             <TextView
                 android:id="@+id/card_line"
@@ -66,9 +66,10 @@
                 android:layout_marginTop="1dp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="#B3FFFFFF"
+                android:textColor="@color/lo_text_2_on_focus"
+                android:duplicateParentState="true"
                 android:textDirection="firstStrongLtr"
-                android:textSize="13sp" />
+                android:textSize="@dimen/lo_text_small" />
         </LinearLayout>
 
         <ImageView
@@ -77,10 +78,11 @@
             android:layout_height="36dp"
             android:layout_marginStart="12dp"
             android:background="@drawable/mibox_music_state_bg"
+            android:duplicateParentState="true"
             android:importantForAccessibility="no"
             android:padding="9dp"
             android:src="@drawable/mibox_ic_play"
-            android:tint="#FFFFFFFF" />
+            android:tint="@color/lo_icon_on_focus" />
     </LinearLayout>
 
     <FrameLayout
@@ -90,7 +92,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="11dp"
         android:layout_marginEnd="0dp"
-        android:background="@drawable/mibox_music_track">
+        android:background="@drawable/lo_track">
 
         <View
             android:id="@+id/card_fill"

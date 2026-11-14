@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- mibox-launcher: the top bar's pills in LaunchOS's design system (mibox/design): white when focused, a flat
+     dark surface otherwise, outlined in the accent while reorder mode is on. Replaces upstream's glass gradient. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/lo_focus" />
+            <corners android:radius="21dp" />
+        </shape>
+    </item>
+    <item android:state_activated="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/lo_surface_3" />
+            <stroke android:width="2dp" android:color="@color/lo_accent" />
+            <corners android:radius="21dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/lo_surface_2" />
+            <corners android:radius="21dp" />
+        </shape>
+    </item>
+</selector>

@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="46dp"
-    android:background="@drawable/mibox_row_bg"
+    android:background="@drawable/lo_focus_row"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
@@ -35,8 +35,8 @@
         android:duplicateParentState="true"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/mibox_row_text"
-        android:textSize="15sp" />
+        android:textColor="@color/lo_text_on_focus"
+        android:textSize="@dimen/lo_text_body" />
 
     <View
         android:id="@+id/mibox_bt_dot"
@@ -51,6 +51,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:duplicateParentState="true"
-        android:textColor="@color/mibox_row_text_dim"
-        android:textSize="11sp" />
+        android:textColor="@color/lo_text_2_on_focus"
+        android:textSize="@dimen/lo_text_small" />
 </LinearLayout>

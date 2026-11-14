@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The seek bar's frame: a faint pill while it has the focus (Left and Right then move through the track). -->
+<!-- The seek bar's frame: a dark pill while it has the focus (the bar also thickens; Left and Right then seek). -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
     <item android:state_focused="true">
-        <shape><solid android:color="#14FFFFFF" /><corners android:radius="14dp" /></shape>
+        <shape><solid android:color="@color/lo_surface_3" /><corners android:radius="@dimen/lo_radius_pill" /></shape>
     </item>
     <item android:drawable="@android:color/transparent" />
 </selector>

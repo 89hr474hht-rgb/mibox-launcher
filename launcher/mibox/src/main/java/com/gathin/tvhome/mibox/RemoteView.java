@@ -2,7 +2,6 @@ package com.gathin.tvhome.mibox;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
@@ -11,7 +10,6 @@ import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.SweepGradient;
 import android.graphics.Typeface;
 import android.os.SystemClock;
 import android.view.View;
@@ -22,11 +20,10 @@ import com.gathin.launchos.design.Motion;
  * The Mi Box S (2nd gen) remote, drawn after Xiaomi's own picture of it (a 200 x 580 grid scaled to the view): power,
  * the Assistant button, the round D-pad, TV+, Back and Home, the four white app buttons and the volume rocker.
  *
- * <p>The still parts are drawn once into a bitmap; each frame adds the moving ones. The remote rises and tilts up
- * into place, its app buttons pop in one by one, then it floats and sways slightly while a light runs down its body.
- * The button being set lifts, glows in its colour behind a soft spotlight that glides from button to button, with a
- * light running round its edge and ripples; choosing an app presses it and sends waves out of the remote's top.
- * Nothing moves when Android's animations are off.
+ * <p>The still parts are drawn once into a bitmap. The remote fades in, then stands still. The button being set is
+ * lifted and outlined in its colour behind a soft spotlight, which glides to it when the selection changes; choosing
+ * an app presses it once and sends a short signal out of the remote's top. The view redraws only while one of those
+ * settles, and nothing moves when Android's animations are off.
  */
 final class RemoteView extends View {
     static final float VW = 200, VH = 580;
@@ -39,12 +36,10 @@ final class RemoteView extends View {
     private final Pill pill;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG), stroke = new Paint(Paint.ANTI_ALIAS_FLAG),
             image = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-    private final Paint vignette = new Paint(Paint.ANTI_ALIAS_FLAG), sheen = new Paint(Paint.ANTI_ALIAS_FLAG),
-            halo = new Paint(Paint.ANTI_ALIAS_FLAG), ring = new Paint(Paint.ANTI_ALIAS_FLAG),
-            shadow = new Paint(Paint.ANTI_ALIAS_FLAG), rings = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint vignette = new Paint(Paint.ANTI_ALIAS_FLAG), halo = new Paint(Paint.ANTI_ALIAS_FLAG),
+            shadow = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF tmp = new RectF(), body = new RectF(BL, BT, BR, BB), grid = new RectF(0, 0, VW, VH);
-    private final Matrix local = new Matrix(), tilt = new Matrix();
-    private final Camera camera = new Camera();
+    private final Matrix local = new Matrix();
     private final boolean still;
     private final long born = SystemClock.uptimeMillis();
     private final float[] lift = new float[4];
@@ -61,15 +56,10 @@ final class RemoteView extends View {
         stroke.setStyle(Paint.Style.STROKE);
         stroke.setStrokeCap(Paint.Cap.ROUND);
         stroke.setStrokeJoin(Paint.Join.ROUND);
-        ring.setStyle(Paint.Style.STROKE);
-        rings.setStyle(Paint.Style.STROKE);
         // Unit shaders, placed with a local matrix each frame.
         vignette.setShader(new RadialGradient(0, 0, 1, new int[]{0, 0, 0x8C000000}, new float[]{0, 0.3f, 1},
                 Shader.TileMode.CLAMP));
-        sheen.setShader(new LinearGradient(0, -1, 0, 1, new int[]{0, 0x1CFFFFFF, 0x30FFFFFF, 0x1CFFFFFF, 0},
-                new float[]{0, 0.35f, 0.5f, 0.65f, 1}, Shader.TileMode.CLAMP));
         shadow.setShader(new RadialGradient(0, 0, 1, 0x66000000, 0, Shader.TileMode.CLAMP));
-        camera.setLocation(0, 0, -24);
     }
 
     /** Highlights the button for this key code (0 for none). */
@@ -80,8 +70,6 @@ final class RemoteView extends View {
         if (i >= 0) {
             halo.setShader(new RadialGradient(0, 0, 1, new int[]{withAlpha(GLOW[i], 0.75f), withAlpha(GLOW[i], 0.22f), 0},
                     new float[]{0, 0.45f, 1}, Shader.TileMode.CLAMP));
-            ring.setShader(new SweepGradient(0, 0, new int[]{0, 0, withAlpha(GLOW[i], 0.9f), 0xFFFFFFFF, 0},
-                    new float[]{0, 0.45f, 0.82f, 0.92f, 1}));
             if (still) {
                 spotX = KX[i];
                 spotY = KY[i];
@@ -271,23 +259,14 @@ final class RemoteView extends View {
         long now = SystemClock.uptimeMillis();
         float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
         lastFrame = now;
-        float t = still ? 0 : (now - born) / 1000f;
-        float enter = still ? 1f : Math.min(1f, (now - born) / 900f);
-        float e = 1 - (float) Math.pow(1 - enter, 3);
+        float enter = still ? 1f : Math.min(1f, (now - born) / (float) Motion.LONG);
+        float e = Motion.ENTER.getInterpolation(enter);
         int sel = index(selected);
+        boolean moving = enter < 1f;
 
-        // Waves behind the remote, like Xiaomi's picture of it.
         float cx = getWidth() / 2f, cy = getHeight() / 2f;
-        for (int i = 0; i < 4 && !still; i++) {
-            float f = ((t / 9f) + i / 4f) % 1f;
-            rings.setStrokeWidth(1.5f * scale);
-            rings.setColor(withAlpha(0xFF5A86C8, 0.16f * e * (float) Math.sin(Math.PI * f)));
-            c.drawCircle(cx, cy - 60 * scale, (60 + 190 * f) * scale, rings);
-        }
-
-        float floatY = still ? 0 : (float) Math.sin(t * 1.1f) * 4f;
-        // The shadow on the "floor", smaller as the remote floats up.
-        local.setScale(70 * scale * (1 - floatY / 60f), 9 * scale);
+        // The shadow on the "floor".
+        local.setScale(70 * scale, 9 * scale);
         local.postTranslate(cx, cy + (VH / 2 - 6) * scale);
         shadow.getShader().setLocalMatrix(local);
         shadow.setAlpha(Math.round(255 * e));
@@ -299,44 +278,30 @@ final class RemoteView extends View {
         if (sel >= 0) {
             spotX += (KX[sel] - spotX) * k;
             spotY += (KY[sel] - spotY) * k;
+            moving |= Math.abs(KX[sel] - spotX) > 0.3f || Math.abs(KY[sel] - spotY) > 0.3f;
         }
-        spotOn += ((sel >= 0 ? 1f : 0f) - spotOn) * (still ? 1 : Math.min(1f, dt * 6f));
+        float spotTo = sel >= 0 ? 1f : 0f;
+        spotOn += (spotTo - spotOn) * (still ? 1 : Math.min(1f, dt * 6f));
+        moving |= Math.abs(spotTo - spotOn) > 0.01f;
         boolean sending = pressedAt > 0 && now - pressedAt < 1100;
         float zoomTo = sel < 0 || sending ? 1f : picking ? 1.3f : 1.14f;
         zoom += (zoomTo - zoom) * (still ? 1 : Math.min(1f, dt * 4.5f));
+        moving |= Math.abs(zoomTo - zoom) > 0.002f;
         c.save();
-        c.translate(cx, cy + (1 - e) * 70 * scale);
-        camera.save();
-        camera.rotateX((1 - e) * 24f + (still ? 0 : (float) Math.sin(t * 0.7f) * 1.2f));
-        camera.rotateY(still ? 0 : (float) Math.sin(t * 0.45f) * 3.5f);
-        camera.getMatrix(tilt);
-        camera.restore();
-        c.concat(tilt);
+        c.translate(cx, cy + (1 - e) * 16 * scale);
         c.scale(scale, scale);
-        c.translate(-VW / 2, -VH / 2 + floatY);
+        c.translate(-VW / 2, -VH / 2);
         c.scale(zoom, zoom, spotX, spotY);
         int alpha = Math.round(255 * e);
         image.setAlpha(alpha);
         c.drawBitmap(still2d, null, grid, image);
 
-        // A light running down the body every seven seconds.
-        float sweep = still ? -1 : (t % 7f) / 1.8f;
-        if (sweep >= 0 && sweep <= 1) {
-            local.setScale(1, 70);
-            local.postRotate(-18);
-            local.postTranslate(100, BT - 80 + sweep * (BB - BT + 160));
-            sheen.getShader().setLocalMatrix(local);
-            sheen.setAlpha(alpha);
-            c.drawRoundRect(body, BRAD, BRAD, sheen);
-        }
-
-        // The Assistant's voice arcs, breathing.
-        float voice = still ? 1 : 0.55f + 0.45f * (float) Math.sin(t * 2.2f);
+        // The Assistant's voice arcs.
         stroke.setShader(null);
         stroke.setStrokeWidth(1.4f);
         for (int i = 0; i < 2; i++) {
             float r = 17.5f + i * 3.6f;
-            stroke.setColor(withAlpha(0xFF4C83FF, e * (i == 0 ? 0.95f : 0.55f) * voice));
+            stroke.setColor(withAlpha(0xFF4C83FF, e * (i == 0 ? 0.95f : 0.55f)));
             tmp.set(100 - r, 88 - r, 100 + r, 88 + r);
             c.drawArc(tmp, -40, 80, false, stroke);
             c.drawArc(tmp, 140, 80, false, stroke);
@@ -350,8 +315,7 @@ final class RemoteView extends View {
             vignette.setAlpha(Math.round(alpha * spotOn));
             c.drawRoundRect(body, BRAD, BRAD, vignette);
             if (halo.getShader() != null) {
-                float pulse = still ? 1 : 0.8f + 0.2f * (float) Math.sin(t * 3.6f);
-                local.setScale(52 * pulse, 40 * pulse);
+                local.setScale(52, 40);
                 local.postTranslate(spotX, spotY);
                 halo.getShader().setLocalMatrix(local);
                 halo.setAlpha(Math.round(alpha * spotOn));
@@ -360,22 +324,21 @@ final class RemoteView extends View {
             }
         }
 
-        // The four app buttons: popping in, the selected one lifted, ringed and rippling.
+        // The four app buttons, the selected one lifted and outlined.
         for (int i = 0; i < 4; i++) {
-            float pop = still ? 1f : clamp((now - born - 450 - i * 90) / 420f);
-            if (pop <= 0) continue;
-            float s = 0.6f + 0.4f * back(pop);
-            lift[i] += ((i == sel ? 1f : 0f) - lift[i]) * (still ? 1 : Math.min(1f, dt * 10f));
-            s *= 1 + 0.14f * lift[i];
+            float liftTo = i == sel ? 1f : 0f;
+            lift[i] += (liftTo - lift[i]) * (still ? 1 : Math.min(1f, dt * 10f));
+            moving |= Math.abs(liftTo - lift[i]) > 0.01f;
+            float s = 1 + 0.12f * lift[i];
             if (i == sel && pressedAt > 0) s *= pressScale((now - pressedAt) / 520f);
             c.save();
             c.translate(KX[i], KY[i]);
-            if (lift[i] > 0.02f) drawSelection(c, i, t, lift[i] * spotOn, alpha);
+            if (lift[i] > 0.02f) drawSelection(c, i, lift[i] * spotOn, alpha);
             c.scale(s, s);
-            pill.draw(c, CODES[i], Math.round(alpha * pop), lift[i]);
+            pill.draw(c, CODES[i], alpha, lift[i]);
             if (sel >= 0 && i != sel) {   // the other buttons step back into the shade
                 paint.setShader(null);
-                paint.setColor(withAlpha(0xFF0A0B0E, 0.42f * spotOn * pop * alpha / 255f));
+                paint.setColor(withAlpha(0xFF0A0B0E, 0.42f * spotOn * alpha / 255f));
                 tmp.set(-Pill.W / 2, -Pill.H / 2, Pill.W / 2, Pill.H / 2);
                 c.drawRoundRect(tmp, Pill.H / 2, Pill.H / 2, paint);
             }
@@ -404,32 +367,21 @@ final class RemoteView extends View {
                 c.drawArc(tmp, 215, 110, false, stroke);
             }
             if (f0 > 1.5f) pressedAt = -1;
+            else moving = true;
         }
+        if (still) pressedAt = -1;
         c.restore();
-        if (!still && isShown()) postInvalidateOnAnimation();
+        if (moving && !still && isShown()) postInvalidateOnAnimation();
+        else lastFrame = 0;   // the next change starts from a fresh frame time
     }
 
-    private void drawSelection(Canvas c, int i, float t, float on, int alpha) {
-        // A light running round the button's edge.
-        local.setRotate((t * 160f) % 360f);
-        ring.getShader().setLocalMatrix(local);
-        ring.setStrokeWidth(1.8f);
-        ring.setAlpha(Math.round(alpha * on));
-        tmp.set(-Pill.W / 2 - 4.5f, -Pill.H / 2 - 4.5f, Pill.W / 2 + 4.5f, Pill.H / 2 + 4.5f);
-        c.drawRoundRect(tmp, Pill.H / 2 + 4.5f, Pill.H / 2 + 4.5f, ring);
+    /** The selected button's outline in its colour. */
+    private void drawSelection(Canvas c, int i, float on, int alpha) {
         stroke.setShader(null);
-        stroke.setStrokeWidth(0.9f);
-        stroke.setColor(withAlpha(GLOW[i], 0.45f * on * alpha / 255f));
+        stroke.setStrokeWidth(1.6f);
+        stroke.setColor(withAlpha(GLOW[i], 0.9f * on * alpha / 255f));
+        tmp.set(-Pill.W / 2 - 4.5f, -Pill.H / 2 - 4.5f, Pill.W / 2 + 4.5f, Pill.H / 2 + 4.5f);
         c.drawRoundRect(tmp, Pill.H / 2 + 4.5f, Pill.H / 2 + 4.5f, stroke);
-        // Ripples, one every 0.9 s.
-        for (int j = 0; j < 2 && !still; j++) {
-            float f = ((t / 1.8f) + j / 2f) % 1f;
-            float g = 5 + 13 * f;
-            stroke.setStrokeWidth(1.2f);
-            stroke.setColor(withAlpha(GLOW[i], 0.5f * (1 - f) * on * alpha / 255f));
-            tmp.set(-Pill.W / 2 - g, -Pill.H / 2 - g, Pill.W / 2 + g, Pill.H / 2 + g);
-            c.drawRoundRect(tmp, Pill.H / 2 + g, Pill.H / 2 + g, stroke);
-        }
     }
 
     private static float pressScale(float p) {

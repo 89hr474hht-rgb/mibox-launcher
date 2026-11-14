@@ -18,20 +18,20 @@ import android.view.View;
 import com.gathin.launchos.design.Motion;
 
 /**
- * The home screen's glow in the focused app's colour, brought to life: instead of one still patch of colour,
- * three strong, soft lights in that colour and two neighbouring hues drift behind the tiles, like the animated
- * backgrounds of Apple Music, and glide to the next app's colours when the focus moves.
+ * The home screen's glow in the focused app's colour: three soft lights in that colour and two neighbouring hues,
+ * kept dark so the tiles stay in front. When the focus moves to another app the colour fades to the new one in about a
+ * third of a second, then nothing redraws until the next change.
  *
- * Built to cost almost nothing on the box's GPU: the lights are painted into a 160 x 90 bitmap, about 20 times a
- * second, and the screen shows it stretched, which is one texture, the same as upstream's still glow. It runs only
- * while the home screen is in front with its glow showing, and stands still when Android's animations are off.
- *
- * It takes the place of upstream's glow bitmap in the "ambient" view. Upstream tints that bitmap with the app's
- * colour (setTint); this one keeps the colour instead and paints its own lights with it.
+ * The lights are painted into a 160 x 90 bitmap that the screen shows stretched, one texture like upstream's still
+ * glow. It takes the place of upstream's glow bitmap in the "ambient" view; upstream tints that bitmap with the app's
+ * colour (setTint), and this one paints its lights with that colour instead.
  */
 final class LivingGlow extends BitmapDrawable {
     private static final int W = 160, H = 90, BLOB = 64;
-    private static final long FRAME_NS = 1_000_000_000L / 20;
+    /** About thirty frames a second while the colour fades; none otherwise. */
+    private static final long FRAME_NS = 1_000_000_000L / 30;
+    /** How dark the lights are kept, so the glow stays behind the tiles. */
+    private static final float DIM = 0.55f;
 
     private final View ambient;
     private final Bitmap bitmap;
@@ -40,7 +40,6 @@ final class LivingGlow extends BitmapDrawable {
     private final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
     private final RectF dst = new RectF();
     private final Choreographer choreographer = Choreographer.getInstance();
-    private final long startNs = System.nanoTime();
 
     private int target = 0x5B6BFF;       // until upstream sets the first app's colour
     private final float[] shown = new float[3];   // the colour on screen, in RGB, gliding towards target
@@ -58,6 +57,10 @@ final class LivingGlow extends BitmapDrawable {
                     paintFrame(now);
                     invalidateSelf();
                 }
+            }
+            if (settled()) {
+                running = false;   // the colour has arrived: stop until the next change
+                return;
             }
             choreographer.postFrameCallback(this);
         }
@@ -93,15 +96,26 @@ final class LivingGlow extends BitmapDrawable {
 
     void resume() {
         if (ambient.getBackground() != this) ambient.setBackground(this);   // upstream rebuilt its own: take it back
-        if (running) return;
+        fade();
+    }
+
+    /** Starts the fade to the target colour, or shows it at once when animations are off. */
+    private void fade() {
         if (!Motion.on()) {
+            hasShown = false;
             paintFrame(System.nanoTime());
             invalidateSelf();
             return;
         }
+        if (running || settled()) return;
         running = true;
         lastFrame = 0;
         choreographer.postFrameCallback(frame);
+    }
+
+    private boolean settled() {
+        return hasShown && Math.abs(shown[0] - ((target >> 16) & 0xFF)) < 1 && Math.abs(shown[1] - ((target >> 8) & 0xFF)) < 1
+                && Math.abs(shown[2] - (target & 0xFF)) < 1;
     }
 
     void pause() {
@@ -113,11 +127,7 @@ final class LivingGlow extends BitmapDrawable {
     @Override
     public void setTintList(ColorStateList tint) {
         if (tint != null) target = tint.getDefaultColor() & 0xFFFFFF;
-        if (!running) {
-            hasShown = false;   // not animating: show the new colour at once
-            paintFrame(System.nanoTime());
-            invalidateSelf();
-        }
+        fade();
     }
 
     @Override
@@ -133,25 +143,17 @@ final class LivingGlow extends BitmapDrawable {
             shown[2] = b;
             hasShown = true;
         } else {
-            // About 0.6 s to reach a new colour at 20 frames a second.
-            shown[0] += (r - shown[0]) * 0.16f;
-            shown[1] += (g - shown[1]) * 0.16f;
-            shown[2] += (b - shown[2]) * 0.16f;
+            // About a third of a second to reach a new colour at thirty frames a second.
+            shown[0] += (r - shown[0]) * 0.22f;
+            shown[1] += (g - shown[1]) * 0.22f;
+            shown[2] += (b - shown[2]) * 0.22f;
         }
         int base = Color.rgb(Math.round(shown[0]), Math.round(shown[1]), Math.round(shown[2]));
-        float t = (now - startNs) / 1e9f;
         bitmap.eraseColor(0);
-        // Three lights on slow, unrelated loops (23, 31 and 43 s), so the pattern never visibly repeats. They are
-        // strong and travel far, and the whole glow breathes a little (every 11 s), so the movement reads from the
-        // sofa without pulling the eye off the tiles.
-        float breath = 0.88f + 0.12f * sin(t, 11, 0f);
-        light(GlowColors.shift(base, 0f, 1.08f), 0.28f + 0.22f * sin(t, 23, 0f), 0.42f + 0.24f * sin(t, 31, 1.3f), 1.30f, 0.86f * breath);
-        light(GlowColors.shift(base, 32f, 1.18f), 0.74f + 0.18f * sin(t, 31, 2.1f), 0.30f + 0.22f * sin(t, 43, 0.4f), 1.10f, 0.70f * breath);
-        light(GlowColors.shift(base, -38f, 0.98f), 0.52f + 0.26f * sin(t, 43, 4.0f), 0.82f + 0.14f * sin(t, 23, 2.7f), 1.20f, 0.60f * breath);
-    }
-
-    private static float sin(float t, float period, float phase) {
-        return (float) Math.sin(t * 2 * Math.PI / period + phase);
+        // Three still lights: the app's colour at the top left, its neighbours further off; all kept dark.
+        light(GlowColors.shift(base, 0f, 1.0f), 0.24f, 0.30f, 1.30f, 0.86f * DIM);
+        light(GlowColors.shift(base, 32f, 1.0f), 0.78f, 0.24f, 1.10f, 0.62f * DIM);
+        light(GlowColors.shift(base, -38f, 0.95f), 0.54f, 0.92f, 1.20f, 0.50f * DIM);
     }
 
     /** One light: the soft disc, centred at (fx, fy) of the frame, size times its height across, at that alpha. */

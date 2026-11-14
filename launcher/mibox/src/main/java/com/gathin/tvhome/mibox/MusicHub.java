@@ -53,7 +53,7 @@ final class MusicHub {
         nowTitle = a.findViewById(R.id.hub_now_title);
         nowBars = a.findViewById(R.id.hub_eq);
         nowBars.setColor(a.getColor(R.color.lo_accent));
-        if (UiFonts.medium(a) != null) ((TextView) a.findViewById(R.id.hub_label)).setTypeface(UiFonts.medium(a));
+        if (UiFonts.semibold(a) != null) ((TextView) a.findViewById(R.id.hub_label)).setTypeface(UiFonts.semibold(a));
     }
 
     View view() {

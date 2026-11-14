@@ -10,7 +10,6 @@ import android.provider.Settings;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -184,7 +183,7 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
         if (!line.contentEquals(stateLine.getText())) {
             stateLine.setText(line);
             stateLine.setAlpha(0.2f);
-            stateLine.animate().alpha(1f).setDuration(260).start();
+            stateLine.animate().alpha(1f).setDuration(Motion.MEDIUM).start();
         }
         halo.removeCallbacks(refreshRunnable);
         if (phase == Updater.Phase.IDLE && now < searchUntil) halo.postDelayed(refreshRunnable, searchUntil - now);
@@ -234,8 +233,8 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
             View v = left.getChildAt(i);
             v.setAlpha(0f);
             v.setTranslationY(14 * dp);
-            v.animate().alpha(1f).translationY(0f).setStartDelay(60L * i).setDuration(420)
-                    .setInterpolator(new DecelerateInterpolator(1.8f)).start();
+            v.animate().alpha(1f).translationY(0f).setStartDelay(60L * i).setDuration(Motion.LONG)
+                    .setInterpolator(Motion.ENTER).start();
         }
         ViewGroup cards = findViewById(R.id.mibox_cards);
         for (int i = 0, n = 0; i < cards.getChildCount(); i++) {
@@ -243,8 +242,8 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
             if (v.getVisibility() != View.VISIBLE) continue;
             v.setAlpha(0f);
             v.setTranslationX(40 * dp);
-            v.animate().alpha(1f).translationX(0f).setStartDelay(180 + 90L * n++).setDuration(460)
-                    .setInterpolator(new DecelerateInterpolator(2f)).start();
+            v.animate().alpha(1f).translationX(0f).setStartDelay(120 + 60L * n++).setDuration(Motion.LONG)
+                    .setInterpolator(Motion.ENTER).start();
         }
     }
 

@@ -13,10 +13,10 @@ import android.widget.TextView;
 import com.gathin.launchos.design.Motion;
 
 /**
- * The focused app's name, highlighted. Under a grid tile: dark text on a bright pill sized to the name, with a soft
- * shadow, instead of white text on the wallpaper. Above the dock (upstream's big "heroName"): a heavier weight, a soft
- * light around the letters, and a sheen that runs across the name each time it changes. Upstream still fades and
- * slides the names in and out on focus; this only restyles their views.
+ * The focused app's name, highlighted. Under a grid tile: dark text on a white pill sized to the name, the same white
+ * as every focused element, instead of white text on the wallpaper. Above the dock (upstream's big "heroName"): the
+ * medium weight, and a short settle when the name changes. Upstream still fades and slides the names in and out on
+ * focus; this only restyles their views.
  */
 final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
     private static final Object STYLED = new Object();
@@ -25,19 +25,21 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
     private final int nameId;
     private final float dp;
     private final Typeface face;
+    private final int focus, onFocus;
 
     private TextView hero;
     private android.text.TextWatcher heroWatcher;
-    private android.animation.ValueAnimator sheen;
 
     private NameHighlight(Activity home, ViewGroup grid, int nameId) {
         this.grid = grid;
         this.nameId = nameId;
         dp = home.getResources().getDisplayMetrics().density;
         face = UiFonts.semibold(home);
+        focus = home.getColor(R.color.lo_focus);
+        onFocus = home.getColor(R.color.lo_on_focus);
     }
 
-    /** The big name above the dock: heavier, glowing, and swept by a sheen when it changes. */
+    /** The big name above the dock: the medium weight, and a short settle when it changes. */
     private void attachHero(Activity home) {
         int id = UpstreamViews.id(home, "heroName");
         View v = id == 0 ? null : home.findViewById(id);
@@ -45,23 +47,6 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
         hero = (TextView) v;
         Typeface medium = UiFonts.medium(home);
         if (medium != null) hero.setTypeface(medium);
-        hero.setShadowLayer(6 * dp, 0, 0, 0x4DFFFFFF);   // wider gets cut off at the view's edges
-        // A glass capsule that hugs the name; shifted left by its padding so the letters stay where upstream puts them.
-        GradientDrawable glass = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{0x38FFFFFF, 0x14FFFFFF});
-        glass.setCornerRadius(999 * dp);
-        glass.setStroke(Math.round(1.2f * dp), 0x52FFFFFF);
-        int ph = Math.round(24 * dp), pv = Math.round(7 * dp);
-        hero.setBackground(glass);
-        hero.setPadding(ph, pv, ph, pv);
-        hero.setTranslationX(-ph);
-        hero.setPivotX(ph);
-        // Its parents would cut off the part of the capsule that sits left of them.
-        for (android.view.ViewParent p = hero.getParent(); p instanceof ViewGroup; p = p.getParent()) {
-            ((ViewGroup) p).setClipChildren(false);
-            ((ViewGroup) p).setClipToPadding(false);
-            if (p == hero.getRootView()) break;
-        }
         if (!Motion.on()) return;
         heroWatcher = new android.text.TextWatcher() {
             @Override
@@ -74,40 +59,14 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
 
             @Override
             public void afterTextChanged(android.text.Editable s) {
-                hero.post(NameHighlight.this::runSheen);
+                hero.setPivotX(0);
                 hero.setPivotY(hero.getHeight() / 2f);
-                hero.setScaleX(0.94f);
-                hero.setScaleY(0.94f);
-                hero.animate().scaleX(1f).scaleY(1f).setDuration(380)
-                        .setInterpolator(new android.view.animation.OvershootInterpolator(2.2f)).start();
+                hero.setScaleX(0.97f);
+                hero.setScaleY(0.97f);
+                hero.animate().scaleX(1f).scaleY(1f).setDuration(Motion.MEDIUM).setInterpolator(Motion.ENTER).start();
             }
         };
         hero.addTextChangedListener(heroWatcher);
-    }
-
-    private void runSheen() {
-        if (sheen != null) sheen.cancel();
-        float w = hero.getWidth();
-        if (w <= 0 || !hero.isShown()) return;
-        android.text.TextPaint paint = hero.getPaint();
-        sheen = android.animation.ValueAnimator.ofFloat(0f, 1f);
-        sheen.setDuration(800);
-        sheen.setInterpolator(new android.view.animation.DecelerateInterpolator(1.4f));
-        sheen.addUpdateListener(a -> {
-            float x = -w * 0.5f + (float) a.getAnimatedValue() * w * 2f;
-            paint.setShader(new android.graphics.LinearGradient(x - w * 0.35f, 0, x, 0,
-                    new int[]{0xFFFFFFFF, 0xFFFFF4D6, 0xFFB9CCFF, 0xFFFFFFFF}, new float[]{0f, 0.45f, 0.7f, 1f},
-                    android.graphics.Shader.TileMode.CLAMP));
-            hero.invalidate();
-        });
-        sheen.addListener(new android.animation.AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(android.animation.Animator animation) {
-                paint.setShader(null);
-                hero.invalidate();
-            }
-        });
-        sheen.start();
     }
 
     static NameHighlight attach(Activity home) {
@@ -123,7 +82,6 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
     }
 
     void destroy() {
-        if (sheen != null) sheen.cancel();
         if (hero != null && heroWatcher != null) hero.removeTextChangedListener(heroWatcher);
         if (grid.getViewTreeObserver().isAlive()) grid.getViewTreeObserver().removeOnGlobalLayoutListener(this);
     }
@@ -151,14 +109,13 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
         if (name.getTag(R.id.mibox_name_styled) == STYLED) return;
         name.setTag(R.id.mibox_name_styled, STYLED);
         GradientDrawable pill = new GradientDrawable();
-        pill.setColor(0xF7FFFFFF);
+        pill.setColor(focus);
         pill.setCornerRadius(12 * dp);
         name.setBackground(pill);
         int pad = Math.round(12 * dp);
         name.setPadding(pad, 0, pad, 0);
-        name.setTextColor(0xFF111216);
+        name.setTextColor(onFocus);
         name.setShadowLayer(0, 0, 0, 0);
-        name.setElevation(5 * dp);
         if (face != null) name.setTypeface(face);
     }
 }

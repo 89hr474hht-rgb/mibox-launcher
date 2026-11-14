@@ -127,7 +127,8 @@ final class ReleaseClient {
     }
 
     private static UpdateException network(IOException e) {
-        return new UpdateException(R.string.mibox_err_network, e.getClass().getSimpleName());
+        Logs.failed("ReleaseClient.network", e);
+        return new UpdateException(R.string.mibox_err_network);
     }
 
     static MessageDigest sha256() {

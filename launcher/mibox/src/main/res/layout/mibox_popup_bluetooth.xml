@@ -20,15 +20,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/mibox_bluetooth"
-            android:textColor="#FFFFFFFF"
-            android:textSize="16sp" />
+            android:textColor="@color/lo_text"
+            android:textSize="@dimen/lo_text_body" />
 
         <TextView
             android:id="@+id/mibox_bt_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#73FFFFFF"
-            android:textSize="11sp" />
+            android:textColor="@color/lo_text_3"
+            android:textSize="@dimen/lo_text_small" />
     </LinearLayout>
 
     <View
@@ -37,7 +37,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="6dp"
-        android:background="#1FFFFFFF" />
+        android:background="@color/lo_line" />
 
     <LinearLayout
         android:id="@+id/mibox_bt_rows"
@@ -52,7 +52,7 @@
         android:layout_marginTop="6dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="6dp"
-        android:background="#1FFFFFFF" />
+        android:background="@color/lo_line" />
 
     <LinearLayout
         android:id="@+id/mibox_bt_actions"

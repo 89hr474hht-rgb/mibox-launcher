@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Settings row icon: a white auto_awesome glyph in a coloured rounded square. -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:width="32dp" android:height="32dp">
-        <shape android:shape="rectangle">
-            <solid android:color="#FFBF5AF2" />
-            <corners android:radius="9dp" />
-        </shape>
-    </item>
-    <item android:width="20dp" android:height="20dp" android:gravity="center"
-        android:drawable="@drawable/mibox_sym_auto_awesome" />
-</layer-list>
+<!-- Settings icon (advanced): a thin line, tinted by the row (white, dark when focused). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M4,7 H7" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M11,7 H20" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M4,12 H13" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M17,12 H20" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M4,17 H5" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M9,17 H20" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M11,7 A2,2 0 1,1 7,7 A2,2 0 1,1 11,7 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M17,12 A2,2 0 1,1 13,12 A2,2 0 1,1 17,12 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M9,17 A2,2 0 1,1 5,17 A2,2 0 1,1 9,17 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
+        android:strokeLineCap="round" android:strokeLineJoin="round" />
+</vector>

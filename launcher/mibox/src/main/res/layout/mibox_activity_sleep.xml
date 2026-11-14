@@ -5,7 +5,7 @@
     android:id="@+id/mibox_sleep_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#DB000000">
+    android:background="@color/lo_surface_1">
 
     <LinearLayout
         android:id="@+id/mibox_sleep_chip"
@@ -31,8 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:fontFeatureSettings="tnum"
-            android:textColor="#FFFFFFFF"
-            android:textSize="17sp"
+            android:textColor="@color/lo_text"
+            android:textSize="@dimen/lo_text_body"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -63,8 +63,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="26dp"
             android:text="@string/mibox_sleep_title"
-            android:textColor="#FFFFFFFF"
-            android:textSize="32sp"
+            android:textColor="@color/lo_text"
+            android:textSize="@dimen/lo_text_display"
             android:textStyle="bold" />
 
         <TextView
@@ -72,8 +72,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="#FFACB8C1"
-            android:textSize="18sp" />
+            android:textColor="@color/lo_text_2"
+            android:textSize="@dimen/lo_text_heading" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
             android:text="@string/mibox_sleep_back"
-            android:textColor="#8CFFFFFF"
-            android:textSize="14sp" />
+            android:textColor="@color/lo_text_3"
+            android:textSize="@dimen/lo_text_small" />
     </LinearLayout>
 </FrameLayout>

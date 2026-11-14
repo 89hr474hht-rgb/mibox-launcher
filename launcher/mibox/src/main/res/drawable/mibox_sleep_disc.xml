@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The disc behind the sleep timer's minutes. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-    <gradient android:angle="315" android:startColor="#FF4F7BFF" android:endColor="#FF9A5CFF" />
+    <solid android:color="@color/lo_surface_2" />
+    <stroke android:width="2dp" android:color="@color/lo_accent" />
 </shape>

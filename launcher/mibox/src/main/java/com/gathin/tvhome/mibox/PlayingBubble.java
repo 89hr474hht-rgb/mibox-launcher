@@ -157,8 +157,8 @@ final class PlayingBubble {
 
     private void place() {
         float d = app.getResources().getDisplayMetrics().density;
-        params.x = Math.round((40 + DRIFT[drift][0]) * d);
-        params.y = Math.round((26 + DRIFT[drift][1]) * d);
+        params.x = Math.round((48 + DRIFT[drift][0]) * d);   // Google TV's safe area: 48 × 27 dp
+        params.y = Math.round((30 + DRIFT[drift][1]) * d);
     }
 
     private void hide() {
