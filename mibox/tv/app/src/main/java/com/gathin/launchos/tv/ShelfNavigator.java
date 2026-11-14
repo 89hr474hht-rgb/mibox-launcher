@@ -38,20 +38,65 @@ final class ShelfNavigator {
         this.layout = layout;
         this.positions = positions;
         this.keys = keys;
+        // Room after the last shelf, so it can reach the top of the area like the others and the shelf above it
+        // leaves the screen whole instead of showing the bottom of its titles.
+        rows.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(android.graphics.Rect out, View view, RecyclerView parent, RecyclerView.State state) {
+                if (parent.getChildAdapterPosition(view) != state.getItemCount() - 1) return;
+                int h = view.getHeight() > 0 ? view.getHeight() : view.getMeasuredHeight();
+                out.bottom = Math.max(0, parent.getHeight() - h);
+            }
+        });
     }
 
-    /** Moves to shelf target (step -1 up, 1 down), onto the card under focused; returns what keeps the focus now. */
+    /**
+     * The shelves' vertical layout. Up and Down are handed to the screen's router. Android scrolls a list to show a
+     * newly focused child; here it only does so when the top of the shelf holding the focus is off screen (focus given
+     * back after another screen, for instance), since the navigator places every shelf it moves to itself.
+     */
+    static LinearLayoutManager layout(android.content.Context c) {
+        return new LinearLayoutManager(c) {
+            /**
+             * Up and Down go to the screen's router (and so to {@link #move}) instead of to whatever card the list
+             * finds next on its own, which it would then scroll to by just enough to show.
+             */
+            @Override
+            public View onInterceptFocusSearch(View focused, int direction) {
+                if (direction != View.FOCUS_UP && direction != View.FOCUS_DOWN) return null;
+                for (View v = focused; v != null; v = v.getParent() instanceof View ? (View) v.getParent() : null) {
+                    if (v instanceof RecyclerView && ((RecyclerView) v).getLayoutManager() == this) {
+                        android.view.ViewParent up = v.getParent();
+                        return up == null ? null : up.focusSearch(focused, direction);
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public boolean requestChildRectangleOnScreen(RecyclerView parent, View child, android.graphics.Rect rect,
+                                                         boolean immediate, boolean focusedChildVisible) {
+                if (child.getTop() >= 0 && child.getTop() < parent.getHeight()) return false;
+                return super.requestChildRectangleOnScreen(parent, child, rect, immediate, focusedChildVisible);
+            }
+        };
+    }
+
+    /** Moves to shelf target (step -1 up, 1 down), onto the card under focused; returns the view that has the focus now. */
     View move(View focused, int target, int step) {
         int[] at = new int[2];
         focused.getLocationOnScreen(at);
         int x = at[0] + focused.getWidth() / 2;
+        rows.invalidateItemDecorations();   // the room after the last shelf is measured once the list has its size
         layout.scrollToPositionWithOffset(target, 0);
         if (Motion.on()) {
             rows.setTranslationY(step * Ui.dp(rows.getContext(), SLIDE_DP));
             rows.animate().translationY(0).setDuration(Motion.MEDIUM).setInterpolator(Motion.ENTER).start();
         }
         focusWhenLaid(target, x);
-        return focused;
+        // The card (or the shelf's list) that took the focus; handing back the old card would take it away again.
+        View now = rows.getRootView().findFocus();
+        return now != null && now.isAttachedToWindow() ? now : focused;
     }
 
     /** Focuses shelf row's card nearest to screen x as soon as it is laid out. */

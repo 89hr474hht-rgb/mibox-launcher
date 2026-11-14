@@ -166,8 +166,15 @@ public final class GridActivity extends Activity {
     }
 
     private void apply() {
-        for (Sort s : Sort.values()) sortViews[s.ordinal()].setSelected(s == sort);
-        for (TextView t : genreViews) t.setSelected(java.util.Objects.equals(t.getTag(), genre));
+        for (Sort s : Sort.values()) {
+            sortViews[s.ordinal()].setSelected(s == sort);
+            sortViews[s.ordinal()].setActivated(s == sort);   // the chips in use in the accent
+        }
+        for (TextView t : genreViews) {
+            boolean on = java.util.Objects.equals(t.getTag(), genre);
+            t.setSelected(on);
+            t.setActivated(on);
+        }
         List<Item> l = new ArrayList<>();
         for (Item i : items) if (genre == null || genre.equals(Smart.firstGenre(i.genre))) l.add(i);
         switch (sort) {

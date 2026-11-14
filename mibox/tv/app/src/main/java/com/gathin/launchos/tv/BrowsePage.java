@@ -123,7 +123,7 @@ final class BrowsePage {
         Focus.lift(root.findViewById(R.id.hero_info));
 
         rowsView = root.findViewById(R.id.rows);
-        rowsLayout = new LinearLayoutManager(activity);
+        rowsLayout = ShelfNavigator.layout(activity);
         rowsView.setLayoutManager(rowsLayout);
         rowsView.setAdapter(rowAdapter);
         rowsView.setItemAnimator(null);

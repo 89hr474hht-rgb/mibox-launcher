@@ -81,6 +81,8 @@ public final class GuideActivity extends Activity {
     private long base, from;
     private float px;
     private boolean shownOnce;
+    /** The first focus fell on line 0's channel because its programmes were not there yet: move it when they come. */
+    private boolean firstOnChannel;
     private int stripStart;
     private final SimpleDateFormat hm = new SimpleDateFormat("HH:mm", Locale.FRANCE);
     private final Runnable tick = new Runnable() {
@@ -224,7 +226,10 @@ public final class GuideActivity extends Activity {
 
     private void choose(Group g) {
         group = g;
-        for (int i = 0; i < groups.size(); i++) groupViews.get(i).setSelected(groups.get(i) == g);
+        for (int i = 0; i < groups.size(); i++) {
+            groupViews.get(i).setSelected(groups.get(i) == g);
+            groupViews.get(i).setActivated(groups.get(i) == g);   // the chosen group in the accent
+        }
         Library lib = Library.of(Xtream.Section.LIVE);
         Channels chs = Channels.get(this);
         if (g.favourites) {
@@ -357,7 +362,18 @@ public final class GuideActivity extends Activity {
                     FETCHED.put(id, System.currentTimeMillis());
                     if (isDestroyed()) return;
                     for (int i = 0; i < channels.size(); i++) {
-                        if (channels.get(i).id.equals(id)) adapter.notifyItemChanged(i, RowAdapter.STRIP);
+                        if (!channels.get(i).id.equals(id)) continue;
+                        adapter.notifyItemChanged(i, RowAdapter.STRIP);
+                        View f = getCurrentFocus();
+                        if (f == null || f.getId() != R.id.guide_channel) continue;
+                        RecyclerView.ViewHolder h = rows.findViewHolderForAdapterPosition(i);
+                        if (h == null || !Root.inside(f, h.itemView)) continue;
+                        if (firstOnChannel && i == 0) {
+                            int line = i;
+                            rows.post(() -> focusRow(line, -1));   // once the blocks are bound
+                        } else {
+                            detail(channels.get(i), onAir(channels.get(i)));
+                        }
                     }
                 });
             });
@@ -402,12 +418,23 @@ public final class GuideActivity extends Activity {
                 best = b;
             }
         }
+        firstOnChannel = best == null && position == 0 && x < 0;
         (best != null ? best : h.itemView.findViewById(R.id.guide_channel)).requestFocus();
+    }
+
+    /** The programme on air for a channel, from the guide already fetched; null when there is none. */
+    private static Epg.Programme onAir(Item c) {
+        List<Epg.Programme> l = c == null ? null : CACHE.get(c.id);
+        if (l == null) return null;
+        long now = System.currentTimeMillis() / 1000;
+        for (Epg.Programme p : l) if (p.start <= now && now < p.end) return p;
+        return null;
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
         if (e.getAction() != KeyEvent.ACTION_DOWN) return super.dispatchKeyEvent(e);
+        firstOnChannel = false;   // a key pressed: the focus is the family's now, not the first one put there
         View f = getCurrentFocus();
         int k = e.getKeyCode();
         if (f != null && f.getParent() instanceof ViewGroup && ((View) f.getParent()).getId() == R.id.guide_strip
@@ -463,7 +490,8 @@ public final class GuideActivity extends Activity {
                     if (item != null) play(item);
                 });
                 channel.setOnFocusChangeListener((x, focused) -> {
-                    if (focused && item != null) detail(item, null);
+                    if (!focused || item == null) return;
+                    detail(item, onAir(item));
                 });
             }
         }

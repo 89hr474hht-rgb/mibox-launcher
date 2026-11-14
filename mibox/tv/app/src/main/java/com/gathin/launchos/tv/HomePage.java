@@ -78,7 +78,7 @@ final class HomePage {
         play = root.findViewById(R.id.home_play);
         status = root.findViewById(R.id.home_status);
         rowsView = root.findViewById(R.id.home_rows);
-        rowsLayout = new LinearLayoutManager(activity);
+        rowsLayout = ShelfNavigator.layout(activity);
         rowsView.setLayoutManager(rowsLayout);
         rowsView.setAdapter(adapter);
         rowsView.setItemAnimator(null);

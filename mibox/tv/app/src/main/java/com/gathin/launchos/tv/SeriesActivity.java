@@ -201,7 +201,9 @@ public final class SeriesActivity extends Activity {
         season = index;
         for (int i = 0; i < seasonsView.getChildCount(); i++) {
             View chip = seasonsView.getChildAt(i);
-            chip.setSelected(seasonsView.getChildAdapterPosition(chip) == index);
+            boolean on = seasonsView.getChildAdapterPosition(chip) == index;
+            chip.setSelected(on);
+            chip.setActivated(on);   // the season shown in the accent
         }
         episodeAdapter.set(seasons.get(index).episodes);
         episodesView.scrollToPosition(0);
@@ -220,6 +222,7 @@ public final class SeriesActivity extends Activity {
             TextView t = (TextView) h.itemView;
             t.setText(Ui.seasonName(SeriesActivity.this, seasons.get(position)));
             t.setSelected(position == season);
+            t.setActivated(position == season);
             t.setOnFocusChangeListener((v, focused) -> {
                 int p = h.getBindingAdapterPosition();
                 if (focused && p != season && p != RecyclerView.NO_POSITION) showSeason(p);

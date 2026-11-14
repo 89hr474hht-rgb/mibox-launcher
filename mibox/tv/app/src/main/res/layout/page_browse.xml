@@ -44,6 +44,8 @@
 
     <LinearLayout
         android:id="@+id/spotlight"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:layout_width="560dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/page_start"
@@ -91,6 +93,8 @@
 
         <LinearLayout
             android:id="@+id/hero_buttons"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
