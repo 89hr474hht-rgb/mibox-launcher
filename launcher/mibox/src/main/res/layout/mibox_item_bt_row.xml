@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One row of the Bluetooth menu, the launcher's popup row (app's item_input) with the icon in a disc. -->
+<!-- One row of the top bar's menus (network, Bluetooth, timer; see MiboxMenu): the icon in a disc, a name, a state. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="46dp"
+    android:layout_height="42dp"
     android:background="@drawable/lo_focus_row"
     android:clickable="true"
     android:focusable="true"
@@ -13,14 +13,14 @@
 
     <FrameLayout
         android:id="@+id/mibox_bt_disc"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:background="@drawable/mibox_bt_circle_off">
 
         <ImageView
             android:id="@+id/mibox_bt_icon"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:layout_gravity="center"
             android:contentDescription="@null" />
     </FrameLayout>
