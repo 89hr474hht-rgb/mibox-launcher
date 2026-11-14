@@ -8,13 +8,11 @@ ajoutée, et le lecteur ne fait aucun appel réseau.
 ## Ce que voit la famille
 
 - **Le hub**, à l'ouverture du lecteur.
-  - Derrière, en très grand, le nom d'album que donnent les étiquettes des pistes (ID3 `TALB`), dans n'importe quelle
-    écriture, ou à défaut le nom du dossier. Il est bien plus grand que l'écran, gravé dans un blanc si sombre qu'on le
-    devine, et le menu flotte par-dessus. Il glisse lentement d'un bout à l'autre et revient (environ 30 s dans chaque
-    sens), en commençant par là où il se lit (la droite pour l'arabe), si bien que tout le mot passe. Une lumière
-    traverse ses lettres de temps en temps. L'arabe est composé dans la police Naskh d'Android. Le mot sculpté est
-    dessiné une fois dans une image à demi-taille, que chaque image ne fait que déplacer.
-  - Un menu typographique, avec un trait d'or devant l'entrée choisie :
+  - À droite, en très grand et très sombre, le nom d'album que donnent les étiquettes des pistes (ID3 `TALB`), dans
+    n'importe quelle écriture, ou à défaut le nom du dossier. Il est fixe, calé à droite, à côté du menu et non
+    derrière. Une lumière le traverse une fois quand on revient au hub. L'arabe est composé dans la police Naskh
+    d'Android. Le mot est gravé une fois, hors du fil principal, dans une image d'au plus 2 048 px de côté.
+  - Un menu typographique ; l'entrée qui a le focus devient blanche :
     - « En lecture » ou « Reprendre » ;
     - Favoris ;
     - chaque collection ;
@@ -136,7 +134,9 @@ Le build CleanYourTV d'origine (sans `-Pmibox`) ne change pas : rien de tout cel
 - `MusicService` : la lecture au premier plan ;
 - `Lrc` (temps par ligne et par mot), `Id3Lyrics`, `LyricsStyle` (les options) ;
 - les vues : `LyricsView`, `EqualizerView`, `ShineText` (le grand mot du hub) et `MusicArt` (les couleurs) ;
-- `MusicActivity` (hub, menu, pages, options) ;
+- `MusicActivity` (rail, pages, mode « En lecture »), avec `MusicHub` (le hub), `TrackListAdapter` (les listes) et
+  `LyricsOptionsPanel` (les options des paroles) ;
+- `MusicPrefs` (les préférences du lecteur) et `Receivers` (les récepteurs) ;
 - `MusicCard` (l'accueil) ;
 - `PlayingBubble` (la bulle) ;
 - `MusicSettings` (les Réglages) ;

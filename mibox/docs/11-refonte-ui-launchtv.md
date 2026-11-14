@@ -1,5 +1,9 @@
 # 11 — Refonte de l'interface de LaunchTV OS (LaunchOS TV)
 
+> **Historique.** Depuis LaunchOS TV 0.8.0, l'apparence suit le système de design commun
+> ([13-systeme-de-design.md](13-systeme-de-design.md)) : plus de verre, de lueurs ni de dégradés. Ce document
+> décrit la refonte 0.6.0 telle qu'elle a été faite.
+
 Branche de travail : `refonte/launchtv-ui`. L'état d'avant la refonte est gardé par le tag
 `backup/avant-refonte-ui` (même commit que `main` au départ et que la version publiée `tv-v0.5.0`).
 Pour revenir en arrière : `git switch main` (la branche n'est jamais fusionnée sans accord), ou

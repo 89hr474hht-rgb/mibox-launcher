@@ -453,6 +453,43 @@ vus sur la box ne sont pas reproduits ici : à revérifier sur la box (M18-03). 
 | M18-14 | Démarrage de LaunchOS TV | Ouvrir LaunchOS TV depuis l'accueil | Le monogramme s'écrit, le point corail, « LaunchOS TV », puis l'appli ; une touche le passe ; rien au retour d'un film | MANUEL | Test partiel (émulateur) |
 | M18-13 | Son | Écouter une longue piste sur la TV et sur la JBL | Aucun grésillement, aucun à-coup | MANUEL | Validation manuelle nécessaire |
 
+## C vicies. LaunchOS 2.0.0 : système de design commun et fiabilité
+
+Résultats remplis après la campagne sur l'émulateur Android TV (API 31). La box, la clé USB et l'enceinte ne sont pas
+disponibles à l'émulateur : ces lignes restent à valider sur la box. Système de design :
+[13-systeme-de-design.md](13-systeme-de-design.md).
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| M20-01 | Accueil | Passer d'une appli à l'autre au D-pad | La lueur change de couleur en un tiers de seconde puis reste fixe ; nom de l'appli sans reflet | MANUEL | Non testé |
+| M20-02 | Pastilles du haut | Parcourir les pastilles | Blanches au focus, sombres sinon ; le nom s'ouvre à côté de l'icône | MANUEL | Non testé |
+| M20-03 | Menus Bluetooth et réseau | Ouvrir chaque menu | Apparition courte ; appareil connecté dans un disque doré ; Retour ferme | MANUEL | Non testé |
+| M20-04 | Réglages | Parcourir toutes les catégories | Icônes au trait fin, focus blanc, coches dorées ; aucune ligne coupée | MANUEL | Non testé |
+| M20-05 | Lecteur | Hub, collection, recherche, En lecture, options | Focus visible partout ; Retour revient au hub ; aucune animation en boucle | MANUEL | Non testé |
+| M20-06 | Lecteur, erreurs | Fichier illisible, fin de liste | La lecture s'arrête proprement ; l'appli reste utilisable | MANUEL | Non testé |
+| M20-07 | Télécommande illustrée | Boutons de la télécommande → changer de bouton | Le projecteur glisse vers le bouton puis tout s'arrête | MANUEL | Non testé |
+| M20-08 | Mises à jour | Vérifier sans réseau | Anneau rouge et message « GitHub ne répond pas… » | MANUEL | Non testé |
+| M20-09 | Animations coupées | Options pour les développeurs → échelles à 0 | Tout s'affiche, rien ne bouge | MANUEL | Non testé |
+| M20-10 | Sur la box | Bluetooth (JBL), CEC, volume, SFR TV après installation | Comme avant | MANUEL | Validation manuelle nécessaire |
+
+## C unvicies. LaunchOS TV 0.8.0 : système de design commun, stabilité, vie privée
+
+Résultats remplis après la campagne sur l'émulateur avec le serveur factice (`mibox/tv/mock`). Le vrai serveur Xtream
+n'est pas testé.
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| T08-01 | Démarrage | OK ou Retour pendant l'écran de démarrage | Il se ferme et la touche agit | MANUEL | Non testé |
+| T08-02 | Menu latéral | Ouvrir, fermer, parcourir | Rubrique choisie en corail ; Droite revient dans la page | MANUEL | Non testé |
+| T08-03 | Connexion | Se connecter, puis supprimer le compte | Pas de saisie automatique ; Supprimer demande un second OK ; tout est effacé | MANUEL | Non testé |
+| T08-04 | Accueil, Films, Séries | Haut et Bas entre les rangées, vite | Le focus suit sans se perdre | MANUEL | Non testé |
+| T08-05 | Erreurs | Couper le serveur, puis Réessayer | Message simple et bouton Réessayer qui marche | MANUEL | Non testé |
+| T08-06 | Guide TV | Parcourir, Gauche et Droite | Premier programme choisi, textes lisibles | MANUEL | Non testé |
+| T08-07 | Film et Série | Ouvrir une fiche de chaque | Même mise en page ; bande-annonce seulement si YouTube | MANUEL | Non testé |
+| T08-08 | Lecteur | Lecture, avance, épisode suivant | Comme avant | MANUEL | Non testé |
+| T08-09 | Réglages | Jauges, Vider le cache, effacer les favoris | Second OK demandé ; textes lisibles sur le focus blanc | MANUEL | Non testé |
+| T08-10 | Vrai serveur | Chaînes, films, séries sur la box | Comme avant | MANUEL | Validation manuelle nécessaire |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

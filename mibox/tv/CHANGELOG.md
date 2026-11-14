@@ -6,6 +6,36 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.8.0] - 2026-11-14
+
+Mise à niveau : le système de design commun avec LaunchOS, une appli plus stable et plus discrète. Aucune fonction
+retirée.
+
+### Ajouté
+- Bouton Réessayer quand une page ne charge pas (Chaînes, Accueil, Films, Séries, Guide TV, une série).
+- Les suppressions (compte, favoris, points de reprise) demandent un second appui sur OK, pendant 5 secondes.
+
+### Modifié
+- Apparence : noir OLED, surfaces plates, accent corail, Inter et une échelle de tailles (texte du guide en 16 sp) ;
+  un seul focus blanc, deux styles de bouton, un seul champ. Plus de verre, de lueurs ni de dégradés. Les fiches Film
+  et Série ont la même mise en page.
+- Chaînes : le format de flux qui a marché (TS ou HLS) est retenu et essayé en premier pour la chaîne suivante.
+- Navigation plus fluide entre les rangées et dans le menu latéral ; le guide réutilise ses cases au lieu de les
+  recréer.
+- Messages d'erreur en phrases simples ; le code technique n'apparaît qu'entre parenthèses.
+- L'écran de démarrage laisse passer la touche qui le ferme.
+
+### Sécurité et vie privée
+- Supprimer le compte efface aussi l'historique, les favoris, les groupes, le guide, le catalogue et les images.
+- Un serveur en https ne peut plus rediriger vers du http.
+- Pas de saisie automatique sur le formulaire de connexion ; pas de transfert vers un autre appareil.
+- Les images sont demandées avec un agent générique ; leur cache est plafonné à 64 Mo.
+- La bande-annonce ne s'ouvre que pour une adresse YouTube.
+
+### Interne
+- Les synchronisations du catalogue ont leur propre fil ; l'historique est enregistré en JSON nommé, avec une
+  migration automatique ; nouveaux tests (HTTP, bandes-annonces, cache, historique, guide).
+
 ## [0.7.0] - 2026-11-12
 
 ### Ajouté

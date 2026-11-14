@@ -5,6 +5,43 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [2.0.0] - 2026-11-14
+
+Mise à niveau : un seul système de design pour LaunchOS et LaunchOS TV, un lecteur plus fiable, du code rangé.
+Aucune fonction retirée.
+
+### Modifié
+- Apparence : noir OLED, surfaces plates, texte crème, accent or ; Inter et une échelle de tailles (rien sous 14 sp
+  hors étiquettes) ; un seul focus, blanc avec texte sombre, et un léger agrandissement. Plus de dégradés, de halos,
+  de verre ni d'animations perpétuelles. Le système est partagé avec LaunchOS TV (`mibox/design`).
+- Accueil : la lueur derrière les tuiles est fixe et sombre, elle change de couleur en un tiers de seconde quand on
+  passe à une autre appli, puis ne redessine plus rien. Le nom de l'appli n'a plus de reflet ni de capsule en verre.
+  Les pastilles du haut ont le focus commun.
+- Réglages : icônes au trait fin, lignes de 56 dp, coches dans l'accent, colonnes et marges sur la grille commune.
+- Lecteur : hub, listes, panneau des options et carte d'accueil sur les jetons communs ; bouton lecture en or.
+  Les pochettes sont des aplats d'une teinte sourde. Le mot de fond du hub est gravé une fois, hors du fil principal,
+  et la lumière passe une seule fois à chaque retour sur le hub.
+- Menus Bluetooth et réseau : apparition courte sans rebond, disque de l'appareil connecté dans l'accent.
+- Télécommande illustrée (boutons des applis) : immobile, elle ne s'anime que quand le bouton choisi change.
+- Mises à jour : l'anneau autour du logo dit ce qui se passe (recherche, téléchargement, prêt, erreur) ; les messages
+  d'erreur disent quoi faire ensuite.
+- Animations : deux courbes et trois durées pour tout ; rien ne bouge quand les animations d'Android sont coupées.
+
+### Corrigé
+- Lecteur : une erreur de lecture ou un fichier illisible arrêtent proprement la lecture au lieu de bloquer le
+  service ; en pause, le focus audio est rendu et le service s'arrête après 10 minutes ; la lecture reprend après le
+  premier parcours de la clé au démarrage.
+- Réglages : la page Musique cesse d'écouter la bibliothèque quand l'écran passe en arrière-plan, ce qui ne garde plus l'écran en mémoire.
+- L'écran de démarrage se passe avec n'importe quelle touche.
+- L'horloge de veille OLED ne se réveille plus que toutes les 5 secondes quand rien ne joue.
+
+### Interne
+- `UpstreamViews` : toutes les recherches de vues et de styles du CleanYourTV d'origine passent par un seul endroit, qui
+  journalise un nom introuvable ; un test vérifie ces noms à chaque build.
+- `Logs` : les erreurs avalées sont journalisées (classe et type seulement, jamais de contenu).
+- `MusicActivity` découpée (`MusicHub`, `TrackListAdapter`, `LyricsOptionsPanel`) ; `MusicPrefs` et `Receivers`
+  regroupent les préférences et les récepteurs.
+
 ## [1.8.0] - 2026-11-12
 
 ### Ajouté
