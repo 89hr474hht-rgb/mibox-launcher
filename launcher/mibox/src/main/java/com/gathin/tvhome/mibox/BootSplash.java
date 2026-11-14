@@ -5,12 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PathMeasure;
 import android.graphics.PorterDuff;
-import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -25,6 +20,8 @@ import android.view.animation.PathInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.gathin.launchos.design.Monogram;
 
 /**
  * LaunchOS's start-up screen: once per boot, the first time the home screen comes up after the box starts (never when
@@ -117,7 +114,7 @@ final class BootSplash extends Dialog {
         lockup = new LinearLayout(c);
         lockup.setOrientation(LinearLayout.HORIZONTAL);
         lockup.setGravity(Gravity.CENTER_VERTICAL);
-        mark = new Monogram(c);
+        mark = new Monogram(c, c.getColor(R.color.lo_accent));
         lockup.addView(mark, new LinearLayout.LayoutParams(Math.round(112 * dp), Math.round(112 * dp)));
         name = new ImageView(c);
         name.setImageResource(R.drawable.mibox_wordmark);
@@ -238,50 +235,5 @@ final class BootSplash extends Dialog {
 
     private static float clamp(float v) {
         return v < 0 ? 0 : v > 1 ? 1 : v;
-    }
-
-    /**
-     * The "lo" monogram drawn as it is written: the same line as the app's icon (one cream stroke from the top of the
-     * L, round its foot and once round the o), up to {@link #written}, and the gold dot at {@link #dot} of its size.
-     */
-    static final class Monogram extends View {
-        static final int CREAM = 0xFFF3EEE4, GOLD = 0xFFF2C879;
-        private static final float GRID = 108f, CX = 64f, CY = 59.5f, R = 14.5f;
-        float written = 1f, dot = 1f;
-        private final Path line = new Path(), part = new Path();
-        private final PathMeasure measure = new PathMeasure();
-        private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG), fill = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private float length;
-
-        Monogram(Context c) {
-            super(c);
-            line.moveTo(30f, 33.5f);
-            line.lineTo(30f, 67f);
-            line.quadTo(30f, 74f, 37f, 74f);
-            line.lineTo(CX, 74f);
-            line.arcTo(new RectF(CX - R, CY - R, CX + R, CY + R), 90f, -359.9f, false);
-            measure.setPath(line, false);
-            length = measure.getLength();
-            stroke.setStyle(Paint.Style.STROKE);
-            stroke.setStrokeCap(Paint.Cap.ROUND);
-            stroke.setStrokeJoin(Paint.Join.ROUND);
-            stroke.setStrokeWidth(7f);
-            stroke.setColor(CREAM);
-            fill.setColor(GOLD);
-        }
-
-        @Override
-        protected void onDraw(Canvas c) {
-            float scale = Math.min(getWidth(), getHeight()) / GRID;
-            c.save();
-            c.scale(scale, scale);
-            if (written > 0) {
-                part.reset();
-                measure.getSegment(0, length * written, part, true);
-                c.drawPath(part, stroke);
-            }
-            if (dot > 0) c.drawCircle(CX, CY, 4.8f * dot, fill);
-            c.restore();
-        }
     }
 }

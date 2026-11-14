@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Text on a focusable row, button or chip: dark on the white focus, the accent while chosen, else white. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/lo_on_focus" android:state_focused="true" />
+    <item android:color="@color/lo_on_focus" android:state_pressed="true" />
+    <item android:color="@color/lo_text_3" android:state_enabled="false" />
+    <item android:color="@color/lo_accent" android:state_activated="true" />
+    <item android:color="@color/lo_text" />
+</selector>

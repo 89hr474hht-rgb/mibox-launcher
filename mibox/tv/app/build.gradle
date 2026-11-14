@@ -39,6 +39,10 @@ android {
         buildConfigField 'String', 'RELEASES_REPO', '"89hr474hht-rgb/mibox-launcher"'
     }
 
+    // The design system shared with LaunchOS (mibox/design): one source for both apps.
+    sourceSets.main.res.srcDirs += rootProject.file('../design/res')
+    sourceSets.main.java.srcDirs += rootProject.file('../design/java')
+
     if (signing != null) {
         signingConfigs {
             launchos {

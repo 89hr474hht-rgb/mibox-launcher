@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A picture tile (poster, channel logo, app banner): a white outline when focused, since a fill would hide it. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="@android:color/transparent" />
+            <stroke android:width="3dp" android:color="@color/lo_focus" />
+            <corners android:radius="@dimen/lo_radius_row" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

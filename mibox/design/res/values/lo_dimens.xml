@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Radii, spacing steps and the page frame shared by both apps. -->
+<resources>
+    <dimen name="lo_radius_row">12dp</dimen>
+    <dimen name="lo_radius_panel">20dp</dimen>
+    <dimen name="lo_radius_pill">100dp</dimen>
+
+    <dimen name="lo_space_1">4dp</dimen>
+    <dimen name="lo_space_2">8dp</dimen>
+    <dimen name="lo_space_3">12dp</dimen>
+    <dimen name="lo_space_4">16dp</dimen>
+    <dimen name="lo_space_5">24dp</dimen>
+    <dimen name="lo_space_6">32dp</dimen>
+    <dimen name="lo_space_7">48dp</dimen>
+
+    <!-- Google TV's safe area on a 960 × 540 dp screen: nothing that must be read goes closer to the edge. -->
+    <dimen name="lo_page_x">48dp</dimen>
+    <dimen name="lo_page_y">27dp</dimen>
+
+    <dimen name="lo_row_height">56dp</dimen>
+    <dimen name="lo_button_height">48dp</dimen>
+    <dimen name="lo_icon">22dp</dimen>
+
+    <dimen name="lo_text_display">40sp</dimen>
+    <dimen name="lo_text_title">28sp</dimen>
+    <dimen name="lo_text_heading">20sp</dimen>
+    <dimen name="lo_text_body">16sp</dimen>
+    <dimen name="lo_text_small">14sp</dimen>
+    <dimen name="lo_text_label">13sp</dimen>
+</resources>

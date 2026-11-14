@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- LaunchOS TV's accent in the shared design system (mibox/design): coral. -->
+<resources>
+    <color name="lo_accent">#FFFF5A4A</color>
+</resources>

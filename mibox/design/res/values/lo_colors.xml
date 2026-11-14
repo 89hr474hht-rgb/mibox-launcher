@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The palette shared by LaunchOS and LaunchOS TV (see mibox/design/README.md). lo_accent is set by each app. -->
+<resources>
+    <color name="lo_black">#FF000000</color>
+    <color name="lo_surface_1">#FF0E0F11</color>
+    <color name="lo_surface_2">#FF17181B</color>
+    <color name="lo_surface_3">#FF222327</color>
+    <color name="lo_text">#FFF4F3F0</color>
+    <color name="lo_text_2">#B8F4F3F0</color>
+    <color name="lo_text_3">#8FF4F3F0</color>
+    <color name="lo_line">#1FFFFFFF</color>
+    <color name="lo_line_strong">#38FFFFFF</color>
+    <color name="lo_cream">#FFF3EEE4</color>
+    <color name="lo_focus">#FFF4F3F0</color>
+    <color name="lo_on_focus">#FF0E0F11</color>
+    <color name="lo_on_accent">#FF0E0F11</color>
+    <color name="lo_scrim">#B3000000</color>
+    <color name="lo_error">#FFFF7A6E</color>
+    <color name="lo_ok">#FF86D69A</color>
+</resources>

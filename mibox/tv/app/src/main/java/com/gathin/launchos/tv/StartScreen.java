@@ -2,12 +2,6 @@ package com.gathin.launchos.tv;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PathMeasure;
-import android.graphics.RectF;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.view.Gravity;
@@ -17,6 +11,8 @@ import android.view.animation.PathInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.gathin.launchos.design.Monogram;
 
 /**
  * LaunchOS TV's start-up screen, when the app is opened (not when coming back to it): on true black, the "lo" monogram
@@ -48,7 +44,7 @@ final class StartScreen {
         lockup = new LinearLayout(a);
         lockup.setOrientation(LinearLayout.HORIZONTAL);
         lockup.setGravity(Gravity.CENTER_VERTICAL);
-        mark = new Monogram(a);
+        mark = new Monogram(a, a.getColor(R.color.lo_accent));
         lockup.addView(mark, new LinearLayout.LayoutParams(Math.round(104 * dp), Math.round(104 * dp)));
         name = new ImageView(a);
         name.setImageResource(R.drawable.wordmark);
@@ -131,46 +127,5 @@ final class StartScreen {
 
     private static float clamp(float v) {
         return v < 0 ? 0 : v > 1 ? 1 : v;
-    }
-
-    /** The "lo" monogram as it is written: one cream line from the top of the L into the o, then the coral dot. */
-    static final class Monogram extends View {
-        private static final float GRID = 108f, CX = 64f, CY = 59.5f, R = 14.5f;
-        float written = 1f, dot = 1f;
-        private final Path line = new Path(), part = new Path();
-        private final PathMeasure measure = new PathMeasure();
-        private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG), fill = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final float length;
-
-        Monogram(Context c) {
-            super(c);
-            line.moveTo(30f, 33.5f);
-            line.lineTo(30f, 67f);
-            line.quadTo(30f, 74f, 37f, 74f);
-            line.lineTo(CX, 74f);
-            line.arcTo(new RectF(CX - R, CY - R, CX + R, CY + R), 90f, -359.9f, false);
-            measure.setPath(line, false);
-            length = measure.getLength();
-            stroke.setStyle(Paint.Style.STROKE);
-            stroke.setStrokeCap(Paint.Cap.ROUND);
-            stroke.setStrokeJoin(Paint.Join.ROUND);
-            stroke.setStrokeWidth(7f);
-            stroke.setColor(0xFFF3EEE4);
-            fill.setColor(0xFFFF5A4A);
-        }
-
-        @Override
-        protected void onDraw(Canvas c) {
-            float scale = Math.min(getWidth(), getHeight()) / GRID;
-            c.save();
-            c.scale(scale, scale);
-            if (written > 0) {
-                part.reset();
-                measure.getSegment(0, length * written, part, true);
-                c.drawPath(part, stroke);
-            }
-            if (dot > 0) c.drawCircle(CX, CY, 4.8f * dot, fill);
-            c.restore();
-        }
     }
 }

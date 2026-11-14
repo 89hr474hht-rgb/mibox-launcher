@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The type scale. Sizes and colours only: each app sets Inter itself. Readable at three metres: 14 sp at least,
+     13 sp only for a short label. -->
+<resources>
+    <style name="Lo.Text" parent="">
+        <item name="android:textColor">@color/lo_text</item>
+        <item name="android:textSize">@dimen/lo_text_body</item>
+    </style>
+    <style name="Lo.Text.Display">
+        <item name="android:textSize">@dimen/lo_text_display</item>
+    </style>
+    <style name="Lo.Text.Title">
+        <item name="android:textSize">@dimen/lo_text_title</item>
+    </style>
+    <style name="Lo.Text.Heading">
+        <item name="android:textSize">@dimen/lo_text_heading</item>
+    </style>
+    <style name="Lo.Text.Body" />
+    <style name="Lo.Text.Secondary">
+        <item name="android:textColor">@color/lo_text_2</item>
+        <item name="android:textSize">@dimen/lo_text_small</item>
+    </style>
+    <style name="Lo.Text.Label">
+        <item name="android:textColor">@color/lo_text_2</item>
+        <item name="android:textSize">@dimen/lo_text_label</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+</resources>

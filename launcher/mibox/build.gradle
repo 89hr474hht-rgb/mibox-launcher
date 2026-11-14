@@ -23,17 +23,24 @@ android {
         buildConfig true
     }
 
+    // The design system shared with LaunchOS TV (mibox/design): one source for both apps.
+    sourceSets.main.res.srcDirs += rootProject.file('../mibox/design/res')
+    sourceSets.main.java.srcDirs += rootProject.file('../mibox/design/java')
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 }
 
-// UpstreamHooksTest reads the launcher's own resources and this module's sources: rerun it when they change.
+// UpstreamHooksTest and MonogramTest read files outside this module: rerun them when those change.
 tasks.withType(Test).configureEach {
     inputs.dir(rootProject.file('app/src/main/res')).withPropertyName('launcherRes')
     inputs.dir(rootProject.file('mibox/app-res')).withPropertyName('forkRes')
     inputs.dir(file('src/main/java')).withPropertyName('libraryJava')
+    // MonogramTest reads the mark's vectors in both apps.
+    inputs.dir(rootProject.file('../mibox/design')).withPropertyName('designSystem')
+    inputs.dir(rootProject.file('../mibox/tv/app/src/main/res/drawable')).withPropertyName('tvDrawables')
 }
 
 dependencies {

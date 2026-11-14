@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A plain progress bar: the line, filled with the accent. For a horizontal ProgressBar's progressDrawable. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape><solid android:color="@color/lo_line_strong" /><corners android:radius="3dp" /></shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip><shape><solid android:color="@color/lo_accent" /><corners android:radius="3dp" /></shape></clip>
+    </item>
+</layer-list>
