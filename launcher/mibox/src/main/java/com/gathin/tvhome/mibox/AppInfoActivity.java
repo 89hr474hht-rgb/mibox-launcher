@@ -26,6 +26,8 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.gathin.launchos.design.Motion;
+
 /**
  * The launcher's App info, opened from a tile's menu (holding OK on an app, then "App info"): the app's name and
  * icon, its version, when it was installed and last updated, where it came from, the Android version it targets
@@ -166,7 +168,7 @@ public final class AppInfoActivity extends Activity {
     }
 
     private boolean reducedMotion() {
-        return Settings.Global.getFloat(getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        return !Motion.on();
     }
 
     /** The backdrop fades in and the panel rises into place, a little like an iOS sheet. */

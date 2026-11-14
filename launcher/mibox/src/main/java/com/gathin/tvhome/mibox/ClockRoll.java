@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
-import android.provider.Settings;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.Spannable;
@@ -20,6 +19,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
+
+import com.gathin.launchos.design.Motion;
 
 /**
  * When the home screen's clock changes, the digits that changed roll like an odometer: the old one slides up and
@@ -70,8 +71,7 @@ final class ClockRoll implements TextWatcher {
         float[] oldX = beforeX;
         before = null;
         if (old == null || old.isEmpty() || old.equals(now) || oldX == null || !clock.isShown()) return;
-        if (Settings.Global.getFloat(clock.getContext().getContentResolver(),
-                Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f) return;
+        if (!Motion.on()) return;
         // The new text is laid out at the next pass: start once it is, just before it is drawn.
         clock.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override

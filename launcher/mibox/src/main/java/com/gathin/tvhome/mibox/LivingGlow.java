@@ -11,10 +11,11 @@ import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
-import android.provider.Settings;
 import android.view.Choreographer;
 import android.view.Gravity;
 import android.view.View;
+
+import com.gathin.launchos.design.Motion;
 
 /**
  * The home screen's glow in the focused app's colour, brought to life: instead of one still patch of colour,
@@ -93,8 +94,7 @@ final class LivingGlow extends BitmapDrawable {
     void resume() {
         if (ambient.getBackground() != this) ambient.setBackground(this);   // upstream rebuilt its own: take it back
         if (running) return;
-        if (Settings.Global.getFloat(ambient.getContext().getContentResolver(),
-                Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f) {
+        if (!Motion.on()) {
             paintFrame(System.nanoTime());
             invalidateSelf();
             return;

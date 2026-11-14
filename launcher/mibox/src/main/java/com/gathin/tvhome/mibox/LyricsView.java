@@ -43,7 +43,7 @@ public final class LyricsView extends View {
     private final TextPaint subPaint = new TextPaint(SMOOTH);
     private final TextPaint emptyPaint = new TextPaint(SMOOTH);
     private final Paint dot = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final float density;
+    private final float textScale;
     private Lrc lrc;
     private String empty = "";
     private StaticLayout emptyLayout;
@@ -72,14 +72,14 @@ public final class LyricsView extends View {
 
     public LyricsView(Context c, AttributeSet attrs) {
         super(c, attrs);
-        density = c.getResources().getDisplayMetrics().scaledDensity;
+        textScale = c.getResources().getDisplayMetrics().scaledDensity;
         Typeface strong = UiFonts.semibold(c), regular = UiFonts.regular(c);
         mainPaint.setColor(0xFFFFFFFF);
         if (strong != null) mainPaint.setTypeface(strong);
         subPaint.setColor(0xFFFFFFFF);
         if (regular != null) subPaint.setTypeface(regular);
         emptyPaint.setColor(0x8CFFFFFF);
-        emptyPaint.setTextSize(19 * density);
+        emptyPaint.setTextSize(19 * textScale);
         if (regular != null) emptyPaint.setTypeface(regular);
         dot.setColor(0xFFFFFFFF);
         setSize(LyricsStyle.MEDIUM);
@@ -95,8 +95,8 @@ public final class LyricsView extends View {
 
     private void setSize(int size) {
         float[] s = SIZES[Math.max(0, Math.min(SIZES.length - 1, size))];
-        mainPaint.setTextSize(s[0] * density);
-        subPaint.setTextSize(s[1] * density);
+        mainPaint.setTextSize(s[0] * textScale);
+        subPaint.setTextSize(s[1] * textScale);
     }
 
     void setClock(Clock c) {
@@ -160,10 +160,10 @@ public final class LyricsView extends View {
         if (translation && !ln.sub.isEmpty()) l.sub = make(ln.sub, subPaint, w);
         float h = 0;
         if (l.main != null) h += l.main.getHeight();
-        if (l.main != null && l.sub != null) h += 8 * density;
+        if (l.main != null && l.sub != null) h += 8 * textScale;
         if (l.sub != null) h += l.sub.getHeight();
         // A pause between lines takes the room of its three dots.
-        l.height = h == 0 ? 18 * density : h;
+        l.height = h == 0 ? 18 * textScale : h;
         laid.put(i, l);
         return l;
     }
@@ -273,7 +273,7 @@ public final class LyricsView extends View {
 
     private void drawEmpty(Canvas canvas, int w) {
         if (empty.isEmpty()) return;
-        if (emptyLayout == null) emptyLayout = make(empty, emptyPaint, Math.min(w, Math.round(520 * density)));
+        if (emptyLayout == null) emptyLayout = make(empty, emptyPaint, Math.min(w, Math.round(520 * textScale)));
         canvas.save();
         canvas.translate(getPaddingLeft() + (w - emptyLayout.getWidth()) / 2f, (getHeight() - emptyLayout.getHeight()) * 0.4f);
         emptyLayout.draw(canvas);
@@ -311,7 +311,7 @@ public final class LyricsView extends View {
                 mainPaint.setAlpha(Math.round(255 * (now ? 1f : base) * fade));
                 l.main.draw(canvas);
             }
-            canvas.translate(0, l.main.getHeight() + 8 * density);
+            canvas.translate(0, l.main.getHeight() + 8 * textScale);
         }
         if (l.sub != null) {
             subPaint.setAlpha(Math.round(255 * (now ? 0.74f : base * 0.85f) * fade));
@@ -364,7 +364,7 @@ public final class LyricsView extends View {
 
     /** Three dots breathing in turn during a pause between lines. */
     private void drawDots(Canvas canvas, float height, long ms, Lrc.Line ln, float fade) {
-        float r = 4.5f * density, gap = 16 * density, cx = width() / 2f, cy = height / 2f;
+        float r = 4.5f * textScale, gap = 16 * textScale, cx = width() / 2f, cy = height / 2f;
         long since = Math.max(0, ms - ln.atMs);
         for (int k = 0; k < 3; k++) {
             double phase = (since / 600.0) - k * 0.35;

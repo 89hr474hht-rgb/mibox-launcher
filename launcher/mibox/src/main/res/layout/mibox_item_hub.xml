@@ -1,53 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One entry of the player's hub: a gold mark while it has the focus, a thin icon, a name and a line under it. -->
+<!-- One entry of the player's hub: a line icon, a name and a line under it; white with dark text when focused. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="68dp"
-    android:alpha="0.55"
+    android:layout_width="440dp"
+    android:layout_height="64dp"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/lo_focus_row"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
-
-    <View
-        android:id="@+id/hub_mark"
-        android:layout_width="3dp"
-        android:layout_height="30dp"
-        android:alpha="0"
-        android:background="@drawable/mibox_music_hub_mark" />
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
     <ImageView
         android:id="@+id/hub_icon"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:layout_marginStart="22dp"
+        android:layout_width="@dimen/lo_icon"
+        android:layout_height="@dimen/lo_icon"
+        android:duplicateParentState="true"
         android:importantForAccessibility="no"
-        android:tint="#FFFFFFFF" />
+        android:tint="@color/lo_icon_on_focus" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/hub_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxWidth="420dp"
+            android:duplicateParentState="true"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="#FFFFFFFF"
-            android:textSize="22sp" />
+            android:textColor="@color/lo_text_on_focus"
+            android:textSize="@dimen/lo_text_heading" />
 
         <TextView
             android:id="@+id/hub_line"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:maxWidth="420dp"
+            android:duplicateParentState="true"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="#8CFFFFFF"
-            android:textSize="13sp" />
+            android:textColor="@color/lo_text_2_on_focus"
+            android:textSize="@dimen/lo_text_small" />
     </LinearLayout>
 </LinearLayout>

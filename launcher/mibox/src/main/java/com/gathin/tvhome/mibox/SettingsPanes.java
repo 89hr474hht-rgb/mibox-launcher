@@ -38,6 +38,16 @@ final class SettingsPanes {
         this.activity = activity;
     }
 
+    /**
+     * The settings screen went to the background: the music page stops listening to the library, so the screen is not
+     * kept alive by it. attach() starts it again when the screen comes back.
+     */
+    static void paused(Activity activity) {
+        View list = UpstreamViews.find(activity, "miboxCategories");
+        Object done = list == null ? null : list.getTag();
+        if (done instanceof SettingsPanes && ((SettingsPanes) done).music != null) ((SettingsPanes) done).music.hidden();
+    }
+
     /** Once per page: sets up the columns and shows the first category. */
     static void attach(Activity activity) {
         SettingsPanes p = new SettingsPanes(activity);

@@ -10,6 +10,8 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.gathin.launchos.design.Motion;
+
 /**
  * The focused app's name, highlighted. Under a grid tile: dark text on a bright pill sized to the name, with a soft
  * shadow, instead of white text on the wallpaper. Above the dock (upstream's big "heroName"): a heavier weight, a soft
@@ -60,8 +62,7 @@ final class NameHighlight implements ViewTreeObserver.OnGlobalLayoutListener {
             ((ViewGroup) p).setClipToPadding(false);
             if (p == hero.getRootView()) break;
         }
-        if (android.provider.Settings.Global.getFloat(home.getContentResolver(),
-                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f) return;
+        if (!Motion.on()) return;
         heroWatcher = new android.text.TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int a, int b, int c) {

@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,6 +13,8 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
+
+import com.gathin.launchos.design.Motion;
 
 /**
  * The small card in the top-right corner of the home screen: "Update" or "Later". It glides in from the right with a
@@ -76,7 +77,7 @@ final class UpdatePrompt extends Dialog {
     }
 
     private boolean still() {
-        return Settings.Global.getFloat(owner.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        return !Motion.on();
     }
 
     private void enter(float dp) {

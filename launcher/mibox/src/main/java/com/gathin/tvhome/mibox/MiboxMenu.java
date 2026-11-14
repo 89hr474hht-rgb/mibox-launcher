@@ -19,6 +19,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gathin.launchos.design.Motion;
+
 /**
  * A small menu that drops from a top-bar pill, in the look of the launcher's own menus: a title and a state on
  * the first line, rows with an icon in a disc, then actions. The network menu is built on it; the Bluetooth menu
@@ -96,8 +98,7 @@ final class MiboxMenu {
         panel.setScaleY(0.92f);
         panel.setTranslationY(-8 * density);
         popup.showAsDropDown(anchor, 0, Math.round(10 * density), Gravity.END);
-        boolean reduced = Settings.Global.getFloat(home.getContentResolver(),
-                Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        boolean reduced = !Motion.on();
         panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(reduced ? 0 : 220)
                 .setInterpolator(new DecelerateInterpolator(1.6f)).start();
         if (actions.getChildCount() > 0) actions.getChildAt(0).requestFocus();

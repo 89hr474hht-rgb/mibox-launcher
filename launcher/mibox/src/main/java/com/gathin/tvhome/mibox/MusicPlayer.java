@@ -42,7 +42,6 @@ final class MusicPlayer {
         void playerChanged();
     }
 
-    private static final String PREFS = "mibox_music";
     /** Holds the application context only, never an activity. */
     @android.annotation.SuppressLint("StaticFieldLeak")
     private static MusicPlayer instance;
@@ -80,6 +79,12 @@ final class MusicPlayer {
             pause();   // the box is going to sleep (the sleep timer, or the remote's power key)
         }
     };
+
+    /** A pause that lasts lets the foreground service go; a quick resume finds it still there. */
+    private static final long IDLE_STOP_MS = 10 * 60_000L;
+    private final Runnable idleStop = this::stopForeground;
+    /** Play was asked for before the library had been read once (just after boot): resume when it has. */
+    private boolean resumeWhenScanned;
 
     private final Runnable save = new Runnable() {
         @Override
@@ -155,10 +160,6 @@ final class MusicPlayer {
         return collection;
     }
 
-    int index() {
-        return index;
-    }
-
     MusicLibrary.Track track() {
         return collection == null || index < 0 || index >= collection.tracks.size() ? null : collection.tracks.get(index);
     }
@@ -231,11 +232,11 @@ final class MusicPlayer {
 
     /** The track kept from last time, when nothing has been played in this process yet. */
     String lastTitle() {
-        return prefs().getString("title", null);
+        return prefs().getString(MusicPrefs.LAST_TITLE, null);
     }
 
     String lastCollectionName() {
-        return prefs().getString("collection_name", null);
+        return prefs().getString(MusicPrefs.LAST_COLLECTION_NAME, null);
     }
 
     // ---- control ----
@@ -268,36 +269,38 @@ final class MusicPlayer {
             if (collection != null && index + 1 < collection.tracks.size()) {
                 play(collection, index + 1, 0);
             } else {
-                playing = false;
-                wantPlay = false;
                 startAt = 0;
-                stopForeground();
-                changed();
+                stopAll(false);
             }
         });
         mp.setOnErrorListener((p, what, extra) -> {
             if (p != player) return true;
             // An unreadable file, or the drive taken out: stop here rather than skip through everything.
-            playing = false;
-            wantPlay = false;
-            release();
-            stopForeground();
-            changed();
+            stopAll(true);
             MusicLibrary.get(app).refresh();
             return true;
         });
         try {
             mp.setDataSource(app, track().uri);
             mp.prepareAsync();
-        } catch (Exception e) {
+        } catch (java.io.IOException | IllegalArgumentException | IllegalStateException | SecurityException e) {
+            // The file is gone or unreadable (a drive taken out): the same stop as a playback error.
             Logs.failed("MusicPlayer.play", e);
-            playing = false;
-            release();
-            changed();
+            stopAll(true);
             return;
         }
         loadLyrics(track());
         metadata();
+        changed();
+    }
+
+    /** Everything stops: the player, the foreground service, the screen-off listener and the sound focus. */
+    private void stopAll(boolean releasePlayer) {
+        playing = false;
+        wantPlay = false;
+        if (releasePlayer) release();
+        main.removeCallbacks(idleStop);
+        stopForeground();
         changed();
     }
 
@@ -317,11 +320,17 @@ final class MusicPlayer {
             play(collection, index, startAt);
             return;
         }
+        MusicLibrary library = MusicLibrary.get(app);
+        if (!library.scanned()) {
+            resumeWhenScanned = true;
+            library.refresh();
+            return;
+        }
         SharedPreferences p = prefs();
-        MusicLibrary.Collection c = MusicLibrary.get(app).find(p.getString("collection", ""));
+        MusicLibrary.Collection c = library.find(p.getString(MusicPrefs.LAST_COLLECTION, ""));
         if (c == null) return;
-        int i = c.indexOf(Uri.parse(p.getString("uri", "")));
-        play(c, Math.max(0, i), i >= 0 ? p.getLong("position", 0) : 0);
+        int i = c.indexOf(Uri.parse(p.getString(MusicPrefs.LAST_URI, "")));
+        play(c, Math.max(0, i), i >= 0 ? p.getLong(MusicPrefs.LAST_POSITION, 0) : 0);
     }
 
     void pause() {
@@ -336,8 +345,33 @@ final class MusicPlayer {
         if (playing) {
             playing = false;
             remember();
-            stopForeground();
+            // The service stays a while, so a quick resume does not race its start; the sound focus goes now.
+            if (focus != null && audio != null) audio.abandonAudioFocusRequest(focus);
+            main.removeCallbacks(idleStop);
+            main.postDelayed(idleStop, IDLE_STOP_MS);
             changed();
+        }
+    }
+
+    /**
+     * The library was read again: the collection playing is swapped for its new copy (tracks added or gone), the
+     * track playing kept. Called by MusicLibrary on the main thread.
+     */
+    void libraryRead(MusicLibrary library) {
+        if (collection != null) {
+            MusicLibrary.Collection fresh = library.find(collection.key);
+            MusicLibrary.Track t = track();
+            if (fresh != null && t != null) {
+                int i = fresh.indexOf(t.uri);
+                if (i >= 0) {
+                    collection = fresh;
+                    index = i;
+                }
+            }
+        }
+        if (resumeWhenScanned) {
+            resumeWhenScanned = false;
+            resume();
         }
     }
 
@@ -380,9 +414,10 @@ final class MusicPlayer {
         }
         playing = true;
         anchorAt = -1;
+        main.removeCallbacks(idleStop);
         session.setActive(true);
         if (!receiverOn) {
-            app.registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+            Receivers.register(app, screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
             receiverOn = true;
         }
         MusicService.start(app);
@@ -403,6 +438,7 @@ final class MusicPlayer {
     }
 
     private void stopForeground() {
+        main.removeCallbacks(idleStop);
         MusicService.stop(app);
         if (receiverOn) {
             try {
@@ -480,13 +516,13 @@ final class MusicPlayer {
                 Lrc l = Lrc.parse(new String(b, StandardCharsets.UTF_8));
                 if (l != null) return l;
             }
-        } catch (Exception e) {
+        } catch (java.io.IOException | SecurityException e) {
             Logs.failed("MusicPlayer.readLyrics.lrc", e);
             // not readable: the tag inside the file is tried next
         }
         try (InputStream in = c.getContentResolver().openInputStream(t.uri)) {
             return in == null ? null : Lrc.parse(Id3Lyrics.read(new java.io.BufferedInputStream(in, 64 * 1024)));
-        } catch (Exception e) {
+        } catch (java.io.IOException | RuntimeException e) {   // unreadable file, or a tag malformed in a new way
             Logs.failed("MusicPlayer.readLyrics.tag", e);
             return null;
         }
@@ -518,12 +554,12 @@ final class MusicPlayer {
     private void remember() {
         MusicLibrary.Track t = track();
         if (t == null) return;
-        prefs().edit().putString("collection", collection.key).putString("collection_name", collection.name)
-                .putString("uri", t.uri.toString()).putString("title", t.title).putLong("position", position()).apply();
+        prefs().edit().putString(MusicPrefs.LAST_COLLECTION, collection.key).putString(MusicPrefs.LAST_COLLECTION_NAME, collection.name)
+                .putString(MusicPrefs.LAST_URI, t.uri.toString()).putString(MusicPrefs.LAST_TITLE, t.title).putLong(MusicPrefs.LAST_POSITION, position()).apply();
     }
 
     private SharedPreferences prefs() {
-        return app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        return MusicPrefs.get(app);
     }
 
     private void changed() {

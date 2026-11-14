@@ -22,7 +22,6 @@ import android.widget.TextView;
  * Settings → Musique); without that, or switched off there, nothing shows.
  */
 final class PlayingBubble {
-    private static final String PREFS = "mibox_music";
     private static final long SETTLE_MS = 350, DRIFT_MS = 60_000;
     private static final int[][] DRIFT = {{0, 0}, {8, 3}, {16, 0}, {8, -3}};
 
@@ -85,11 +84,11 @@ final class PlayingBubble {
     }
 
     static boolean enabled(Context c) {
-        return c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean("bubble", true);
+        return MusicPrefs.get(c).getBoolean(MusicPrefs.BUBBLE, true);
     }
 
     static void setEnabled(Context c, boolean on) {
-        c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean("bubble", on).apply();
+        MusicPrefs.get(c).edit().putBoolean(MusicPrefs.BUBBLE, on).apply();
         get(c).later();
     }
 

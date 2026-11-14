@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import com.gathin.launchos.design.Motion;
+
 /**
  * Chooses what the remote's Netflix, YouTube and Prime Video buttons open. The remote is drawn on the left
  * (RemoteView) and the button whose row has the focus lights up on it; OK on a row shows the apps, and the chosen
@@ -312,7 +314,7 @@ public final class RemoteKeysActivity extends Activity {
     }
 
     private boolean still() {
-        return Settings.Global.getFloat(getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        return !Motion.on();
     }
 
     private int px(float v) {

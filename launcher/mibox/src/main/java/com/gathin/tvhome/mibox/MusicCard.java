@@ -23,7 +23,6 @@ import java.util.List;
  * app grid scrolls. Switched off in Settings → Musique.
  */
 final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
-    private static final String PREFS = "mibox_music";
     private static final long TICK_MS = 400;
 
     private final Activity home;
@@ -34,7 +33,8 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
     private final MusicPlayer player;
     private final MusicLibrary library;
     private float hue = -1;
-    private boolean resumed, shown;
+    private boolean resumed, shown, on = true;
+    private final float gap;
     private final ViewTreeObserver.OnPreDrawListener follow = this::place;
     private final Runnable tick = new Runnable() {
         @Override
@@ -47,6 +47,7 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
     private MusicCard(Activity home, ViewGroup root, View hero) {
         this.home = home;
         this.hero = hero;
+        gap = 16 * home.getResources().getDisplayMetrics().density;
         player = MusicPlayer.get(home);
         library = MusicLibrary.get(home);
         card = LayoutInflater.from(home).inflate(R.layout.mibox_music_card, root, false);
@@ -94,15 +95,16 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
     }
 
     static boolean enabled(Context c) {
-        return c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean("home_card", true);
+        return MusicPrefs.get(c).getBoolean(MusicPrefs.HOME_CARD, true);
     }
 
     static void setEnabled(Context c, boolean on) {
-        c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean("home_card", on).apply();
+        MusicPrefs.get(c).edit().putBoolean(MusicPrefs.HOME_CARD, on).apply();
     }
 
     void resume() {
         resumed = true;
+        on = enabled(home);   // Settings → Musique is another screen: read again each time home comes back
         player.addListener(this);
         library.addListener(this);
         if (!library.scanned()) library.refresh();
@@ -137,11 +139,11 @@ final class MusicCard implements MusicPlayer.Listener, MusicLibrary.Listener {
     }
 
     /** Centred on the dock app's name, on the right; shown while the name is. */
+    /** Runs before every frame of the home screen: reads nothing but views and two fields. */
     private boolean place() {
         // A very long app name would run into the card: the card steps aside while it shows.
-        float gap = 16 * home.getResources().getDisplayMetrics().density;
         boolean clash = card.getWidth() > 0 && hero.getX() + hero.getWidth() * hero.getScaleX() > card.getLeft() - gap;
-        boolean want = enabled(home) && hero.getVisibility() == View.VISIBLE && hero.getHeight() > 0
+        boolean want = on && hero.getVisibility() == View.VISIBLE && hero.getHeight() > 0
                 && (hero.getAlpha() > 0.5f && !clash || card.hasFocus());
         if (want && hero.getAlpha() > 0.5f && card.getHeight() > 0) {
             // A real layout position, not a translation: the remote's focus search reads the layout, and finds the

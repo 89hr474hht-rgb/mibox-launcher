@@ -14,8 +14,9 @@ import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.graphics.Typeface;
 import android.os.SystemClock;
-import android.provider.Settings;
 import android.view.View;
+
+import com.gathin.launchos.design.Motion;
 
 /**
  * The Mi Box S (2nd gen) remote, drawn after Xiaomi's own picture of it (a 200 x 580 grid scaled to the view): power,
@@ -55,7 +56,7 @@ final class RemoteView extends View {
 
     RemoteView(Context context) {
         super(context);
-        still = Settings.Global.getFloat(context.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        still = !Motion.on();
         pill = new Pill(context);
         stroke.setStyle(Paint.Style.STROKE);
         stroke.setStrokeCap(Paint.Cap.ROUND);

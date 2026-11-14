@@ -16,12 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Interpolator;
 import android.view.animation.PathInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.gathin.launchos.design.Monogram;
+import com.gathin.launchos.design.Motion;
 
 /**
  * LaunchOS's start-up screen: once per boot, the first time the home screen comes up after the box starts (never when
@@ -36,7 +38,7 @@ final class BootSplash extends Dialog {
     /** A first run of this version long after the box started (an update, say) is not a boot. */
     private static final long LATE_START_MS = 10 * 60_000L;
     /** Ease out, the way things come to rest. */
-    private static final PathInterpolator EASE = new PathInterpolator(0.2f, 0f, 0f, 1f);
+    private static final Interpolator EASE = Motion.ENTER;
     /** Ease in and out, for the line being written. */
     private static final PathInterpolator WRITE = new PathInterpolator(0.55f, 0f, 0.25f, 1f);
 
@@ -56,7 +58,7 @@ final class BootSplash extends Dialog {
     private BootSplash(Activity home) {
         super(home, android.R.style.Theme_Material_NoActionBar_Fullscreen);
         this.home = home;
-        still = Settings.Global.getFloat(home.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        still = !Motion.on();
     }
 
     /** True for the first home screen of this boot; remembers the boot, so it is true once. */
@@ -227,9 +229,11 @@ final class BootSplash extends Dialog {
         if (r != null) r.run();
     }
 
-    /** Every key waits until the launcher is ready. */
+    /** Any key ends it: the remote never stays dead behind it. */
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        // Keys do nothing else while it shows; any key lets the home screen through at once.
+        if (event.getAction() == KeyEvent.ACTION_UP) leave();
         return true;
     }
 

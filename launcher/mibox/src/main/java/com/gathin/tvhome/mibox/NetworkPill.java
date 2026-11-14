@@ -138,6 +138,7 @@ final class NetworkPill {
             // Too many callbacks for the app: the menu just stays as first read.
         }
         IntentFilter f = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        // Exported, as in BluetoothStatus: Wi-Fi state changes are not all sent by the system's own uid.
         if (Build.VERSION.SDK_INT >= 33) home.registerReceiver(wifiState, f, Context.RECEIVER_EXPORTED);
         else home.registerReceiver(wifiState, f);
         watching = true;

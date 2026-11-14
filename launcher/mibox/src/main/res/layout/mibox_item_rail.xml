@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One item of the player's menu: its icon, and its name while the menu is open. -->
+<!-- One item of the player's side menu: its icon, and its name while the menu is open. White when focused; the
+     section shown is marked by a faint fill and the accent. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:layout_marginTop="4dp"
-    android:background="@drawable/mibox_music_rail_item_bg"
+    android:background="@drawable/lo_focus_row"
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
@@ -17,7 +18,7 @@
         android:layout_height="20dp"
         android:duplicateParentState="true"
         android:importantForAccessibility="no"
-        android:tint="@color/mibox_music_rail" />
+        android:tint="@color/lo_icon_on_focus" />
 
     <TextView
         android:id="@+id/rail_label"
@@ -29,6 +30,6 @@
         android:duplicateParentState="true"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/mibox_music_rail"
-        android:textSize="15sp" />
+        android:textColor="@color/lo_text_on_focus"
+        android:textSize="@dimen/lo_text_body" />
 </LinearLayout>

@@ -82,6 +82,8 @@ final class BluetoothStatus implements BluetoothProfile.ServiceListener {
         f.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         f.addAction(BluetoothDevice.ACTION_NAME_CHANGED);
         f.addAction(ACTION_ALIAS_CHANGED);
+        // Exported on purpose: these come from the Bluetooth service, which is not the system's own uid, and a
+        // not-exported receiver would no longer hear them on Android 13+.
         if (Build.VERSION.SDK_INT >= 33) app.registerReceiver(receiver, f, Context.RECEIVER_EXPORTED);
         else app.registerReceiver(receiver, f);
         registered = true;

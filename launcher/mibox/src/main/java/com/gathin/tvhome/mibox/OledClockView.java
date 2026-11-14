@@ -30,7 +30,7 @@ final class OledClockView extends View {
     private final Paint time = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint small = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Random random = new Random();
-    private final float density;
+    private final float textScale;
     private DreamSettings.Style style;
     private boolean nightDim;
     /** Where the block's centre is, as a fraction of the free room, so a new size keeps a valid place. */
@@ -38,7 +38,10 @@ final class OledClockView extends View {
     private final Runnable tick = this::minute;
     private final TextPaint lyricPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private final TextPaint subPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-    /** The lyrics line shown, so a new one is drawn when the sound moves on (checked every half second). */
+    /**
+     * The lyrics line shown, so a new one is drawn when the sound moves on: checked every half second while music
+     * plays, every five seconds otherwise (in case it starts). The clock itself draws once a minute.
+     */
     private int lyricIndex = -2;
     private String trackTitle;
     private final Runnable music = new Runnable() {
@@ -51,13 +54,13 @@ final class OledClockView extends View {
                 trackTitle = t;
                 invalidate();
             }
-            postDelayed(this, 500);
+            postDelayed(this, now == -2 ? 5000 : 500);
         }
     };
 
     OledClockView(Context c) {
         super(c);
-        density = c.getResources().getDisplayMetrics().scaledDensity;
+        textScale = c.getResources().getDisplayMetrics().scaledDensity;
         Typeface light = UiFonts.light(c);
         Typeface regular = UiFonts.regular(c);
         if (light != null) time.setTypeface(light);
@@ -80,12 +83,12 @@ final class OledClockView extends View {
         style = DreamSettings.style(getContext());
         nightDim = DreamSettings.nightDim(getContext());
         boolean discreet = style == DreamSettings.Style.SMALL;
-        time.setTextSize((discreet ? 64 : style == DreamSettings.Style.CLOCK ? 150 : 128) * density);
+        time.setTextSize((discreet ? 64 : style == DreamSettings.Style.CLOCK ? 150 : 128) * textScale);
         time.setLetterSpacing(-0.02f);
-        small.setTextSize((discreet ? 18 : 26) * density);
+        small.setTextSize((discreet ? 18 : 26) * textScale);
         small.setLetterSpacing(0.02f);
-        lyricPaint.setTextSize((discreet ? 20 : 28) * density);
-        subPaint.setTextSize((discreet ? 14 : 18) * density);
+        lyricPaint.setTextSize((discreet ? 20 : 28) * textScale);
+        subPaint.setTextSize((discreet ? 14 : 18) * textScale);
         invalidate();
     }
 
@@ -157,7 +160,7 @@ final class OledClockView extends View {
         Paint.FontMetrics tm = time.getFontMetrics();
         Paint.FontMetrics sm = small.getFontMetrics();
         float timeH = tm.descent - tm.ascent;
-        float gap = 10 * density;
+        float gap = 10 * textScale;
         float smallH = line == null ? 0 : sm.descent - sm.ascent + gap;
         float blockH = timeH + smallH;
         float blockW = Math.max(time.measureText(clock), line == null ? 0 : small.measureText(line));
@@ -222,7 +225,7 @@ final class OledClockView extends View {
 
     private void drawWithLyrics(Canvas canvas, String clock, StaticLayout[] lyric) {
         Paint.FontMetrics tm = time.getFontMetrics();
-        float timeH = tm.descent - tm.ascent, gap = 14 * density, between = 8 * density;
+        float timeH = tm.descent - tm.ascent, gap = 14 * textScale, between = 8 * textScale;
         float lyricH = (lyric[0] == null ? 0 : lyric[0].getHeight())
                 + (lyric[1] == null ? 0 : lyric[1].getHeight() + (lyric[0] == null ? 0 : between));
         float blockW = Math.max(time.measureText(clock), getWidth() * 0.62f);

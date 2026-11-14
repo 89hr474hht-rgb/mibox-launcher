@@ -34,21 +34,36 @@ import java.util.concurrent.Executors;
  * Reading needs the audio permission, asked for from the player.
  */
 final class MusicLibrary {
-    /** One audio file. */
+    /**
+     * One audio file. Two tracks are the same file when their URI is. The folded keys used to sort, search and keep
+     * favourites are worked out once, when the file is read from the index.
+     */
     static final class Track {
         final Uri uri;
         final String title, artist, fileName, path;
         final long durationMs;
-        final int number;
+        final String sortKey, searchKey, favoriteKey;
 
-        Track(Uri uri, String title, String artist, String fileName, String path, long durationMs, int number) {
+        Track(Uri uri, String title, String artist, String fileName, String path, long durationMs) {
             this.uri = uri;
             this.title = title;
             this.artist = artist;
             this.fileName = fileName;
             this.path = path;
             this.durationMs = durationMs;
-            this.number = number;
+            sortKey = fold(fileName);
+            searchKey = fold(title) + " " + sortKey;
+            favoriteKey = MusicLibrary.favoriteKey(path);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof Track && ((Track) o).uri.equals(uri);
+        }
+
+        @Override
+        public int hashCode() {
+            return uri.hashCode();
         }
     }
 
@@ -101,7 +116,6 @@ final class MusicLibrary {
 
     /** The key of the Favoris collection: never a folder's path. */
     static final String FAVORITES = "\u2605favorites";
-    private static final String PREFS = "mibox_music";
 
     /** Holds the application context only, never an activity. */
     @android.annotation.SuppressLint("StaticFieldLeak")
@@ -132,8 +146,7 @@ final class MusicLibrary {
             }
         };
         // Sent by the system only: a receiver that is not exported still gets them.
-        if (Build.VERSION.SDK_INT >= 33) app.registerReceiver(mounts, f, Context.RECEIVER_NOT_EXPORTED);
-        else app.registerReceiver(mounts, f);
+        Receivers.register(app, mounts, f);
     }
 
     static synchronized MusicLibrary get(Context c) {
@@ -175,34 +188,37 @@ final class MusicLibrary {
 
     // ---- favourites: kept by folder and file name, so they come back when the drive is plugged in again ----
 
-    boolean isFavorite(Track t) {
-        return t != null && favoriteKeys().contains(favoriteKey(t.path));
-    }
-
     void toggleFavorite(Track t) {
         if (t == null) return;
         java.util.Set<String> keys = new java.util.HashSet<>(favoriteKeys());
-        String k = favoriteKey(t.path);
-        if (!keys.remove(k)) keys.add(k);
-        app.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putStringSet("favorites", keys).apply();
+        if (!keys.remove(t.favoriteKey)) keys.add(t.favoriteKey);
+        MusicPrefs.get(app).edit().putStringSet(MusicPrefs.FAVORITES, keys).apply();
+        favoritesCache = null;
         for (Listener l : new ArrayList<>(listeners)) l.libraryChanged();
     }
 
-    /** The favourite tracks found on the drives now, in folder then file name order. */
+    /** The favourite tracks found on the drives now, in folder then file name order; kept until either changes. */
     Collection favorites() {
+        if (favoritesCache != null) return favoritesCache;
         java.util.Set<String> keys = favoriteKeys();
         List<Track> tracks = new ArrayList<>();
         if (!keys.isEmpty()) {
-            for (Collection c : collections) for (Track t : c.tracks) if (keys.contains(favoriteKey(t.path))) tracks.add(t);
+            for (Collection c : collections) for (Track t : c.tracks) if (keys.contains(t.favoriteKey)) tracks.add(t);
         }
-        tracks.sort((a, b) -> naturalCompare(favoriteKey(a.path), favoriteKey(b.path)));
-        return new Collection(FAVORITES, app.getString(R.string.mibox_music_favorites), "",
+        tracks.sort((a, b) -> naturalCompareFolded(fold(a.favoriteKey), fold(b.favoriteKey)));
+        favoritesCache = new Collection(FAVORITES, app.getString(R.string.mibox_music_favorites), "",
                 Collections.unmodifiableList(tracks));
+        return favoritesCache;
     }
 
+    private Collection favoritesCache;
+
     private java.util.Set<String> favoriteKeys() {
-        return app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .getStringSet("favorites", Collections.emptySet());
+        return MusicPrefs.get(app).getStringSet(MusicPrefs.FAVORITES, Collections.emptySet());
+    }
+
+    boolean isFavorite(Track t) {
+        return t != null && favoriteKeys().contains(t.favoriteKey);
     }
 
     /** "Folder/file.mp3": the same track on the same drive, whatever Android numbers it this time. */
@@ -252,7 +268,10 @@ final class MusicLibrary {
                 collections = found;
                 scanned = true;
                 scanning = false;
+                favoritesCache = null;
                 for (Listener l : new ArrayList<>(listeners)) l.libraryChanged();
+                MusicPlayer player = MusicPlayer.peek();
+                if (player != null) player.libraryRead(this);
                 if (again) {
                     again = false;
                     refresh();
@@ -288,8 +307,8 @@ final class MusicLibrary {
                 : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String[] cols = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.TRACK, MediaStore.Audio.Media.ALBUM};
-        Map<String, List<Object[]>> byFolder = new LinkedHashMap<>();
+                MediaStore.Audio.Media.ALBUM};
+        Map<String, List<Track>> byFolder = new LinkedHashMap<>();
         Map<String, Map<String, Integer>> albums = new java.util.HashMap<>();
         try (Cursor c = app.getContentResolver().query(uri, cols, null, null, null)) {
             if (c == null) return Collections.emptyList();
@@ -301,9 +320,9 @@ final class MusicLibrary {
                 File parent = new File(data).getParentFile();
                 if (parent == null) continue;
                 Track t = new Track(ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id),
-                        title(c.getString(1), file), clean(c.getString(2)), file, data, c.getLong(3), c.getInt(6) % 1000);
-                byFolder.computeIfAbsent(parent.getPath(), k -> new ArrayList<>()).add(new Object[]{t});
-                String album = clean(c.getString(7));
+                        title(c.getString(1), file), clean(c.getString(2)), file, data, c.getLong(3));
+                byFolder.computeIfAbsent(parent.getPath(), k -> new ArrayList<>()).add(t);
+                String album = clean(c.getString(6));
                 if (!album.isEmpty()) albums.computeIfAbsent(parent.getPath(), k -> new java.util.HashMap<>()).merge(album, 1, Integer::sum);
             }
         } catch (RuntimeException e) {
@@ -311,10 +330,9 @@ final class MusicLibrary {
             return Collections.emptyList();   // a drive pulled out during the query, or no permission
         }
         List<Collection> out = new ArrayList<>();
-        for (Map.Entry<String, List<Object[]>> e : byFolder.entrySet()) {
-            List<Track> tracks = new ArrayList<>();
-            for (Object[] o : e.getValue()) tracks.add((Track) o[0]);
-            tracks.sort((a, b) -> naturalCompare(a.fileName, b.fileName));
+        for (Map.Entry<String, List<Track>> e : byFolder.entrySet()) {
+            List<Track> tracks = e.getValue();
+            tracks.sort((a, b) -> naturalCompareFolded(a.sortKey, b.sortKey));
             String volume = volumeOf(e.getKey(), vols);
             String name = new File(e.getKey()).getName();
             out.add(new Collection(e.getKey(), name.isEmpty() ? volume : name, volume, mostOf(albums.get(e.getKey())),
@@ -368,7 +386,11 @@ final class MusicLibrary {
 
     /** "2" before "10", case and accents ignored: the order people expect in a folder. */
     static int naturalCompare(String a, String b) {
-        String x = fold(a), y = fold(b);
+        return naturalCompareFolded(fold(a), fold(b));
+    }
+
+    /** naturalCompare on strings already folded. */
+    static int naturalCompareFolded(String x, String y) {
         int i = 0, j = 0;
         while (i < x.length() && j < y.length()) {
             char cx = x.charAt(i), cy = y.charAt(j);
@@ -398,18 +420,53 @@ final class MusicLibrary {
 
     /** Whether a track matches what was typed: every word, in its title or file name, accents ignored. */
     static boolean matches(String title, String fileName, String query) {
-        String q = fold(query).trim();
-        if (q.isEmpty()) return true;
-        String hay = fold(title) + " " + fold(fileName);
-        for (String w : q.split("\\s+")) {
-            if (w.matches("\\d+")) {
-                // A number finds the track with that number, "2" as well as "002".
-                String n = w.replaceFirst("^0+(?=\\d)", "");
-                if (!hay.matches("(?s).*(^|\\D)0*" + n + "(\\D|$).*")) return false;
-            } else if (!hay.contains(w)) {
-                return false;
+        return Query.of(query).matches(fold(title) + " " + fold(fileName));
+    }
+
+    /** What was typed in the search field, folded and split once, then tried against each track's searchKey. */
+    static final class Query {
+        private final String[] words;
+
+        private Query(String[] words) {
+            this.words = words;
+        }
+
+        static Query of(String typed) {
+            String q = fold(typed).trim();
+            return new Query(q.isEmpty() ? new String[0] : q.split("\\s+"));
+        }
+
+        boolean matches(String hay) {
+            for (String w : words) {
+                if (isDigits(w)) {
+                    // A number finds the track with that number, "2" as well as "002".
+                    if (!hasNumber(hay, w.replaceFirst("^0+(?=\\d)", ""))) return false;
+                } else if (!hay.contains(w)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private static boolean isDigits(String w) {
+            for (int i = 0; i < w.length(); i++) if (!Character.isDigit(w.charAt(i))) return false;
+            return !w.isEmpty();
+        }
+
+        /** Whether hay holds n as a whole number, leading zeros allowed: "002" holds 2, "12" does not. */
+        private static boolean hasNumber(String hay, String n) {
+            int from = 0;
+            while (true) {
+                int at = hay.indexOf(n, from);
+                if (at < 0) return false;
+                int start = at;
+                while (start > 0 && hay.charAt(start - 1) == '0') start--;
+                boolean before = start == 0 || !Character.isDigit(hay.charAt(start - 1));
+                int end = at + n.length();
+                boolean after = end == hay.length() || !Character.isDigit(hay.charAt(end));
+                if (before && after) return true;
+                from = at + 1;
             }
         }
-        return true;
     }
 }

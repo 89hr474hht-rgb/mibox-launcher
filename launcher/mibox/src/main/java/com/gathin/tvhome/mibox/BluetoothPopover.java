@@ -22,6 +22,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gathin.launchos.design.Motion;
+
 /**
  * The Bluetooth menu: a small panel that drops from the Bluetooth pill, in the look of the launcher's own menus
  * (the Inputs menu), laid out like Apple's: connected devices first with their icon in a blue disc, then the
@@ -92,8 +94,7 @@ final class BluetoothPopover implements BluetoothStatus.Listener {
         panel.setScaleY(0.92f);
         panel.setTranslationY(-8 * density);
         popup.showAsDropDown(anchor, 0, Math.round(10 * density), Gravity.END);
-        boolean reduced = Settings.Global.getFloat(home.getContentResolver(),
-                Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        boolean reduced = !Motion.on();
         panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(reduced ? 0 : 220)
                 .setInterpolator(new DecelerateInterpolator(1.6f)).start();
         View first = rows.getChildCount() > 0 ? rows.getChildAt(0) : null;

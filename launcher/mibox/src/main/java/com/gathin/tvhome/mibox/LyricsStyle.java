@@ -13,46 +13,44 @@ final class LyricsStyle {
     /** The shift moves by this much, up to this far either way. */
     static final int OFFSET_STEP = 100, OFFSET_MAX = 3000;
 
-    private static final String PREFS = "mibox_music";
-
     private LyricsStyle() {
     }
 
     private static SharedPreferences prefs(Context c) {
-        return c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        return MusicPrefs.get(c);
     }
 
     static int size(Context c) {
-        return Math.max(SMALL, Math.min(LARGE, prefs(c).getInt("lyrics_size", MEDIUM)));
+        return Math.max(SMALL, Math.min(LARGE, prefs(c).getInt(MusicPrefs.LYRICS_SIZE, MEDIUM)));
     }
 
     static void setSize(Context c, int size) {
-        prefs(c).edit().putInt("lyrics_size", size).apply();
+        prefs(c).edit().putInt(MusicPrefs.LYRICS_SIZE, size).apply();
     }
 
     static boolean translation(Context c) {
-        return prefs(c).getBoolean("lyrics_translation", true);
+        return prefs(c).getBoolean(MusicPrefs.LYRICS_TRANSLATION, true);
     }
 
     static void setTranslation(Context c, boolean on) {
-        prefs(c).edit().putBoolean("lyrics_translation", on).apply();
+        prefs(c).edit().putBoolean(MusicPrefs.LYRICS_TRANSLATION, on).apply();
     }
 
     static boolean words(Context c) {
-        return prefs(c).getBoolean("lyrics_words", true);
+        return prefs(c).getBoolean(MusicPrefs.LYRICS_WORDS, true);
     }
 
     static void setWords(Context c, boolean on) {
-        prefs(c).edit().putBoolean("lyrics_words", on).apply();
+        prefs(c).edit().putBoolean(MusicPrefs.LYRICS_WORDS, on).apply();
     }
 
     /** Positive shows the lyrics earlier. */
     static int offset(Context c) {
-        return clampOffset(prefs(c).getInt("lyrics_offset", 0));
+        return clampOffset(prefs(c).getInt(MusicPrefs.LYRICS_OFFSET, 0));
     }
 
     static void setOffset(Context c, int ms) {
-        prefs(c).edit().putInt("lyrics_offset", clampOffset(ms)).apply();
+        prefs(c).edit().putInt(MusicPrefs.LYRICS_OFFSET, clampOffset(ms)).apply();
     }
 
     static int clampOffset(int ms) {

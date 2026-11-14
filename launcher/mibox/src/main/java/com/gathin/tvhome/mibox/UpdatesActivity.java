@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import com.gathin.launchos.design.Motion;
+
 /**
  * The LaunchOS updates page: the logo with what the updater is doing around it (UpdateHalo), the installed version,
  * the state in one line and the actions on the left; what is new, notices and the history in cards on the right.
@@ -225,7 +227,7 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
 
     /** The left column rises in, then the cards slide in from the right one after the other. */
     private void enter() {
-        if (Settings.Global.getFloat(getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f) return;
+        if (!Motion.on()) return;
         float dp = getResources().getDisplayMetrics().density;
         ViewGroup left = findViewById(R.id.mibox_left);
         for (int i = 0; i < left.getChildCount(); i++) {

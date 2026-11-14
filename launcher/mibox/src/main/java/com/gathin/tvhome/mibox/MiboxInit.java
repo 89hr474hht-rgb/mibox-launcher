@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,6 +103,7 @@ public final class MiboxInit extends ContentProvider {
         @Override
         public void onActivityPaused(Activity activity) {
             PlayingBubble.screenOut(activity);
+            if (SETTINGS.equals(activity.getClass().getName())) SettingsPanes.paused(activity);
             HomeExtras extras = EXTRAS.get(activity);
             if (extras != null) extras.pause();
             if (resumedHome.get() == activity) {
@@ -121,11 +123,14 @@ public final class MiboxInit extends ContentProvider {
 
         @Override
         public void onActivityPreCreated(Activity activity, Bundle state) {
+            // Android 10+ calls this before the activity reads its resources.
             french(activity.getResources());
         }
 
         @Override
         public void onActivityCreated(Activity activity, Bundle state) {
+            // Before Android 10 there is no pre-created call: this is the earliest point left.
+            if (Build.VERSION.SDK_INT < 29) french(activity.getResources());
             // LaunchOS's start-up screen, on the first home screen of a boot only. Shown as the home screen is
             // created, before its first frame, so the home screen never flashes up before it.
             if (HOME.equals(activity.getClass().getName()) && BootSplash.firstHomeOfBoot(activity)) {

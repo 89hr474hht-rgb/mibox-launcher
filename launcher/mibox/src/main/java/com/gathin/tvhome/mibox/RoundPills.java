@@ -4,13 +4,14 @@ import android.animation.ValueAnimator;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import java.util.List;
+
+import com.gathin.launchos.design.Motion;
 
 /**
  * The top bar's pills as round buttons: only the icon shows, and the pill with focus widens to show its name, then
@@ -68,8 +69,7 @@ final class RoundPills {
             int from = v.getWidth() > 0 ? v.getWidth() : size;
             int to = target > 0 ? natural() : size;
             float start = open;
-            boolean reduced = Settings.Global.getFloat(v.getContext().getContentResolver(),
-                    Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+            boolean reduced = !Motion.on();
             anim = ValueAnimator.ofFloat(0f, 1f);
             anim.setDuration(reduced ? 0 : target > 0 ? OPEN_MS : CLOSE_MS);
             anim.setInterpolator(new DecelerateInterpolator(1.5f));

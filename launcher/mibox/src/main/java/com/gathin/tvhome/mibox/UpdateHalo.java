@@ -10,10 +10,11 @@ import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
-import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+
+import com.gathin.launchos.design.Motion;
 
 /**
  * The big round picture of the updates page: the LaunchOS logo in a glow, with what the updater is doing drawn around
@@ -49,7 +50,7 @@ public final class UpdateHalo extends View {
         super(context, attrs);
         dp = context.getResources().getDisplayMetrics().density;
         logo = context.getDrawable(R.drawable.mibox_logo);
-        still = Settings.Global.getFloat(context.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
+        still = !Motion.on();
         ring.setStyle(Paint.Style.STROKE);
         ring.setStrokeCap(Paint.Cap.ROUND);
         mark.setStyle(Paint.Style.STROKE);
