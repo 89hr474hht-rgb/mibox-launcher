@@ -5,20 +5,23 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.gathin.launchos.design.Focus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 /**
- * Connexion: a glass card split in two over the posters already on the box. The owner types the server, user name
- * and password with the remote and the box's keyboard; the eye shows or hides the password. Se connecter tests the
- * account with the server first (the button turns into a spinner meanwhile); only an account the server accepts is
- * kept, and the button then says Continuer.
+ * Connexion. The owner types the server, user name and password with the remote; the eye shows or hides the password.
+ * Se connecter tests the account with the server first (on {@link Bg#run}, the button a spinner meanwhile); only an
+ * account the server accepts is kept (AccountStore), and the button then says Continuer. Supprimer le compte asks a
+ * second OK ({@link Confirm}), then deletes the account and everything kept for it (AccountStore.forget).
  */
 public final class AccountActivity extends Activity {
     private EditText server, user, password;
@@ -26,6 +29,7 @@ public final class AccountActivity extends Activity {
     private View saveSpinner;
     private ImageView reveal;
     private boolean busy, connected, shown;
+    private Confirm remove;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -39,9 +43,9 @@ public final class AccountActivity extends Activity {
         saveSpinner = findViewById(R.id.save_spinner);
         reveal = findViewById(R.id.reveal);
         reveal.setOnClickListener(v -> reveal(!shown));
-        Ui.lift(reveal, 1.05f);
-        Ui.lift(findViewById(R.id.save), 1.03f);
-        Ui.lift(findViewById(R.id.remove), 1.05f);
+        Focus.lift(reveal);
+        Focus.lift(findViewById(R.id.save));
+        Focus.lift(findViewById(R.id.remove));
         Account a = AccountStore.load(this);
         if (a != null) {
             server.setText(a.server);
@@ -71,8 +75,11 @@ public final class AccountActivity extends Activity {
             if (connected) finish();
             else save();
         });
-        findViewById(R.id.remove).setOnClickListener(v -> {
-            AccountStore.clear(this);
+        TextView removeButton = findViewById(R.id.remove);
+        remove = new Confirm(removeButton, removeButton, () -> {
+            AccountStore.forget(this);
+            connected = false;
+            saveLabel.setText(R.string.login_connect);
             server.setText("");
             user.setText("");
             password.setText("");
@@ -106,7 +113,7 @@ public final class AccountActivity extends Activity {
             if (isDestroyed()) return;
             loading(false);
             if (error != null) {
-                show(error.french(), true);
+                show(error.text(this), true);
                 return;
             }
             if (!AccountStore.save(this, account)) {
@@ -115,16 +122,26 @@ public final class AccountActivity extends Activity {
             }
             String expires = info.expires > 0
                     ? new SimpleDateFormat("d MMMM yyyy", Locale.FRANCE).format(new Date(info.expires * 1000))
-                    : "sans date de fin";
+                    : getString(R.string.login_no_end);
             connected = true;
+            // A panel that only offers HLS for live channels: ask for it first.
+            if (info.m3u8 && !info.ts) Options.setLiveHls(this, AccountStore.key(account), true);
             saveLabel.setText(R.string.login_continue);
-            String formats = info.ts && info.m3u8 ? "TS et HLS" : info.m3u8 ? "HLS" : "TS";
-            show("Connecté. Compte enregistré sur la box.\n"
-                    + "Abonnement : " + expires + "\n"
-                    + "Connexions : " + info.activeConnections + " en cours sur " + Math.max(info.maxConnections, 1)
-                    + " autorisée" + (info.maxConnections > 1 ? "s" : "") + "\n"
-                    + "Formats du direct : " + formats, false);
+            String formats = getString(info.ts && info.m3u8 ? R.string.login_formats_both
+                    : info.m3u8 ? R.string.login_formats_hls : R.string.login_formats_ts);
+            int allowed = Math.max(info.maxConnections, 1);
+            show(getString(R.string.login_ok) + "\n"
+                    + getString(R.string.login_expires, expires) + "\n"
+                    + getResources().getQuantityString(R.plurals.login_connections, allowed, info.activeConnections, allowed)
+                    + "\n" + getString(R.string.login_formats, formats), false);
         });
+    }
+
+    /** Back while the deletion waits for its second OK only puts the button back. */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && remove != null && remove.cancel()) return true;
+        return super.onKeyDown(keyCode, event);
     }
 
     /** Se connecter becomes a spinner while the server answers. */
@@ -148,9 +165,9 @@ public final class AccountActivity extends Activity {
         boolean waiting = text.equals(getString(R.string.testing));
         findViewById(R.id.result_box).setVisibility(View.VISIBLE);
         result.setText(text);
-        result.setTextColor(getColor(error ? R.color.ds_danger : R.color.ds_text));
+        result.setTextColor(getColor(error ? R.color.lo_error : R.color.lo_text));
         ImageView icon = findViewById(R.id.result_icon);
         icon.setImageResource(error ? R.drawable.ic_alert : waiting ? R.drawable.ic_refresh : R.drawable.ic_check_circle);
-        icon.setImageTintList(getColorStateList(error ? R.color.danger : waiting ? R.color.accent_light : R.color.ok));
+        icon.setImageTintList(getColorStateList(error ? R.color.lo_error : waiting ? R.color.lo_accent : R.color.lo_ok));
     }
 }

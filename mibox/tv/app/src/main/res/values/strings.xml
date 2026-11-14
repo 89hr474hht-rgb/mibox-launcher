@@ -17,33 +17,83 @@
     <string name="testing">Connexion au serveur…</string>
     <string name="missing_fields">Remplis le serveur, l\'identifiant et le mot de passe.</string>
     <string name="saved_failed">Impossible d\'enregistrer le compte sur la box (stockage chiffré indisponible).</string>
-    <string name="removed">Compte supprimé de la box.</string>
+    <string name="removed">Compte supprimé de la box, avec son historique, ses favoris, ses groupes et chaînes modifiés et les images gardées.</string>
     <string name="live">EN DIRECT</string>
     <string name="play_failed">Lecture impossible.</string>
     <string name="retrying">Nouvelle tentative…</string>
     <string name="retrying_hls">Nouvelle tentative en HLS…</string>
+    <string name="retrying_ts">Nouvelle tentative en MPEG-TS…</string>
     <string name="retry_hint">OK pour réessayer, Retour pour quitter.</string>
-    <string name="nav_refresh">Actualiser</string>
-    <string name="refresh_title">Actualiser</string>
-    <string name="refresh_hint">Quand ton fournisseur ajoute des chaînes, des films ou des épisodes. Les listes se rechargent aussi seules toutes les 6 heures.</string>
-    <string name="refresh_all">Tout actualiser</string>
-    <string name="refresh_all_sub">Chaînes, films, séries et guide des programmes</string>
-    <string name="refresh_live">Chaînes en direct</string>
-    <string name="refresh_movies">Films</string>
-    <string name="refresh_series">Séries</string>
-    <string name="refresh_guide">Guide des programmes</string>
-    <string name="refresh_images">Logos et affiches</string>
     <string name="refresh_not_loaded">Pas encore chargé</string>
-    <string name="refresh_running">Actualisation…</string>
-    <string name="refresh_done">À jour</string>
-    <string name="refresh_cleared">Vidé</string>
-    <string name="refresh_some_failed">Une liste n\'a pas pu être rechargée</string>
     <string name="refresh_no_account">Aucun compte enregistré</string>
-    <plurals name="refresh_guide_sub">
-        <item quantity="one">%1$d chaîne en mémoire. Il se recharge quand une chaîne s\'affiche.</item>
-        <item quantity="other">%1$d chaînes en mémoire. Il se recharge quand une chaîne s\'affiche.</item>
-    </plurals>
-    <string name="refresh_images_sub">%1$s en cache sur la box. Ils se téléchargent de nouveau quand ils s\'affichent.</string>
     <string name="guide_next">Ensuite · %1$s  %2$s</string>
     <string name="guide_now">%1$s – %2$s · %3$s</string>
+    <!-- Retry after a failed load, and the second step of a deletion. -->
+    <string name="retry">Réessayer</string>
+    <string name="confirm_delete">Confirmer la suppression ?</string>
+
+    <!-- What went wrong with the provider's server (XtreamException). -->
+    <string name="err_bad_address">L\'adresse du serveur n\'est pas valide. Exemple : http://serveur.exemple:8080</string>
+    <string name="err_unknown_host">Adresse du serveur introuvable. Vérifie l\'adresse et la connexion de la box.</string>
+    <string name="err_timeout">Le serveur ne répond pas. Réessaie dans un moment.</string>
+    <string name="err_network">Impossible de joindre le serveur. Vérifie la connexion de la box.</string>
+    <string name="err_refused">Le serveur refuse l\'accès : identifiants refusés, ou trop de connexions en même temps. (code %1$d)</string>
+    <string name="err_server">Le serveur du fournisseur a un problème. Réessaie plus tard. (code %1$d)</string>
+    <string name="err_bad_answer">Le serveur a envoyé une réponse illisible. Ce n\'est peut-être pas un serveur Xtream Codes.</string>
+    <string name="err_too_big">Cette liste est trop grande pour la mémoire de la box.</string>
+    <string name="err_auth">Identifiant ou mot de passe refusé par le serveur.</string>
+    <string name="err_account_status">Le compte n\'est pas actif (état : %1$s).</string>
+    <string name="err_unknown">Une erreur inattendue s\'est produite. Réessaie.</string>
+
+    <!-- What went wrong while playing (Players.describe). -->
+    <string name="play_err_refused">Le serveur refuse ce flux. Une autre lecture est peut-être en cours sur ce compte. (code %1$d)</string>
+    <string name="play_err_gone">Ce contenu n\'existe plus chez le fournisseur.</string>
+    <string name="play_err_format">Le format de ce flux n\'est pas reconnu.</string>
+    <string name="play_err_decoder">La box ne sait pas lire ce format vidéo ou audio.</string>
+    <string name="play_err_other">La lecture s\'est arrêtée sur une erreur.</string>
+
+    <!-- The account once the server accepted it. -->
+    <string name="login_ok">Connecté. Compte enregistré sur la box.</string>
+    <string name="login_expires">Abonnement : %1$s</string>
+    <string name="login_no_end">sans date de fin</string>
+    <plurals name="login_connections">
+        <item quantity="one">Connexions : %1$d en cours sur %2$d autorisée</item>
+        <item quantity="other">Connexions : %1$d en cours sur %2$d autorisées</item>
+    </plurals>
+    <string name="login_formats">Formats du direct : %1$s</string>
+    <string name="login_formats_both">TS et HLS</string>
+    <string name="login_formats_hls" translatable="false">HLS</string>
+    <string name="login_formats_ts" translatable="false">TS</string>
+
+    <!-- Counts and short texts of the lists. -->
+    <plurals name="count_groups">
+        <item quantity="one">%d groupe</item>
+        <item quantity="other">%d groupes</item>
+    </plurals>
+    <plurals name="count_channels">
+        <item quantity="one">%d chaîne</item>
+        <item quantity="other">%d chaînes</item>
+    </plurals>
+    <plurals name="count_titles">
+        <item quantity="one">%d titre</item>
+        <item quantity="other">%d titres</item>
+    </plurals>
+    <plurals name="count_seasons">
+        <item quantity="one">%d saison</item>
+        <item quantity="other">%d saisons</item>
+    </plurals>
+    <string name="live_watched">Regardée %1$s</string>
+    <string name="live_number">Chaîne %1$d</string>
+    <string name="season_name">Saison %1$d</string>
+    <string name="episode_name">Épisode %1$d</string>
+    <string name="osd_track">Piste %1$d</string>
+    <string name="osd_track_surround">%1$s · 5.1</string>
+    <string name="osd_track_stereo">%1$s · stéréo</string>
+
+    <!-- How long ago, how big. -->
+    <string name="ago_now">à l\'instant</string>
+    <string name="ago_minutes">il y a %1$d min</string>
+    <string name="ago_hours">il y a %1$d h</string>
+    <string name="size_kb">%1$d Ko</string>
+    <string name="size_mb">%1$s Mo</string>
 </resources>

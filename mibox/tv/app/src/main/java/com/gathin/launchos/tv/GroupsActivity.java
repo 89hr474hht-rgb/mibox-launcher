@@ -106,8 +106,8 @@ public final class GroupsActivity extends Activity {
             name.setText(g == null ? Groups.panelName(section, c) : g.name(section, c));
             Library lib = Library.of(section);
             List<Item> l = lib.items(c.id);
-            String count = l == null ? "" : l.size() + (l.size() > 1 ? " titres" : " titre");
-            if (section == Xtream.Section.LIVE && l != null) count = l.size() + (l.size() > 1 ? " chaînes" : " chaîne");
+            String count = l == null ? "" : getResources().getQuantityString(section == Xtream.Section.LIVE
+                    ? R.plurals.count_channels : R.plurals.count_titles, l.size(), l.size());
             boolean renamed = g != null && g.renamed(section, c.id);
             sub.setText(renamed ? Ui.meta(getString(R.string.group_was, Groups.panelName(section, c)), count) : count);
             boolean isHidden = g != null && g.hidden(section, c.id);

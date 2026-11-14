@@ -10,9 +10,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gathin.launchos.design.Focus;
+
 /**
- * A film: its poster blurred behind the page; on the left its year, length, genre, summary and people, on the right
- * the poster and Lecture or Reprendre, Depuis le début, and the trailer when the panel gives one.
+ * A film, laid out like a series (SeriesActivity): its poster blurred behind the page; on the left its year, length,
+ * genre, summary and people, on the right the poster and Regarder or Reprendre, Depuis le début, and the trailer when
+ * the panel gives a YouTube one ({@link Trailers}). The sheet comes from {@link Details}.
  */
 public final class MovieActivity extends Activity {
     private static final String EXTRA_ID = "id", EXTRA_NAME = "name", EXTRA_IMAGE = "image", EXTRA_EXT = "ext",
@@ -23,7 +26,8 @@ public final class MovieActivity extends Activity {
     private TextView meta, plot, people, play, restart, trailer;
     private ImageView blur, poster;
     private View plotSkeleton, posterSkeleton;
-    private String trailerId = "";
+    /** The checked YouTube address of the trailer, "" when there is none. */
+    private String trailerUrl = "";
 
     static Intent intent(Context c, Item film) {
         return new Intent(c, MovieActivity.class).putExtra(EXTRA_ID, film.id).putExtra(EXTRA_NAME, film.name)
@@ -43,9 +47,8 @@ public final class MovieActivity extends Activity {
         Intent in = getIntent();
         film = Library.of(Xtream.Section.MOVIES).find(in.getStringExtra(EXTRA_ID));
         if (film == null) {
-            film = new Item(Item.Kind.MOVIE, in.getStringExtra(EXTRA_ID), in.getStringExtra(EXTRA_NAME),
-                    in.getStringExtra(EXTRA_IMAGE), in.getStringExtra(EXTRA_EXT), 0, "", in.getStringExtra(EXTRA_CATEGORY),
-                    0, 0f, "", "", 0, 0);
+            film = Item.movie(in.getStringExtra(EXTRA_ID), in.getStringExtra(EXTRA_NAME), in.getStringExtra(EXTRA_IMAGE),
+                    in.getStringExtra(EXTRA_EXT), in.getStringExtra(EXTRA_CATEGORY));
         }
         blur = findViewById(R.id.blur);
         poster = findViewById(R.id.poster);
@@ -67,9 +70,9 @@ public final class MovieActivity extends Activity {
         play.setOnClickListener(v -> start(position()));
         restart.setOnClickListener(v -> start(0));
         trailer.setOnClickListener(v -> openTrailer());
-        Ui.lift(play, 1.05f);
-        Ui.lift(restart, 1.05f);
-        Ui.lift(trailer, 1.05f);
+        Focus.lift(play);
+        Focus.lift(restart);
+        Focus.lift(trailer);
         play.requestFocus();
     }
 
@@ -110,19 +113,19 @@ public final class MovieActivity extends Activity {
         } else if (picture.isEmpty() && vi != null) {
             posterSkeleton.setVisibility(View.GONE);
         }
-        trailerId = vi == null ? "" : vi.trailer;
-        trailer.setVisibility(trailerId.isEmpty() ? View.GONE : View.VISIBLE);
+        // Only a YouTube video is offered; anything else from the panel hides the button.
+        String url = vi == null ? null : Trailers.youtube(vi.trailer);
+        trailerUrl = url == null ? "" : url;
+        trailer.setVisibility(trailerUrl.isEmpty() ? View.GONE : View.VISIBLE);
     }
 
-    /** The trailer opens in YouTube (the panel gives a YouTube id, sometimes a whole address). */
+    /** The trailer opens in YouTube (or whatever app opens YouTube addresses on the box). */
     private void openTrailer() {
-        if (trailerId.isEmpty()) return;
-        String url = trailerId.matches("(?i)^https?://.*") ? trailerId
-                : "https://www.youtube.com/watch?v=" + Uri.encode(trailerId);
+        if (trailerUrl.isEmpty()) return;
         try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl)));
         } catch (ActivityNotFoundException e) {
-            GlassToast.show(this, getString(R.string.detail_trailer_none), false);
+            Notice.show(this, getString(R.string.detail_trailer_none), false);
         }
     }
 

@@ -12,12 +12,15 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gathin.launchos.design.Focus;
+
 import java.util.Locale;
 
 /**
- * A button that becomes its own progress gauge: at rest it shows what it refreshes and when that was last done;
- * pressed, its glass fills from the left as the work goes, with the percentage in the corner (or a light that
- * sweeps across when the end cannot be known); then it turns green, or red with the reason, and settles back.
+ * A tile (tile_bg) that is also its own progress gauge, for one section's refresh in Réglages: at rest it says what
+ * it holds; while SyncStore works, a faint accent fill grows from the left with the percentage in the corner (or a
+ * third of it sweeps across when the end cannot be known); then a green (done) or red (failed, with the reason) fill.
+ * The sweep runs only while needed and stops when the view is detached. Main thread only.
  */
 public final class GaugeButton extends FrameLayout {
     enum Look { IDLE, RUNNING, DONE, FAILED }
@@ -36,7 +39,7 @@ public final class GaugeButton extends FrameLayout {
     public GaugeButton(Context c, AttributeSet attrs) {
         super(c, attrs);
         LayoutInflater.from(c).inflate(R.layout.view_gauge_button, this, true);
-        setBackgroundResource(R.drawable.ds_tile_bg);
+        setBackgroundResource(R.drawable.tile_bg);
         setFocusable(true);
         setClipToOutline(true);
         fill = findViewById(R.id.gauge_fill);
@@ -46,7 +49,7 @@ public final class GaugeButton extends FrameLayout {
         percent = findViewById(R.id.gauge_percent);
         fill.setPivotX(0);
         fill.setScaleX(0);
-        Ui.lift(this, 1.05f);
+        Focus.lift(this);
     }
 
     void set(int iconRes, int titleRes) {
@@ -60,7 +63,7 @@ public final class GaugeButton extends FrameLayout {
 
     /** At rest: what it holds now. */
     void idle(CharSequence text) {
-        enter(Look.IDLE, R.drawable.ds_gauge_fill);
+        enter(Look.IDLE, R.drawable.gauge_fill);
         animateFill(0);
         percent.setVisibility(GONE);
         say(text);
@@ -68,7 +71,7 @@ public final class GaugeButton extends FrameLayout {
 
     /** Working: fraction from 0 to 1, or below 0 when the end is not known. */
     void running(float fraction, CharSequence text) {
-        enter(Look.RUNNING, R.drawable.ds_gauge_fill);
+        enter(Look.RUNNING, R.drawable.gauge_fill);
         if (fraction < 0) {
             percent.setVisibility(GONE);
             startSweep();
@@ -82,7 +85,7 @@ public final class GaugeButton extends FrameLayout {
     }
 
     void done(CharSequence text) {
-        enter(Look.DONE, R.drawable.ds_gauge_fill_ok);
+        enter(Look.DONE, R.drawable.gauge_fill_ok);
         animateFill(1);
         percent.setVisibility(VISIBLE);
         percent.setText("✓");
@@ -90,7 +93,7 @@ public final class GaugeButton extends FrameLayout {
     }
 
     void failed(CharSequence text) {
-        enter(Look.FAILED, R.drawable.ds_gauge_fill_error);
+        enter(Look.FAILED, R.drawable.gauge_fill_error);
         animateFill(1);
         percent.setVisibility(VISIBLE);
         percent.setText("!");

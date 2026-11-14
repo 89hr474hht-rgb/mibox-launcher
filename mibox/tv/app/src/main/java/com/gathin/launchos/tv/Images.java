@@ -9,15 +9,24 @@ import android.widget.ImageView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Logos and posters: fetched once, scaled down to the size they are shown at, kept in memory (an eighth of the
- * app's heap) and on disk in the app's cache, which Android may clear when space runs low.
+ * Logos and posters: fetched once (with a generic User-Agent, as they often sit on third-party hosts), scaled down to
+ * the size they are shown at, kept in memory (an eighth of the app's heap) and on disk in cacheDir/img, at most
+ * {@link #DISK_CAP} (the least recently used files go first, {@link DiskCachePolicy}). Work runs on its own pool of three
+ * threads; results come back on the main thread.
  */
 final class Images {
     private static final int MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+    /** The pictures kept on disk, at most. */
+    static final long DISK_CAP = 64L * 1024 * 1024;
+    /** The disk cache is measured again after this many new files. */
+    private static final int TRIM_EVERY = 32;
+    private static int written = TRIM_EVERY;
     private static final ExecutorService POOL = Executors.newFixedThreadPool(3);
     private static final LruCache<String, Bitmap> MEMORY =
             new LruCache<String, Bitmap>((int) Math.min(Runtime.getRuntime().maxMemory() / 8, 48L * 1024 * 1024)) {
@@ -134,20 +143,25 @@ final class Images {
         if (file.exists()) {
             try {
                 data = java.nio.file.Files.readAllBytes(file.toPath());
-            } catch (java.io.IOException ignored) {
+                // Used again: it moves to the back of the eviction queue.
+                if (!file.setLastModified(System.currentTimeMillis())) Logs.missing("Images.touch", "mtime");
+            } catch (java.io.IOException e) {
+                Logs.failed("Images.read", e);
             }
         }
         if (data == null) {
             try {
-                data = Http.get(url, MAX_IMAGE_BYTES);
+                data = Http.get(url, MAX_IMAGE_BYTES, Http.GENERIC_AGENT);
             } catch (XtreamException e) {
                 return null;
             }
             if (dir.isDirectory() || dir.mkdirs()) {
                 try (FileOutputStream out = new FileOutputStream(file)) {
                     out.write(data);
-                } catch (java.io.IOException ignored) {
+                } catch (java.io.IOException e) {
+                    Logs.failed("Images.write", e);
                 }
+                trimSoon(dir);
             }
         }
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -163,6 +177,21 @@ final class Images {
         } catch (OutOfMemoryError e) {
             Logs.failed("Images.decode", e);
             return null;
+        }
+    }
+
+    /** After every {@link #TRIM_EVERY} new files (and the first), brings the disk cache back under its cap. */
+    private static void trimSoon(File dir) {
+        synchronized (Images.class) {
+            if (++written < TRIM_EVERY) return;
+            written = 0;
+            File[] files = dir.listFiles();
+            if (files == null) return;
+            List<DiskCachePolicy.Entry> list = new ArrayList<>(files.length);
+            for (File f : files) list.add(new DiskCachePolicy.Entry(f.getName(), f.length(), f.lastModified()));
+            for (String name : DiskCachePolicy.evict(list, DISK_CAP)) {
+                if (!new File(dir, name).delete()) Logs.missing("Images.trim", "delete");
+            }
         }
     }
 

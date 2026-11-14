@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Page frame of the new screens. -->
-    <dimen name="ds_page_x">40dp</dimen>
-    <dimen name="ds_page_y">34dp</dimen>
-    <dimen name="ds_gap">24dp</dimen>
-    <dimen name="ds_radius">18dp</dimen>
     <!--
-      The mini-player (picture-in-picture) sits in the bottom-right corner, 26 dp from the edges. Nothing that
-      matters may sit there or within 24 dp of it: the dead zone is pip_width + 26 + 24 by pip_height + 26 + 24
-      (306 + 26 + 24, 172 + 26 + 24). SafeScrollView keeps focused rows out of it.
+      The mini-player (picture-in-picture) sits in the bottom-right corner, inside the page frame (lo_page_x from the
+      right, lo_page_y from the bottom). Nothing that matters may sit there or within 24 dp of it: the dead zone is
+      pip_width + 48 + 24 by pip_height + 27 + 24 (306 + 48 + 24, 172 + 27 + 24). SafeScrollView keeps focused rows out
+      of it.
     -->
-    <dimen name="ds_pip_zone_width">356dp</dimen>
-    <dimen name="ds_pip_zone_height">222dp</dimen>
+    <dimen name="pip_zone_width">378dp</dimen>
+    <dimen name="pip_zone_height">223dp</dimen>
     <!-- Guide TV: the channel column and one channel's line. -->
-    <dimen name="guide_channel_width">210dp</dimen>
-    <dimen name="guide_row_height">58dp</dimen>
+    <dimen name="guide_channel_width">220dp</dimen>
+    <dimen name="guide_row_height">60dp</dimen>
 </resources>

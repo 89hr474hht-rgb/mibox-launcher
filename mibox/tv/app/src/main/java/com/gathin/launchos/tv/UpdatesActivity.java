@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gathin.launchos.design.Focus;
+
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +49,7 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
         permissionBox = findViewById(R.id.permission_box);
 
         findViewById(R.id.check).setOnClickListener(v -> Updater.get().check(this, this::refresh));
+        for (int id : new int[]{R.id.check, R.id.install, R.id.later, R.id.permission_open}) Focus.lift(findViewById(id));
         install.setOnClickListener(v -> {
             Release r = new UpdateState(this).available();
             if (r != null) Updater.get().install(this, r);
@@ -96,25 +99,25 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
         boolean newer = r != null && r.version.isNewerThan(now);
 
         String sub = null;
-        int icon = R.drawable.ic_check_circle, tint = R.color.ok;
-        status.setTextColor(getColor(R.color.text));
+        int icon = R.drawable.ic_check_circle, tint = R.color.lo_ok;
+        status.setTextColor(getColor(R.color.lo_text));
         if (u.phase() == Updater.Phase.CHECKING) {
             status.setText(R.string.upd_checking);
             icon = R.drawable.ic_refresh;
-            tint = R.color.accent_light;
+            tint = R.color.lo_accent;
         } else if (state.lastError() != null) {
             status.setText(state.lastError());
-            status.setTextColor(getColor(R.color.danger));
+            status.setTextColor(getColor(R.color.lo_error));
             icon = R.drawable.ic_alert;
-            tint = R.color.danger;
+            tint = R.color.lo_error;
         } else if (newer) {
             status.setText(getString(R.string.upd_available, String.valueOf(r.version)));
             icon = R.drawable.ic_update;
-            tint = R.color.accent_light;
+            tint = R.color.lo_accent;
         } else if (state.lastCheck() <= 0) {
             status.setText(R.string.upd_never_checked);
             icon = R.drawable.ic_history;
-            tint = R.color.text_dim;
+            tint = R.color.lo_text_2;
         } else {
             status.setText(R.string.upd_up_to_date);
         }
@@ -156,7 +159,7 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
         progress.setVisibility(p == null ? View.GONE : View.VISIBLE);
         if (p != null) {
             progress.setText(p);
-            progress.setTextColor(getColor(bad ? R.color.danger : R.color.text));
+            progress.setTextColor(getColor(bad ? R.color.lo_error : R.color.lo_text));
         }
 
         permissionBox.setVisibility(getPackageManager().canRequestPackageInstalls() ? View.GONE : View.VISIBLE);
@@ -173,7 +176,7 @@ public final class UpdatesActivity extends Activity implements Updater.Listener 
             boolean failed = !ok && !UpdateState.R_CANCELLED.equals(e.result) && !UpdateState.R_IGNORED.equals(e.result);
             ImageView i1 = line.findViewById(R.id.icon);
             i1.setImageResource(ok ? R.drawable.ic_check : failed ? R.drawable.ic_alert : R.drawable.ic_history);
-            i1.setImageTintList(getColorStateList(ok ? R.color.ok : failed ? R.color.danger : R.color.text_dim));
+            i1.setImageTintList(getColorStateList(ok ? R.color.lo_ok : failed ? R.color.lo_error : R.color.lo_text_2));
             String what = e.version + "  ·  " + result(e.result);
             if (e.detail != null && !e.detail.isEmpty()) what += " (" + e.detail + ")";
             ((TextView) line.findViewById(R.id.what)).setText(what);

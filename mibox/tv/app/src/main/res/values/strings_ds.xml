@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The new Réglages (master-detail) and its Mise à jour & Cache page. -->
+<!-- Réglages (master-detail) and its Mise à jour & Cache page, the login, Accueil, the films, the guide and the player. -->
 <resources>
-    <string name="ds_brand" translatable="false">LaunchTV OS</string>
     <string name="settings_version">Version %1$s</string>
 
     <string name="settings_cat_account">Compte</string>
@@ -64,7 +63,7 @@
     </plurals>
 
     <!-- Connexion -->
-    <string name="login_brand">LaunchTV\nOS</string>
+    <string name="login_brand" translatable="false">LaunchOS\nTV</string>
     <string name="login_tagline">Vos chaînes, films et séries, sur le grand écran.</string>
     <string name="login_connect">Se connecter</string>
     <string name="login_continue">Continuer</string>

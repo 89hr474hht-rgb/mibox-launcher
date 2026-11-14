@@ -11,7 +11,7 @@
         android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="@dimen/poster_height"
-        android:background="@drawable/poster_bg"
+        android:background="@drawable/lo_focus_tile"
         android:duplicateParentState="true"
         android:padding="3dp">
 
@@ -36,8 +36,8 @@
                 android:gravity="center"
                 android:maxLines="4"
                 android:padding="10dp"
-                android:textColor="#99FFFFFF"
-                android:textSize="14sp" />
+                android:textColor="@color/lo_text_3"
+                android:textSize="@dimen/lo_text_small" />
 
             <ImageView
                 android:id="@+id/image"
@@ -84,5 +84,5 @@
         android:paddingEnd="3dp"
         android:singleLine="true"
         android:textColor="@color/card_title"
-        android:textSize="12sp" />
+        android:textSize="@dimen/lo_text_small" />
 </LinearLayout>

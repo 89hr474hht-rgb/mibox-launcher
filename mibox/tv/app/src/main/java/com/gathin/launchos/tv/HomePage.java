@@ -3,12 +3,13 @@ package com.gathin.launchos.tv;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.gathin.launchos.design.Focus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Accueil, the dashboard. In the top third, the hero: what is being watched (or the newest film) over its picture,
- * full screen, fading to black at the bottom, with Reprendre or Regarder and Plus d'infos. Underneath, the shelves:
- * Reprendre la lecture, Vos chaînes, Derniers films, Dernières séries. A focused card takes over the hero after a
- * short pause, so fast scrolling stays light. While the lists load, skeleton posters hold the shelves' place.
+ * Accueil. The hero (what is being watched, else the newest film or series, over its picture) with Reprendre or
+ * Regarder and Plus d'infos; underneath, the shelves: Reprendre la lecture, Vos chaînes, the newest films and series.
+ * A focused card takes over the hero after a short pause (fast scrolling stays light); Up and Down between shelves go
+ * through {@link ShelfNavigator}. Skeletons hold the shelves' place while the lists load. Main thread only.
  */
 final class HomePage {
     private static final int SHELF = 30;
@@ -52,6 +53,7 @@ final class HomePage {
     private final ShelfAdapter adapter = new ShelfAdapter();
     private final RecyclerView.RecycledViewPool pool = new RecyclerView.RecycledViewPool();
     private final Map<String, Integer> positions = new HashMap<>();
+    private final ShelfNavigator shelves;
 
     private Xtream api;
     private Item heroItem;
@@ -80,14 +82,18 @@ final class HomePage {
         rowsView.setLayoutManager(rowsLayout);
         rowsView.setAdapter(adapter);
         rowsView.setItemAnimator(null);
+        shelves = new ShelfNavigator(rowsView, rowsLayout, positions, h -> {
+            Shelf s = ((ShelfAdapter.Holder) h).shelf;
+            return s == null ? null : s.key;
+        });
         play.setOnClickListener(v -> {
             if (heroItem != null) play(heroItem);
         });
         root.findViewById(R.id.home_info).setOnClickListener(v -> {
             if (heroItem != null) open(heroItem);
         });
-        Ui.lift(play, 1.05f);
-        Ui.lift(root.findViewById(R.id.home_info), 1.05f);
+        Focus.lift(play);
+        Focus.lift(root.findViewById(R.id.home_info));
         LinearLayout cards = root.findViewById(R.id.home_skeleton_cards);
         for (int i = 0; i < SKELETON_CARDS; i++) {
             SkeletonView s = new SkeletonView(activity);
@@ -164,7 +170,7 @@ final class HomePage {
         Library films = Library.of(Xtream.Section.MOVIES), series = Library.of(Xtream.Section.SERIES);
         for (History.Entry e : h.films(SHELF)) {
             Item known = films.find(e.id);
-            dated.add(new Object[]{e.at, known != null ? known : new Item(Item.Kind.MOVIE, e.id, e.name, e.image, e.ext, 0, "")});
+            dated.add(new Object[]{e.at, known != null ? known : Item.movie(e.id, e.name, e.image, e.ext, "")});
         }
         for (Item s : h.recentSeries(SHELF)) {
             Item known = series.find(s.id);
@@ -306,7 +312,7 @@ final class HomePage {
 
     View defaultFocus() {
         if (heroItem != null) return play;
-        return cardIn(0, -1);
+        return shelves.cardIn(0, -1);
     }
 
     /** Where an arrow goes inside the page; null hands it to the main screen (the rail). */
@@ -317,18 +323,18 @@ final class HomePage {
             int row = holder == null ? 0 : holder.getBindingAdapterPosition();
             if (direction == View.FOCUS_UP) {
                 if (row <= 0) return heroItem != null ? play : focused;
-                return moveRow(focused, row - 1, -1);
+                return shelves.move(focused, row - 1, -1);
             }
             if (direction == View.FOCUS_DOWN) {
                 if (row >= adapter.getItemCount() - 1) return focused;
-                return moveRow(focused, row + 1, 1);
+                return shelves.move(focused, row + 1, 1);
             }
             if (proposed != null && holder != null && Root.inside(proposed, holder.itemView)) return proposed;
             return direction == View.FOCUS_LEFT ? null : focused;
         }
         if (Root.inside(focused, buttons)) {
             if (direction == View.FOCUS_DOWN) {
-                View card = cardIn(0, -1);
+                View card = shelves.cardIn(0, -1);
                 return card != null ? card : focused;
             }
             if (direction == View.FOCUS_UP) return focused;
@@ -336,49 +342,6 @@ final class HomePage {
             if (direction == View.FOCUS_RIGHT) return Root.inside(proposed, buttons) ? proposed : focused;
         }
         return proposed;
-    }
-
-    /** Moves to another shelf, keeping it at the top of the shelves, onto the card under the focus. */
-    private View moveRow(View focused, int target, int step) {
-        int[] at = new int[2];
-        focused.getLocationOnScreen(at);
-        int x = at[0] + focused.getWidth() / 2;
-        rowsLayout.scrollToPositionWithOffset(target, 0);
-        rowsView.setTranslationY(step * Ui.dp(activity, 30));
-        rowsView.animate().translationY(0).setDuration(220).setInterpolator(new DecelerateInterpolator()).start();
-        rowsView.post(() -> {
-            View card = cardIn(target, x);
-            if (card != null) card.requestFocus();
-        });
-        return focused;
-    }
-
-    /** The card in a shelf nearest to screen x (or where the shelf was left when x is -1). */
-    private View cardIn(int row, int x) {
-        View rowView = rowsLayout.findViewByPosition(row);
-        if (rowView == null) return null;
-        RecyclerView list = rowView.findViewById(R.id.row_list);
-        if (list.getChildCount() == 0) return null;
-        ShelfAdapter.Holder h = (ShelfAdapter.Holder) rowsView.getChildViewHolder(rowView);
-        Integer left = h.shelf == null ? null : positions.get(h.shelf.key);
-        if (x < 0 && left != null && list.getLayoutManager() != null) {
-            View v = list.getLayoutManager().findViewByPosition(left);
-            if (v != null) return v;
-        }
-        View best = null;
-        int bestDistance = Integer.MAX_VALUE;
-        int[] at = new int[2];
-        for (int i = 0; i < list.getChildCount(); i++) {
-            View c = list.getChildAt(i);
-            c.getLocationOnScreen(at);
-            if (at[0] < 0) continue;
-            int d = x < 0 ? at[0] : Math.abs(at[0] + c.getWidth() / 2 - x);
-            if (d < bestDistance) {
-                bestDistance = d;
-                best = c;
-            }
-        }
-        return best;
     }
 
     // ---- shelves ----

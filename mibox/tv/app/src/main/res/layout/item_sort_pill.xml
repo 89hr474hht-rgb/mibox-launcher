@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- An order, a genre or a group to pick: a chip; the one in use is selected. -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Pill"
-    android:layout_marginStart="8dp" />
+    style="@style/Chip"
+    android:layout_marginStart="@dimen/lo_space_2" />

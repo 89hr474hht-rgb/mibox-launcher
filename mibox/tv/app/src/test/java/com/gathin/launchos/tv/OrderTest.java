@@ -57,7 +57,7 @@ public class OrderTest {
     }
 
     private static Item film(String id, String name, long added) {
-        return new Item(Item.Kind.MOVIE, id, name, "", "mkv", 0, "", "1", added, 0f, "", "", 0, 0);
+        return Item.listed(Item.Kind.MOVIE, id, name, "", "mkv", 0, "", "1", added, 0f, "", "", 0);
     }
 
     @Test

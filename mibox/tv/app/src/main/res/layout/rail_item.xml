@@ -11,7 +11,7 @@
             android:layout_height="match_parent"
             android:duplicateParentState="true"
             android:importantForAccessibility="no"
-            android:tint="@color/nav_text" />
+            android:tint="@color/lo_icon_on_focus" />
 
         <View
             android:id="@+id/rail_dot"
@@ -33,6 +33,6 @@
         android:duplicateParentState="true"
         android:fontFamily="@font/launchos_medium"
         android:singleLine="true"
-        android:textColor="@color/nav_text"
-        android:textSize="16sp" />
+        android:textColor="@color/lo_text_on_focus"
+        android:textSize="@dimen/lo_text_body" />
 </merge>

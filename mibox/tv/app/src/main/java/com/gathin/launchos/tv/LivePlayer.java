@@ -24,8 +24,9 @@ import java.util.List;
 /**
  * Live TV inside the main screen, so a channel can shrink into the small window at the bottom right of Chaînes and
  * grow back without stopping. Full screen: Up/Down (or CH+/CH−) zap inside the list it was started from, OK shows
- * what is on, Back shrinks it (or stops it when the mini player is off). A stream that drops is tried again, then
- * as HLS. The time spent on each channel feeds the favourites.
+ * what is on, Back shrinks it (or stops it when the mini player is off). A stream that drops is tried twice again,
+ * then in the other format (MPEG-TS or HLS); the format that played is remembered for the account (Options), so the
+ * next channel asks for it first. The time spent on each channel feeds the favourites. Main thread only.
  */
 final class LivePlayer {
     enum Mode { HIDDEN, FULL, MINI }
@@ -57,7 +58,8 @@ final class LivePlayer {
     private List<Item> channels = new ArrayList<>();
     private int index;
     private String group = "";
-    private boolean triedHls;
+    /** The format asked for now, and whether the other one was tried already for this channel. */
+    private boolean hls, triedOther;
     private int retries;
     private Epg.Listing guide;
     private String guideFor;
@@ -247,6 +249,8 @@ final class LivePlayer {
                     // failing a few seconds in ends on a message instead of trying forever.
                     layer.removeCallbacks(steady);
                     layer.postDelayed(steady, STEADY_MS);
+                    // This format plays on this account: the next channel asks for it first.
+                    if (api != null) Options.setLiveHls(activity, api.accountKey(), hls);
                     infoSub.setText(group);
                     error.setVisibility(View.GONE);
                     caption();
@@ -283,10 +287,11 @@ final class LivePlayer {
         if (player == null || channels.isEmpty()) return;
         countViewing();
         index = i;
-        triedHls = false;
+        triedOther = false;
         retries = 0;
+        hls = Options.liveHls(activity, api.accountKey());
         Item c = channels.get(i);
-        start(api.liveUrl(c, false), MimeTypes.VIDEO_MP2T);
+        start(c);
         infoNumber.setText(c.num > 0 ? String.valueOf(c.num) : "");
         infoTitle.setText(LivePage.display(activity, c));
         infoSub.setText(group);
@@ -307,9 +312,11 @@ final class LivePlayer {
         host.channelChanged(c);
     }
 
-    private void start(String url, String mime) {
+    /** Asks for the channel in the current format (hls or MPEG-TS). */
+    private void start(Item c) {
         error.setVisibility(View.GONE);
-        MediaItem.Builder b = new MediaItem.Builder().setUri(Uri.parse(url)).setMimeType(mime)
+        MediaItem.Builder b = new MediaItem.Builder().setUri(Uri.parse(api.liveUrl(c, hls)))
+                .setMimeType(hls ? MimeTypes.APPLICATION_M3U8 : MimeTypes.VIDEO_MP2T)
                 .setLiveConfiguration(new MediaItem.LiveConfiguration.Builder().build());
         player.setMediaItem(b.build());
         player.prepare();
@@ -319,7 +326,7 @@ final class LivePlayer {
 
     private void failed(PlaybackException e) {
         layer.removeCallbacks(steady);
-        // A live stream that drops is tried twice again, then asked for as HLS once.
+        // A live stream that drops is tried twice again, then asked for once in the other format.
         if (retries < 2) {
             retries++;
             infoSub.setText(R.string.retrying);
@@ -332,15 +339,16 @@ final class LivePlayer {
             }, 1200);
             return;
         }
-        if (!triedHls) {
-            triedHls = true;
+        if (!triedOther) {
+            triedOther = true;
             retries = 0;
-            infoSub.setText(R.string.retrying_hls);
+            hls = !hls;
+            infoSub.setText(hls ? R.string.retrying_hls : R.string.retrying_ts);
             if (mode == Mode.FULL) showInfo();
-            start(api.liveUrl(channels.get(index), true), MimeTypes.APPLICATION_M3U8);
+            start(channels.get(index));
             return;
         }
-        errorText.setText(Players.describe(e));
+        errorText.setText(Players.describe(activity, e));
         error.setVisibility(mode == Mode.FULL ? View.VISIBLE : View.GONE);
         caption.setText(activity.getString(R.string.play_failed));
     }

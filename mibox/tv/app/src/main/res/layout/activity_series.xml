@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A series: its picture full screen, what it is, Regarder or Reprendre, the seasons and the season's episodes. -->
+<!--
+  A series, laid out like a film (activity_movie): its picture blurred behind the page, the label, title, meta and
+  summary at the top left with Regarder or Reprendre, then the seasons as chips and the season's episodes.
+-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/page">
+    android:background="@color/lo_black">
 
     <ImageView
-        android:id="@+id/backdrop_a"
+        android:id="@+id/blur"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:alpha="0"
-        android:importantForAccessibility="no"
-        android:scaleType="centerCrop" />
-
-    <ImageView
-        android:id="@+id/backdrop_b"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
         android:alpha="0"
         android:importantForAccessibility="no"
         android:scaleType="centerCrop" />
@@ -26,69 +19,62 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/scrim_left" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_gravity="bottom"
-        android:background="@drawable/scrim_page_bottom" />
+        android:background="@drawable/detail_scrim" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingTop="36dp">
+        android:paddingTop="@dimen/lo_space_6">
 
         <LinearLayout
-            android:layout_width="600dp"
+            android:layout_width="640dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="64dp"
             android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/label"
-        style="@style/Label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/label"
+                style="@style/Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/title"
-        style="@style/Title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="end"
-        android:fontFamily="@font/launchos_bold"
-        android:lineSpacingMultiplier="0.95"
-        android:maxLines="2"
-        android:textSize="32sp" />
+            <TextView
+                android:id="@+id/title"
+                style="@style/Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/lo_space_2"
+                android:ellipsize="end"
+                android:fontFamily="@font/launchos_bold"
+                android:singleLine="true"
+                android:textSize="@dimen/lo_text_display" />
 
-    <TextView
-        android:id="@+id/meta"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/launchos_medium"
-        android:singleLine="true"
-        android:textColor="#D9FFFFFF"
-        android:textSize="14sp" />
+            <TextView
+                android:id="@+id/meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/lo_space_2"
+                android:fontFamily="@font/launchos_medium"
+                android:singleLine="true"
+                android:textColor="@color/lo_text"
+                android:textSize="@dimen/lo_text_small" />
 
-    <TextView
-        android:id="@+id/plot"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:ellipsize="end"
-        android:lineSpacingMultiplier="1.25"
-        android:maxLines="2"
-        android:textColor="#C7FFFFFF"
-        android:textSize="15sp" />
+            <TextView
+                android:id="@+id/plot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/lo_space_3"
+                android:ellipsize="end"
+                android:lineSpacingMultiplier="1.3"
+                android:maxLines="2"
+                android:textColor="@color/lo_text_2"
+                android:textSize="@dimen/lo_text_body" />
 
             <TextView
                 android:id="@+id/play"
-                style="@style/GlassButton"
-                android:layout_marginTop="16dp"
+                style="@style/Button.Primary"
+                android:layout_marginTop="@dimen/lo_space_4"
                 android:drawableStart="@drawable/ic_play"
                 android:text="@string/hero_play"
                 android:visibility="invisible" />
@@ -97,11 +83,14 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/seasons"
             android:layout_width="match_parent"
-            android:layout_height="46dp"
-            android:layout_marginTop="14dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="@dimen/lo_space_4"
+            android:clipChildren="false"
             android:clipToPadding="false"
             android:paddingStart="64dp"
-            android:paddingEnd="40dp" />
+            android:paddingTop="4dp"
+            android:paddingEnd="@dimen/lo_page_x"
+            android:paddingBottom="4dp" />
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -114,18 +103,35 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="58dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="40dp" />
+                android:paddingTop="@dimen/lo_space_3"
+                android:paddingEnd="@dimen/lo_page_x" />
 
-            <TextView
-                android:id="@+id/status"
+            <LinearLayout
+                android:id="@+id/status_box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="30dp"
-                android:textColor="@color/text_dim"
-                android:textSize="17sp"
-                android:visibility="gone" />
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="@dimen/lo_space_6"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.25"
+                    android:textColor="@color/lo_text_2"
+                    android:textSize="@dimen/lo_text_body" />
+
+                <TextView
+                    android:id="@+id/retry"
+                    style="@style/Button"
+                    android:layout_marginTop="@dimen/lo_space_4"
+                    android:drawableStart="@drawable/ic_refresh"
+                    android:text="@string/retry"
+                    android:visibility="gone" />
+            </LinearLayout>
         </FrameLayout>
     </LinearLayout>
 </FrameLayout>

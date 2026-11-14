@@ -2,4 +2,8 @@
 <lint>
     <!-- Updater.install: a rough free-space floor before a ~1 MB download; Android checks again when installing. -->
     <issue id="UsableSpace" severity="ignore" />
+    <!-- The design system's floor: no text under 12 sp, sizes in sp, every visible text from resources. -->
+    <issue id="SmallSp" severity="error" />
+    <issue id="SpUsage" severity="error" />
+    <issue id="HardcodedText" severity="error" />
 </lint>

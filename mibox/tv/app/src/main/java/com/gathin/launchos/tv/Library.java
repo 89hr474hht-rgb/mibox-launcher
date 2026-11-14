@@ -11,7 +11,8 @@ import java.util.Map;
  * One section's catalogue (channels, films or series), kept for the whole app: the categories, then every item
  * at once, read as it arrives, so the home pages can show the newest films, rows by group and search across
  * everything. A panel that refuses the whole list is read one category at a time instead ({@link #partial}).
- * Everything is kept for {@link #MAX_AGE_MS}; the Actualiser screen drops it at once. Main thread only.
+ * Everything is kept for {@link #MAX_AGE_MS}; SyncStore drops it to read it again. Main thread only; the whole list is
+ * read on {@link Bg#sync}, a single category on {@link Bg#run}.
  */
 final class Library {
     static final long MAX_AGE_MS = 6 * 60 * 60 * 1000L;
@@ -145,7 +146,8 @@ final class Library {
         loading = true;
         int e = epoch;
         Xtream.Section s = section;
-        Bg.run(() -> {
+        // The whole catalogue: on the catalogue thread, so screens keep their own pool.
+        Bg.sync(() -> {
             List<Xtream.Category> cats = api.categories(s);
             List<Item> list = null;
             try {
@@ -200,6 +202,7 @@ final class Library {
         categoryWaiting.put(categoryId, w);
         int e = epoch;
         Xtream.Section s = section;
+        // One category, for a row on screen: interactive work, not a catalogue download.
         Bg.run(() -> api.items(s, categoryId), (list, failure) -> {
             if (e != epoch) return;
             List<Runnable> all = categoryWaiting.remove(categoryId);

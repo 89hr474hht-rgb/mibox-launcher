@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- An error said on a row: the error colour, a darker red on the white focus. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="#FFC62828" android:state_focused="true" />
-    <item android:color="@color/danger" />
+    <item android:color="#FFB3261E" android:state_focused="true" />
+    <item android:color="@color/lo_error" />
 </selector>

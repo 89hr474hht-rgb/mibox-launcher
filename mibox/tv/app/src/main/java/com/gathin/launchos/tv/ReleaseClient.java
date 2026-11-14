@@ -127,7 +127,9 @@ final class ReleaseClient {
     }
 
     private static UpdateException network(IOException e) {
-        return new UpdateException(R.string.upd_err_network, e.getClass().getSimpleName());
+        // The family sees a plain sentence; the exception's type goes to the log only.
+        Logs.failed("ReleaseClient.network", e);
+        return new UpdateException(R.string.upd_err_network);
     }
 
     static MessageDigest sha256() {

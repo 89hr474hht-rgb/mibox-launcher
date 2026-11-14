@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- A season of a series: a chip; the season shown is selected. -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="42dp"
-    android:layout_marginEnd="8dp"
-    android:background="@drawable/row_bg"
-    android:focusable="true"
-    android:fontFamily="@font/launchos_medium"
-    android:gravity="center"
-    android:paddingStart="18dp"
-    android:paddingEnd="18dp"
-    android:textColor="@color/nav_text"
-    android:textSize="15sp" />
+    style="@style/Chip"
+    android:layout_marginEnd="@dimen/lo_space_2" />

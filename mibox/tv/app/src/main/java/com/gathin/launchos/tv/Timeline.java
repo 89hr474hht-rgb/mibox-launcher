@@ -33,4 +33,23 @@ final class Timeline {
         float m = (nowSec - from) / 60f;
         return m < 0 || m > minutes ? -1f : m;
     }
+
+    /**
+     * Where programmes go on a line, in pixels: {left, width} for each span (minutes, in order), at px per minute.
+     * Each keeps at least minWidth so its title can be read, and never starts before the previous one ends plus gap
+     * (a short programme pushes the next one a little); null for one that no longer fits in total.
+     */
+    static int[][] place(float[][] spans, float px, int gap, int minWidth, int total) {
+        int[][] out = new int[spans.length][];
+        int end = 0;
+        for (int i = 0; i < spans.length; i++) {
+            int left = Math.max(Math.round(spans[i][0] * px), i == 0 ? 0 : end + gap);
+            int right = Math.max(Math.round(spans[i][1] * px) - gap, left + minWidth);
+            right = Math.min(right, total);
+            if (right - left < Math.min(minWidth, total) / 2 || left >= total) continue;
+            out[i] = new int[]{left, right - left};
+            end = right;
+        }
+        return out;
+    }
 }

@@ -6,9 +6,15 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/** Plain GET requests. Follows redirects itself, as panels often send http to https or to another host. */
+/**
+ * Plain GET requests, on the calling (background) thread. Follows redirects itself, as panels often send http to https
+ * or to another host, but never from https down to http ({@link #redirectAllowed}). The panel gets the app's name as
+ * its User-Agent; other hosts (pictures) get a generic one ({@link #GENERIC_AGENT}).
+ */
 final class Http {
     static final String USER_AGENT = "LaunchOS-TV/" + BuildConfig.VERSION_NAME;
+    /** For pictures on third-party hosts: says nothing about the app or its version. */
+    static final String GENERIC_AGENT = "Mozilla/5.0 (Linux; Android)";
     private static final int MAX_REDIRECTS = 5;
 
     private Http() {
@@ -26,16 +32,26 @@ final class Http {
 
     /** The body of a 200 answer, or an {@link XtreamException} that never quotes the address (it holds the account). */
     static byte[] get(String address, int maxBytes) throws XtreamException {
-        return get(address, maxBytes, in -> readAll(in, maxBytes));
+        return get(address, maxBytes, in -> readAll(in, maxBytes), null, USER_AGENT);
+    }
+
+    /** The same, with another User-Agent (a picture on someone else's host). */
+    static byte[] get(String address, int maxBytes, String userAgent) throws XtreamException {
+        return get(address, maxBytes, in -> readAll(in, maxBytes), null, userAgent);
     }
 
     /** A 200 answer handed to body as a stream, cut off after maxBytes. */
     static <T> T get(String address, long maxBytes, Body<T> body) throws XtreamException {
-        return get(address, maxBytes, body, null);
+        return get(address, maxBytes, body, null, USER_AGENT);
     }
 
     /** The same, telling progress how much has arrived as it is read (about every 64 KB). */
     static <T> T get(String address, long maxBytes, Body<T> body, Progress progress) throws XtreamException {
+        return get(address, maxBytes, body, progress, USER_AGENT);
+    }
+
+    private static <T> T get(String address, long maxBytes, Body<T> body, Progress progress, String userAgent)
+            throws XtreamException {
         String url = address;
         try {
             for (int hop = 0; hop <= MAX_REDIRECTS; hop++) {
@@ -43,14 +59,16 @@ final class Http {
                 c.setInstanceFollowRedirects(false);
                 c.setConnectTimeout(10_000);
                 c.setReadTimeout(30_000);
-                c.setRequestProperty("User-Agent", USER_AGENT);
+                c.setRequestProperty("User-Agent", userAgent);
                 c.setRequestProperty("Accept-Encoding", "identity");
                 try {
                     int code = c.getResponseCode();
                     if (code >= 300 && code < 400) {
                         String next = c.getHeaderField("Location");
                         if (next == null) throw new XtreamException(XtreamException.Kind.SERVER, code);
-                        url = new URL(new URL(url), next).toString();
+                        String to = new URL(new URL(url), next).toString();
+                        if (!redirectAllowed(url, to)) throw new XtreamException(XtreamException.Kind.SERVER, code);
+                        url = to;
                         continue;
                     }
                     if (code != 200) {
@@ -74,6 +92,22 @@ final class Http {
         } catch (IOException e) {
             throw new XtreamException(XtreamException.Kind.NETWORK, 0);
         }
+    }
+
+    /**
+     * Whether a redirect from one address to the next may be followed: only to http or https, and never from https
+     * down to plain http (that would send the account in clear). http -> http and http -> https are fine. Pure.
+     */
+    static boolean redirectAllowed(String from, String to) {
+        String a = scheme(from), b = scheme(to);
+        if (b == null || (!b.equals("http") && !b.equals("https"))) return false;
+        return !("https".equals(a) && b.equals("http"));
+    }
+
+    private static String scheme(String url) {
+        if (url == null) return null;
+        int colon = url.indexOf(':');
+        return colon <= 0 ? null : url.substring(0, colon).toLowerCase(java.util.Locale.ROOT);
     }
 
     /** Stops a body that grows past its limit, rather than filling the box's memory; tells progress as it goes. */

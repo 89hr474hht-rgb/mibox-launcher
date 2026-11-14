@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/page_bg"
+    android:background="@color/lo_black"
     android:orientation="vertical"
     android:paddingTop="@dimen/screen_top">
 
@@ -39,7 +39,7 @@
             android:imeOptions="actionSearch|flagNoExtractUi"
             android:importantForAutofill="no"
             android:inputType="text"
-            android:textSize="20sp" />
+            android:textSize="@dimen/lo_text_heading" />
     </LinearLayout>
 
     <TextView
@@ -49,13 +49,13 @@
         android:layout_marginTop="90dp"
         android:drawableTop="@drawable/ic_search_large"
         android:drawablePadding="18dp"
-        android:drawableTint="#66FFFFFF"
+        android:drawableTint="@color/lo_text_3"
         android:gravity="center"
         android:paddingStart="80dp"
         android:paddingEnd="80dp"
         android:text="@string/search_type"
-        android:textColor="@color/text_dim"
-        android:textSize="16sp" />
+        android:textColor="@color/lo_text_2"
+        android:textSize="@dimen/lo_text_body" />
 
     <ScrollView
         android:id="@+id/results_scroll"

@@ -23,10 +23,10 @@
     <string name="upd_h_ignored">ignorée</string>
     <string name="upd_banner">LaunchOS TV %1$s est disponible : ouvre « Mises à jour » en bas à gauche.</string>
     <string name="upd_updated_toast">LaunchOS TV mis à jour : version %1$s</string>
-    <string name="upd_err_network">Impossible de joindre GitHub (%1$s).</string>
-    <string name="upd_err_http">GitHub a répondu %1$d.</string>
-    <string name="upd_err_rate">Trop de vérifications : GitHub en autorise 60 par heure. Réessaie plus tard.</string>
-    <string name="upd_err_format">Réponse de GitHub illisible.</string>
+    <string name="upd_err_network">Impossible de vérifier les mises à jour : pas de réponse. Vérifie la connexion de la box.</string>
+    <string name="upd_err_http">Le serveur des mises à jour ne répond pas correctement. Réessaie plus tard. (code %1$d)</string>
+    <string name="upd_err_rate">Trop de vérifications en peu de temps. Réessaie dans une heure.</string>
+    <string name="upd_err_format">Réponse illisible du serveur des mises à jour.</string>
     <string name="upd_err_space">Espace insuffisant : %1$d Mo nécessaires.</string>
     <string name="upd_err_size">Le fichier n\'a pas la taille annoncée.</string>
     <string name="upd_err_checksum">L\'empreinte SHA-256 ne correspond pas : fichier refusé.</string>
@@ -36,5 +36,5 @@
     <string name="upd_err_not_newer">Cette version n\'est pas plus récente que celle installée.</string>
     <string name="upd_err_signature">L\'APK n\'est pas signé avec la clé de LaunchOS TV installé : fichier refusé.</string>
     <string name="upd_err_permission">Android n\'autorise pas encore LaunchOS TV à installer ses mises à jour.</string>
-    <string name="upd_err_install">Android a refusé l\'installation : %1$s</string>
+    <string name="upd_err_install">Android n\'a pas installé la mise à jour. Réessaie plus tard.</string>
 </resources>

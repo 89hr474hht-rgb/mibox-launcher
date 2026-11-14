@@ -34,14 +34,14 @@ public final class SkeletonView extends View {
     public SkeletonView(Context c, AttributeSet attrs) {
         super(c, attrs);
         radius = Ui.dp(c, 6);
-        base.setColor(c.getColor(R.color.ds_skeleton));
+        base.setColor(c.getColor(R.color.skeleton));
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        int glow = getContext().getColor(R.color.ds_skeleton_shine);
+        int glow = getContext().getColor(R.color.skeleton_shine);
         shine.setShader(new LinearGradient(0, 0, Math.max(1, w * 0.6f), 0,
                 new int[]{0x00FFFFFF, glow, 0x00FFFFFF}, null, Shader.TileMode.CLAMP));
     }

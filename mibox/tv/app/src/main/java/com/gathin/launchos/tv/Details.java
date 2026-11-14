@@ -27,6 +27,12 @@ final class Details {
         LOADING.clear();
     }
 
+    /** Forgets every sheet (the account was deleted). */
+    static void clear() {
+        CACHE.evictAll();
+        LOADING.clear();
+    }
+
     static Xtream.VodInfo cached(String id) {
         return CACHE.get(id);
     }

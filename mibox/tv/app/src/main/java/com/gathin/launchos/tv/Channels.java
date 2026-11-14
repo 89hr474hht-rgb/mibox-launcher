@@ -34,6 +34,12 @@ final class Channels {
         return a == null ? null : new Channels(c, AccountStore.key(a));
     }
 
+    /** Forgets every starred and hidden channel, for every account (the account was deleted). */
+    static void forgetAll(Context c) {
+        c.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().apply();
+        version++;
+    }
+
     /** Changes after every edit, so Chaînes knows to show its lists again. */
     static int version() {
         return version;
@@ -92,8 +98,7 @@ final class Channels {
             try {
                 JSONArray a = new JSONArray((String) e.getValue());
                 String id = e.getKey().substring(prefix.length());
-                found.add(new Item(Item.Kind.LIVE, id, a.optString(1), a.optString(2), "", a.optInt(3), "",
-                        a.optString(4), 0, 0f, "", "", 0, 0));
+                found.add(Item.live(id, a.optString(1), a.optString(2), a.optInt(3), a.optString(4)));
                 order.add(new long[]{a.optLong(0), found.size() - 1});
             } catch (JSONException ignored) {
                 // A damaged entry is left out.

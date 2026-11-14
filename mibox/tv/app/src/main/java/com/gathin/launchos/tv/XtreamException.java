@@ -1,6 +1,11 @@
 package com.gathin.launchos.tv;
 
-/** A failed call, with a French message for the screen. It never carries the address, which holds the account. */
+import android.content.Context;
+
+/**
+ * A failed call to the panel, as a kind (and an HTTP code or the account's state when there is one). It never carries
+ * the address, which holds the account; {@link #text} gives the sentence to show, from the resources.
+ */
 final class XtreamException extends Exception {
     enum Kind { BAD_ADDRESS, UNKNOWN_HOST, TIMEOUT, NETWORK, REFUSED, SERVER, BAD_ANSWER, TOO_BIG, AUTH, ACCOUNT_STATUS }
 
@@ -19,30 +24,31 @@ final class XtreamException extends Exception {
         this.status = status;
     }
 
-    String french() {
+    /** What went wrong, in a plain sentence for the screen. */
+    String text(Context c) {
         switch (kind) {
             case BAD_ADDRESS:
-                return "L'adresse du serveur n'est pas valide. Exemple : http://serveur.exemple:8080";
+                return c.getString(R.string.err_bad_address);
             case UNKNOWN_HOST:
-                return "Adresse du serveur introuvable. Vérifie l'adresse et la connexion de la box.";
+                return c.getString(R.string.err_unknown_host);
             case TIMEOUT:
-                return "Le serveur ne répond pas (délai dépassé).";
+                return c.getString(R.string.err_timeout);
             case NETWORK:
-                return "Impossible de joindre le serveur.";
+                return c.getString(R.string.err_network);
             case REFUSED:
-                return "Le serveur refuse l'accès (code " + code + "). Identifiants, ou trop de connexions en même temps.";
+                return c.getString(R.string.err_refused, code);
             case SERVER:
-                return "Le serveur a répondu avec une erreur (code " + code + ").";
+                return c.getString(R.string.err_server, code);
             case BAD_ANSWER:
-                return "Le serveur a envoyé une réponse illisible. Ce n'est peut-être pas un serveur Xtream Codes.";
+                return c.getString(R.string.err_bad_answer);
             case TOO_BIG:
-                return "Cette liste est trop grande pour la mémoire de la box.";
+                return c.getString(R.string.err_too_big);
             case AUTH:
-                return "Identifiant ou mot de passe refusé par le serveur.";
+                return c.getString(R.string.err_auth);
             case ACCOUNT_STATUS:
-                return "Le compte n'est pas actif (état : " + status + ").";
+                return c.getString(R.string.err_account_status, status == null ? "" : status);
             default:
-                return "Erreur inconnue.";
+                return c.getString(R.string.err_unknown);
         }
     }
 }

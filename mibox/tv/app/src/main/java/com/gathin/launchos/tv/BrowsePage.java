@@ -12,6 +12,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gathin.launchos.design.Focus;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +21,10 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Films or Séries, full screen. On top, the spotlight: the newest titles one after the other with a slow fade
- * (Regarder, Plus d'infos), or, once the focus is in the rows, the focused title over its picture. Underneath, the
- * rows: Reprendre, the newest, then each group (pinned first, then A to Z), each ending with Tout voir. Up and Down
- * go from row to row, the focused row always at the same height.
+ * Films or Séries. On top, the spotlight: the newest titles one after the other every {@link #HERO_MS} (Regarder,
+ * Plus d'infos), or, once the focus is in the rows, the focused title over its picture. Underneath, the rows:
+ * Reprendre, the newest, then each group in the order chosen in Réglages, each ending with Tout voir. Up and Down go
+ * from row to row through {@link ShelfNavigator}. The hero timer runs only while the page is shown. Main thread only.
  */
 final class BrowsePage {
     private static final int HERO_COUNT = 7;
@@ -59,6 +61,7 @@ final class BrowsePage {
     private final Backdrop backdrop;
     private final View spotlight, heroButtons, topActions, scrim;
     private final TextView label, title, meta, plot, heroPlay, browseStatus;
+    private final View statusBox, retry;
     private final LinearLayout dots;
     private final RecyclerView rowsView;
     private final LinearLayoutManager rowsLayout;
@@ -66,6 +69,7 @@ final class BrowsePage {
     private final RecyclerView.RecycledViewPool pool = new RecyclerView.RecycledViewPool();
     /** Where each row was left, so coming back to it lands on the same card. */
     private final Map<String, Integer> rowPositions = new HashMap<>();
+    private final ShelfNavigator shelves;
 
     private Xtream api;
     private List<Item> hero = new ArrayList<>();
@@ -108,11 +112,25 @@ final class BrowsePage {
         dots = root.findViewById(R.id.hero_dots);
         heroPlay = root.findViewById(R.id.hero_play);
         browseStatus = root.findViewById(R.id.browse_status);
+        statusBox = root.findViewById(R.id.browse_status_box);
+        retry = root.findViewById(R.id.retry);
+        retry.setOnClickListener(v -> {
+            retry.setVisibility(View.GONE);
+            show(this.api);
+        });
+        Focus.lift(retry);
+        Focus.lift(heroPlay);
+        Focus.lift(root.findViewById(R.id.hero_info));
+
         rowsView = root.findViewById(R.id.rows);
         rowsLayout = new LinearLayoutManager(activity);
         rowsView.setLayoutManager(rowsLayout);
         rowsView.setAdapter(rowAdapter);
         rowsView.setItemAnimator(null);
+        shelves = new ShelfNavigator(rowsView, rowsLayout, rowPositions, h -> {
+            Row r = ((RowAdapter.Holder) h).row;
+            return r == null ? null : r.key();
+        });
         TextView search = root.findViewById(R.id.action_search);
         TextView all = root.findViewById(R.id.action_all);
         search.setText(movies ? R.string.browse_search_movies : R.string.browse_search_series);
@@ -120,6 +138,8 @@ final class BrowsePage {
         search.setOnClickListener(v -> activity.startActivity(new Intent(activity, SearchActivity.class)
                 .putExtra(SearchActivity.EXTRA_SECTION, section.name())));
         all.setOnClickListener(v -> openGrid(null, all.getText().toString()));
+        Focus.lift(search);
+        Focus.lift(all);
         heroPlay.setOnClickListener(v -> {
             Item i = heroItem();
             if (i != null) play(i);
@@ -159,7 +179,7 @@ final class BrowsePage {
         lib.load(api, () -> {
             if (activity.isDestroyed()) return;
             if (lib.error() != null && !lib.ready()) {
-                status(lib.error().french());
+                failed(lib.error().text(activity));
                 return;
             }
             build();
@@ -172,7 +192,15 @@ final class BrowsePage {
 
     private void status(String text) {
         browseStatus.setText(text);
-        browseStatus.setVisibility(View.VISIBLE);
+        statusBox.setVisibility(View.VISIBLE);
+        retry.setVisibility(View.GONE);
+    }
+
+    /** The list could not be read: the reason, and Réessayer, which takes the focus unless the rail has it. */
+    private void failed(String text) {
+        status(text);
+        retry.setVisibility(View.VISIBLE);
+        if (activity.showing(this) && !activity.inRail()) retry.requestFocus();
     }
 
     private void build() {
@@ -181,7 +209,7 @@ final class BrowsePage {
         shownGeneration = Library.generation();
         shownGroups = Groups.version();
         shownHistory = History.version();
-        browseStatus.setVisibility(View.GONE);
+        statusBox.setVisibility(View.GONE);
         spotlight.setVisibility(View.VISIBLE);
 
         // Hidden groups stay out of the hero, the newest row and search.
@@ -234,7 +262,7 @@ final class BrowsePage {
         if (movies) {
             for (History.Entry e : h.films(20)) {
                 Item known = lib.find(e.id);
-                items.add(known != null ? known : new Item(Item.Kind.MOVIE, e.id, e.name, e.image, e.ext, 0, ""));
+                items.add(known != null ? known : Item.movie(e.id, e.name, e.image, e.ext, ""));
             }
         } else {
             for (Item stored : h.recentSeries(20)) {
@@ -486,8 +514,9 @@ final class BrowsePage {
     // ---- focus ----
 
     View defaultFocus() {
+        if (retry.getVisibility() == View.VISIBLE && statusBox.getVisibility() == View.VISIBLE) return retry;
         if (!hero.isEmpty()) return heroPlay;
-        View card = cardIn(0, -1);
+        View card = shelves.cardIn(0, -1);
         if (card != null) return card;
         waitedAt = SystemClock.uptimeMillis();
         return root.findViewById(R.id.action_search);
@@ -507,11 +536,11 @@ final class BrowsePage {
                     setHeroMode(true);
                     return up;
                 }
-                return moveRow(focused, row - 1, -1);
+                return shelves.move(focused, row - 1, -1);
             }
             if (direction == View.FOCUS_DOWN) {
                 if (row >= rowAdapter.getItemCount() - 1) return focused;
-                return moveRow(focused, row + 1, 1);
+                return shelves.move(focused, row + 1, 1);
             }
             // Left and Right stay in the row; Left at its first card opens the rail.
             if (proposed != null && rowHolder != null && Root.inside(proposed, rowHolder.itemView)) return proposed;
@@ -519,7 +548,7 @@ final class BrowsePage {
         }
         if (inHero) {
             if (direction == View.FOCUS_DOWN) {
-                View card = cardIn(0, -1);
+                View card = shelves.cardIn(0, -1);
                 return card != null ? card : focused;
             }
             if (direction == View.FOCUS_UP) return root.findViewById(R.id.action_search);
@@ -539,56 +568,12 @@ final class BrowsePage {
             }
         }
         if (inTop) {
-            if (direction == View.FOCUS_DOWN) return !hero.isEmpty() ? heroPlay : cardIn(0, -1);
+            if (direction == View.FOCUS_DOWN) return !hero.isEmpty() ? heroPlay : shelves.cardIn(0, -1);
             if (direction == View.FOCUS_UP) return focused;
             if (direction == View.FOCUS_LEFT) return Root.inside(proposed, topActions) ? proposed : null;
             if (direction == View.FOCUS_RIGHT) return Root.inside(proposed, topActions) ? proposed : focused;
         }
         return proposed;
-    }
-
-    /** Moves to another row, keeping it at the top of the rows area, onto the card under the focus. */
-    private View moveRow(View focused, int target, int step) {
-        int[] at = new int[2];
-        focused.getLocationOnScreen(at);
-        int x = at[0] + focused.getWidth() / 2;
-        rowsLayout.scrollToPositionWithOffset(target, 0);
-        rowsView.setTranslationY(step * Ui.dp(activity, 36));
-        rowsView.animate().translationY(0).setDuration(220).setInterpolator(new DecelerateInterpolator()).start();
-        rowsView.post(() -> {
-            View card = cardIn(target, x);
-            if (card != null) card.requestFocus();
-        });
-        return focused;
-    }
-
-    /** The card in a row nearest to screen x (or where the row was left when x is -1). */
-    private View cardIn(int row, int x) {
-        View rowView = rowsLayout.findViewByPosition(row);
-        if (rowView == null) return null;
-        RecyclerView list = rowView.findViewById(R.id.row_list);
-        if (list.getChildCount() == 0) return null;
-        RowAdapter.Holder h = (RowAdapter.Holder) rowsView.getChildViewHolder(rowView);
-        Integer left = h.row == null ? null : rowPositions.get(h.row.key());
-        if (x < 0 && left != null) {
-            RecyclerView.LayoutManager lm = list.getLayoutManager();
-            View v = lm == null ? null : lm.findViewByPosition(left);
-            if (v != null) return v;
-        }
-        View best = null;
-        int bestDistance = Integer.MAX_VALUE;
-        int[] at = new int[2];
-        for (int i = 0; i < list.getChildCount(); i++) {
-            View c = list.getChildAt(i);
-            c.getLocationOnScreen(at);
-            if (at[0] < 0) continue;
-            int d = x < 0 ? at[0] : Math.abs(at[0] + c.getWidth() / 2 - x);
-            if (d < bestDistance) {
-                bestDistance = d;
-                best = c;
-            }
-        }
-        return best;
     }
 
     // ---- rows ----

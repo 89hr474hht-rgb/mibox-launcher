@@ -5,15 +5,15 @@
     android:layout_height="@dimen/guide_row_height"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    android:paddingTop="3dp"
-    android:paddingBottom="3dp">
+    android:paddingTop="@dimen/lo_space_1"
+    android:paddingBottom="@dimen/lo_space_1">
 
     <LinearLayout
         android:id="@+id/guide_channel"
         android:layout_width="@dimen/guide_channel_width"
         android:layout_height="match_parent"
         android:layout_marginEnd="6dp"
-        android:background="@drawable/ds_row_bg"
+        android:background="@drawable/lo_focus_row"
         android:focusable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -35,8 +35,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textColor="#80FFFFFF"
-                android:textSize="13sp" />
+                android:textColor="@color/lo_text_3"
+                android:textSize="@dimen/lo_text_small" />
 
             <ImageView
                 android:id="@+id/guide_logo"
@@ -54,9 +54,10 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:fontFamily="@font/launchos_medium"
+            android:duplicateParentState="true"
             android:maxLines="2"
-            android:textColor="@color/ds_text"
-            android:textSize="13sp" />
+            android:textColor="@color/lo_text_on_focus"
+            android:textSize="@dimen/lo_text_body" />
     </LinearLayout>
 
     <FrameLayout

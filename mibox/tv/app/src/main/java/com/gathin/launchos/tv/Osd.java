@@ -22,8 +22,9 @@ import java.util.Locale;
 /**
  * The player's on-screen display. At the top, the title and the time; at the bottom, a thin seek bar, the controls
  * in the middle (10 s back, play or pause, 30 s on, next episode) and audio, subtitles and picture-in-picture at the
- * far right. It hides after {@link #HIDE_MS} without a key. Hidden, Left and Right seek at once and show it, any
- * other arrow or OK only shows it, and Back leaves; shown, Back hides it. Media keys work either way.
+ * far right. It hides after {@link #HIDE_MS} without a key. Hidden, Left and Right seek at once and show it, OK and
+ * the other arrows only show it (OK on play/pause then toggles), and Back leaves; shown, Back hides it. Media keys
+ * work either way. Attached to the player from PlayerActivity's onStart to onStop. Main thread only.
  */
 final class Osd {
     static final long HIDE_MS = 3000;
@@ -291,7 +292,7 @@ final class Osd {
         }
         if (count == 0) {
             // Nothing to choose: say so, without a menu.
-            GlassToast.show(activity, activity.getString(text ? R.string.osd_no_subs : R.string.osd_no_audio), false);
+            Notice.show(activity, activity.getString(text ? R.string.osd_no_subs : R.string.osd_no_audio), false);
             show(false);
             return;
         }
@@ -303,18 +304,18 @@ final class Osd {
     }
 
     /** "Français · 5.1", from the track's label or language. */
-    static String label(Format f, int n) {
+    private String label(Format f, int n) {
         String name = f.label;
         if (name == null || name.isEmpty()) {
             if (f.language != null && !f.language.isEmpty() && !f.language.equals("und")) {
                 String l = new Locale(f.language).getDisplayLanguage(Locale.FRANCE);
                 name = l.isEmpty() ? f.language : Character.toUpperCase(l.charAt(0)) + l.substring(1);
             } else {
-                name = "Piste " + n;
+                name = activity.getString(R.string.osd_track, n);
             }
         }
-        if (f.channelCount >= 6) name += " · 5.1";
-        else if (f.channelCount == 2) name += " · stéréo";
+        if (f.channelCount >= 6) return activity.getString(R.string.osd_track_surround, name);
+        if (f.channelCount == 2) return activity.getString(R.string.osd_track_stereo, name);
         return name;
     }
 }

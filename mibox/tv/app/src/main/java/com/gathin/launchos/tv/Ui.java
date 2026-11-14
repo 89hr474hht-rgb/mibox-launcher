@@ -2,9 +2,8 @@ package com.gathin.launchos.tv;
 
 import android.content.Context;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 
-/** Small shared pieces of the look: the lift of a focused card, and dp. */
+/** Small helpers for the views: dp, initials for a card without a picture, the meta line. Pure, any thread. */
 final class Ui {
     private Ui() {
     }
@@ -13,13 +12,14 @@ final class Ui {
         return Math.round(v * c.getResources().getDisplayMetrics().density);
     }
 
-    /** A focused card grows a little and rises above its neighbours. */
-    static void lift(View v, float scale) {
-        v.setOnFocusChangeListener((view, focused) -> {
-            float s = focused ? scale : 1f;
-            view.animate().scaleX(s).scaleY(s).translationZ(focused ? dp(view.getContext(), 10) : 0)
-                    .setDuration(160).setInterpolator(new DecelerateInterpolator()).start();
-        });
+    /** An episode's title, or "Épisode 3" when the panel gave none. */
+    static String episodeTitle(Context c, Item episode) {
+        return episode.title.isEmpty() ? c.getString(R.string.episode_name, episode.num) : episode.title;
+    }
+
+    /** A season's name, or "Saison 2" when the panel gave none. */
+    static String seasonName(Context c, Xtream.Season s) {
+        return s.name.isEmpty() ? c.getString(R.string.season_name, s.number) : s.name;
     }
 
     /** One or two letters for a card without a picture. */

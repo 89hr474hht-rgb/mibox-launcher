@@ -90,6 +90,31 @@ final class AccountStore {
         version++;
     }
 
+    /**
+     * Deletes the account and everything the box kept for it: what was watched (History), the starred and hidden
+     * channels, the renamed, hidden and pinned groups, the lists' sizes (SyncStore), the films' sheets, the programme
+     * guide and the pictures, in memory and in cacheDir/img (that last part on {@link Bg#run}). The owner's choices
+     * in Réglages (Options) stay. Main thread.
+     */
+    static void forget(Context context) {
+        Context app = context.getApplicationContext();
+        clear(app);
+        History.forgetAll(app);
+        Channels.forgetAll(app);
+        Groups.forgetAll(app);
+        SyncStore.forgetAll(app);
+        Options.forgetAccounts(app);
+        Library.forAccount(version);
+        Details.clear();
+        Epg.clear();
+        Images.clearMemory();
+        Bg.run(() -> {
+            Images.clearDisk(app);
+            return Boolean.TRUE;
+        }, (done, error) -> {
+        });
+    }
+
     private static SecretKey key() throws GeneralSecurityException, java.io.IOException {
         KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
         ks.load(null);

@@ -1,169 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  LaunchOS TV's theme and widget styles, on the shared design system (mibox/design): lo_* colours, radii and type
+  sizes. The font (Inter) is set here, since the shared Lo.Text styles carry sizes and colours only.
+  Two button looks: Button (secondary, dark pill) and Button.Primary (the accent); Chip for filters and groups;
+  OsdButton for the player's round controls. Focus is the same everywhere: white fill, dark text and icon.
+-->
 <resources>
     <style name="Theme.LaunchOSTV" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/page</item>
-        <item name="android:colorAccent">@color/accent</item>
-        <item name="android:colorBackground">@color/page</item>
-        <item name="android:textColorPrimary">@color/text</item>
-        <item name="android:textColorSecondary">@color/text_dim</item>
+        <item name="android:windowBackground">@color/lo_black</item>
+        <item name="android:colorAccent">@color/lo_accent</item>
+        <item name="android:colorBackground">@color/lo_black</item>
+        <item name="android:textColorPrimary">@color/lo_text</item>
+        <item name="android:textColorSecondary">@color/lo_text_2</item>
         <item name="android:textViewStyle">@style/Text</item>
         <item name="android:editTextStyle">@style/Field</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Activity</item>
     </style>
 
-    <style name="Text" parent="android:Widget.Material.TextView">
-        <item name="android:fontFamily">@font/launchos_regular</item>
-        <item name="android:textColor">@color/text</item>
+    <style name="Theme.LaunchOSTV.Player">
+        <item name="android:windowBackground">@color/lo_black</item>
     </style>
 
-    <style name="Field" parent="android:Widget.Material.EditText">
+    <style name="Text" parent="android:Widget.Material.TextView">
         <item name="android:fontFamily">@font/launchos_regular</item>
-        <item name="android:textColor">@color/text</item>
-        <item name="android:textColorHint">@color/text_dim</item>
-        <item name="android:textSize">17sp</item>
-        <item name="android:background">@drawable/field_bg</item>
-        <item name="android:paddingStart">18dp</item>
-        <item name="android:paddingEnd">18dp</item>
-        <item name="android:minHeight">50dp</item>
-        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/lo_text</item>
     </style>
 
     <style name="Title">
         <item name="android:fontFamily">@font/launchos_semibold</item>
-        <item name="android:textColor">@color/text</item>
+        <item name="android:textColor">@color/lo_text</item>
     </style>
 
+    <!-- The one text field: the second surface, outlined in white while focused. -->
+    <style name="Field" parent="android:Widget.Material.EditText">
+        <item name="android:fontFamily">@font/launchos_regular</item>
+        <item name="android:textColor">@color/lo_text</item>
+        <item name="android:textColorHint">@color/lo_text_3</item>
+        <item name="android:textSize">@dimen/lo_text_body</item>
+        <item name="android:background">@drawable/lo_field</item>
+        <item name="android:paddingStart">@dimen/lo_space_4</item>
+        <item name="android:paddingEnd">@dimen/lo_space_4</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:drawablePadding">@dimen/lo_space_3</item>
+        <item name="android:drawableTint">@color/field_icon</item>
+    </style>
 
+    <!-- A secondary action: a dark pill, white when focused. -->
     <style name="Button">
-        <item name="android:layout_height">50dp</item>
-        <item name="android:background">@drawable/button_bg</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/lo_button_height</item>
+        <item name="android:background">@drawable/lo_focus_button</item>
         <item name="android:focusable">true</item>
         <item name="android:gravity">center</item>
-        <item name="android:paddingStart">26dp</item>
-        <item name="android:paddingEnd">26dp</item>
+        <item name="android:paddingStart">@dimen/lo_space_5</item>
+        <item name="android:paddingEnd">@dimen/lo_space_5</item>
+        <item name="android:drawablePadding">@dimen/lo_space_2</item>
+        <item name="android:drawableTint">@color/lo_icon_on_focus</item>
         <item name="android:fontFamily">@font/launchos_semibold</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/button_text</item>
-        <item name="android:drawablePadding">10dp</item>
-        <item name="android:drawableTint">@color/button_text</item>
+        <item name="android:textSize">@dimen/lo_text_body</item>
+        <item name="android:textColor">@color/lo_text_on_focus</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <!-- The page's main action: the accent, white when focused. -->
+    <style name="Button.Primary">
+        <item name="android:background">@drawable/lo_button_primary</item>
+        <item name="android:textColor">@color/lo_text_on_accent</item>
+        <item name="android:drawableTint">@color/lo_text_on_accent</item>
+    </style>
+
+    <!-- A filter, an order or a group to pick: a smaller pill; the one in use is faintly filled (selected). -->
+    <style name="Chip">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:background">@drawable/lo_focus_chip</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">@dimen/lo_space_4</item>
+        <item name="android:paddingEnd">@dimen/lo_space_4</item>
+        <item name="android:drawablePadding">@dimen/lo_space_2</item>
+        <item name="android:drawableTint">@color/lo_icon_on_focus</item>
+        <item name="android:fontFamily">@font/launchos_medium</item>
+        <item name="android:textSize">@dimen/lo_text_small</item>
+        <item name="android:textColor">@color/lo_text_on_focus</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <!-- A round control of the player's display. -->
+    <style name="OsdButton">
+        <item name="android:layout_width">@dimen/lo_button_height</item>
+        <item name="android:layout_height">@dimen/lo_button_height</item>
+        <item name="android:background">@drawable/lo_focus_chip</item>
+        <item name="android:focusable">true</item>
+        <item name="android:padding">13dp</item>
+        <item name="android:tint">@color/lo_icon_on_focus</item>
     </style>
 
     <style name="RailItem">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">46dp</item>
-        <item name="android:layout_marginBottom">6dp</item>
-        <item name="android:background">@drawable/nav_bg</item>
+        <item name="android:layout_height">@dimen/lo_button_height</item>
+        <item name="android:layout_marginBottom">@dimen/lo_space_1</item>
+        <item name="android:background">@drawable/rail_item_bg</item>
         <item name="android:focusable">true</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:paddingStart">15dp</item>
     </style>
 
-    <style name="GlassButton">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:background">@drawable/glass_button_bg</item>
-        <item name="android:focusable">true</item>
-        <item name="android:gravity">center</item>
-        <item name="android:paddingStart">22dp</item>
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:drawablePadding">10dp</item>
-        <item name="android:drawableTint">@color/button_text</item>
-        <item name="android:fontFamily">@font/launchos_semibold</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/button_text</item>
-        <item name="android:singleLine">true</item>
-    </style>
-
-    <style name="Pill">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">44dp</item>
-        <item name="android:background">@drawable/pill_bg</item>
-        <item name="android:focusable">true</item>
-        <item name="android:gravity">center</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:paddingEnd">18dp</item>
-        <item name="android:drawablePadding">9dp</item>
-        <item name="android:drawableTint">@color/button_text</item>
-        <item name="android:fontFamily">@font/launchos_medium</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:textColor">@color/button_text</item>
-        <item name="android:singleLine">true</item>
-    </style>
-
+    <!-- A tiny badge (quality, Épinglé): the only text allowed at the label size. -->
     <style name="Tag">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/tag_bg</item>
-        <item name="android:fontFamily">@font/launchos_bold</item>
+        <item name="android:fontFamily">@font/launchos_semibold</item>
         <item name="android:paddingStart">5dp</item>
         <item name="android:paddingEnd">5dp</item>
         <item name="android:paddingTop">1dp</item>
         <item name="android:paddingBottom">1dp</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textColor">@color/text_dim</item>
-        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/lo_text_2</item>
+        <item name="android:textSize">@dimen/lo_text_label</item>
     </style>
 
+    <!-- A short label above a title or a group of rows. -->
     <style name="Label">
-        <item name="android:fontFamily">@font/launchos_bold</item>
-        <item name="android:textColor">@color/accent_light</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:letterSpacing">0.12</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-
-    <style name="Theme.LaunchOSTV.Player">
-        <item name="android:windowBackground">@android:color/black</item>
-    </style>
-
-    <!-- LaunchTV OS design system: buttons of the new screens. -->
-    <style name="DsButtonBase">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">50dp</item>
-        <item name="android:focusable">true</item>
-        <item name="android:gravity">center</item>
-        <item name="android:paddingStart">20dp</item>
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:drawablePadding">10dp</item>
         <item name="android:fontFamily">@font/launchos_semibold</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:singleLine">true</item>
-    </style>
-
-    <style name="DsButton" parent="DsButtonBase">
-        <item name="android:background">@drawable/ds_button_glass</item>
-        <item name="android:textColor">@color/ds_text</item>
-        <item name="android:drawableTint">@color/ds_accent_light</item>
-    </style>
-
-    <style name="DsButtonPrimary" parent="DsButtonBase">
-        <item name="android:background">@drawable/ds_button_primary</item>
-        <item name="android:textColor">#FFFFFFFF</item>
-        <item name="android:drawableTint">#FFFFFFFF</item>
-    </style>
-
-    <style name="DsField" parent="android:Widget.Material.EditText">
-        <item name="android:fontFamily">@font/launchos_regular</item>
-        <item name="android:textColor">@color/ds_text</item>
-        <item name="android:textColorHint">@color/ds_text_faint</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:background">@drawable/ds_field_bg</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:paddingEnd">16dp</item>
-        <item name="android:minHeight">52dp</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:drawablePadding">14dp</item>
-        <item name="android:drawableTint">@color/field_icon</item>
-    </style>
-
-    <!-- A round control of the player's display. -->
-    <style name="DsOsdButton">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:background">@drawable/ds_osd_button</item>
-        <item name="android:focusable">true</item>
-        <item name="android:padding">13dp</item>
-        <item name="android:tint">@color/ds_osd_icon</item>
+        <item name="android:textColor">@color/lo_text_2</item>
+        <item name="android:textSize">@dimen/lo_text_label</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 </resources>

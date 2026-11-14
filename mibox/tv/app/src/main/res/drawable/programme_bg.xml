@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A programme in the guide: the first surface; the one on now is a little lighter; focused, white. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
+    <item android:state_focused="true">
+        <shape><solid android:color="@color/lo_focus" /><corners android:radius="@dimen/lo_radius_row" /></shape>
+    </item>
+    <item android:state_activated="true">
+        <shape><solid android:color="@color/lo_surface_3" /><corners android:radius="@dimen/lo_radius_row" /></shape>
+    </item>
+    <item>
+        <shape><solid android:color="@color/lo_surface_1" /><corners android:radius="@dimen/lo_radius_row" /></shape>
+    </item>
+</selector>

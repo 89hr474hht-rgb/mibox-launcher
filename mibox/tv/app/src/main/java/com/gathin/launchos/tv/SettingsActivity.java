@@ -11,15 +11,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gathin.launchos.design.Focus;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 /**
- * Réglages, master-detail. The categories sit on a glass panel at the left (30 %); focusing one shows its page at
- * the right (70 %) with a short slide; Right or OK goes into the page, Left or Back comes back to the category.
- * Mise à jour &amp; Cache reads the provider's lists again through {@link SyncStore}, whose gauges keep going when
- * the page is left, and frees the cache with a {@link GlassToast} that says how much.
+ * Réglages, master-detail: the categories on a panel at the left (30 %); focusing one shows its page at the right
+ * (70 %); Right or OK goes into the page, Left or Back comes back to the category. Mise à jour &amp; Cache starts
+ * refreshes in {@link SyncStore} and listens to it from onStart to onStop (the work itself outlives the screen), and
+ * frees the cache with a {@link Notice} that says how much. Deletions ask a second OK ({@link Confirm}).
  */
 public final class SettingsActivity extends Activity implements SyncStore.Listener {
     private static final String STATE_CATEGORY = "category";
@@ -44,6 +46,7 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
     private final GaugeButton[] gauges = new GaugeButton[Xtream.Section.values().length];
     private TextView syncAll, cacheClear;
     private boolean clearing;
+    private final List<Confirm> confirms = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle state) {
@@ -122,6 +125,7 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
                 if (focused) show(index, true);
             });
             c.setOnClickListener(v -> enterPane());
+            Focus.lift(c, Focus.SCALE_LARGE);
             c.setOnKeyListener((v, code, e) -> code == KeyEvent.KEYCODE_DPAD_RIGHT
                     && e.getAction() == KeyEvent.ACTION_DOWN && enterPane());
         }
@@ -136,7 +140,7 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
         shown = index;
         for (int i = 0; i < panes.length; i++) {
             panes[i].setVisibility(i == index ? View.VISIBLE : View.GONE);
-            categories[i].setSelected(i == index);
+            categories[i].setActivated(i == index);
         }
         scroll.scrollTo(0, 0);
         ViewGroup pane = panes[index];
@@ -159,6 +163,10 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
     /** Back from inside a page goes to its category first; from the categories it leaves. */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // A deletion waiting for its second OK: Back only puts it back.
+            for (Confirm c : confirms) if (c.cancel()) return true;
+        }
         if (keyCode == KeyEvent.KEYCODE_BACK && shown >= 0) {
             View focus = getCurrentFocus();
             if (focus != null && isInside(focus, panes[shown])) {
@@ -222,77 +230,78 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
     // ---- detail: the pages ----
 
     private void buildAccount(ViewGroup pane) {
-        account = Rows.addGlass(pane, R.drawable.ic_account, R.string.nav_account).opens()
+        account = Rows.add(pane, R.drawable.ic_account, R.string.nav_account).opens()
                 .click(v -> startActivity(new Intent(this, AccountActivity.class)));
     }
 
     private void buildChannels(ViewGroup pane) {
-        groupOrder = Rows.addGlass(pane, R.drawable.ic_sort, R.string.settings_group_order).click(v -> {
+        groupOrder = Rows.add(pane, R.drawable.ic_sort, R.string.settings_group_order).click(v -> {
             Smart.GroupOrder o = Options.groupOrder(this);
             Options.setGroupOrder(this, GROUP_ORDERS[(o.ordinal() + 1) % GROUP_ORDERS.length]);
             Groups.touch();
             states();
         });
-        channelOrder = Rows.addGlass(pane, R.drawable.ic_live, R.string.settings_channel_order).click(v -> {
+        channelOrder = Rows.add(pane, R.drawable.ic_live, R.string.settings_channel_order).click(v -> {
             Smart.ChannelOrder o = Options.channelOrder(this);
             Options.setChannelOrder(this, CHANNEL_ORDERS[(o.ordinal() + 1) % CHANNEL_ORDERS.length]);
             states();
         });
-        dedupe = Rows.addGlass(pane, R.drawable.ic_all, R.string.settings_dedupe).sub(R.string.settings_dedupe_sub)
+        dedupe = Rows.add(pane, R.drawable.ic_all, R.string.settings_dedupe).sub(R.string.settings_dedupe_sub)
                 .click(v -> {
                     Options.setDedupe(this, !Options.dedupe(this));
                     states();
                 });
-        adult = Rows.addGlass(pane, R.drawable.ic_hide, R.string.settings_adult).sub(R.string.settings_adult_sub)
+        adult = Rows.add(pane, R.drawable.ic_hide, R.string.settings_adult).sub(R.string.settings_adult_sub)
                 .click(v -> {
                     Options.setHideAdult(this, !Options.hideAdult(this));
                     Groups.touch();
                     states();
                 });
-        hiddenChannels = Rows.addGlass(pane, R.drawable.ic_hide, R.string.settings_hidden_channels).opens()
+        hiddenChannels = Rows.add(pane, R.drawable.ic_hide, R.string.settings_hidden_channels).opens()
                 .click(v -> startActivity(new Intent(this, HiddenChannelsActivity.class)));
-        Rows.addGlass(pane, R.drawable.ic_folder, R.string.settings_groups_live).sub(R.string.settings_groups_sub).opens()
+        Rows.add(pane, R.drawable.ic_folder, R.string.settings_groups_live).sub(R.string.settings_groups_sub).opens()
                 .click(v -> groups(Xtream.Section.LIVE));
     }
 
     private void buildVod(ViewGroup pane) {
-        Rows.addGlass(pane, R.drawable.ic_movie, R.string.settings_groups_movies).sub(R.string.settings_groups_sub)
+        Rows.add(pane, R.drawable.ic_movie, R.string.settings_groups_movies).sub(R.string.settings_groups_sub)
                 .opens().click(v -> groups(Xtream.Section.MOVIES));
-        Rows.addGlass(pane, R.drawable.ic_series, R.string.settings_groups_series).sub(R.string.settings_groups_sub)
+        Rows.add(pane, R.drawable.ic_series, R.string.settings_groups_series).sub(R.string.settings_groups_sub)
                 .opens().click(v -> groups(Xtream.Section.SERIES));
     }
 
     private void buildPlay(ViewGroup pane) {
-        mini = Rows.addGlass(pane, R.drawable.ic_mini, R.string.settings_mini).sub(R.string.settings_mini_sub).click(v -> {
+        mini = Rows.add(pane, R.drawable.ic_mini, R.string.settings_mini).sub(R.string.settings_mini_sub).click(v -> {
             Options.setMiniPlayer(this, !Options.miniPlayer(this));
             states();
         });
-        next = Rows.addGlass(pane, R.drawable.ic_next, R.string.settings_next).sub(R.string.settings_next_sub).click(v -> {
+        next = Rows.add(pane, R.drawable.ic_next, R.string.settings_next).sub(R.string.settings_next_sub).click(v -> {
             Options.setNextEpisode(this, !Options.nextEpisode(this));
             states();
         });
-        tidy = Rows.addGlass(pane, R.drawable.ic_text, R.string.settings_tidy).sub(R.string.settings_tidy_sub).click(v -> {
+        tidy = Rows.add(pane, R.drawable.ic_text, R.string.settings_tidy).sub(R.string.settings_tidy_sub).click(v -> {
             Options.setTidyNames(this, !Options.tidyNames(this));
             Groups.touch();
             states();
         });
     }
 
+    /** Both deletions ask a second OK ({@link Confirm}), like deleting the account. */
     private void buildHistory(ViewGroup pane) {
-        Rows.Row fav = Rows.addGlass(pane, R.drawable.ic_star_line, R.string.settings_clear_fav)
+        Rows.Row fav = Rows.add(pane, R.drawable.ic_star_line, R.string.settings_clear_fav)
                 .sub(R.string.settings_clear_fav_sub);
-        fav.click(v -> {
+        confirms.add(new Confirm(fav.view, fav.title, () -> {
             History h = History.get(this);
             if (h != null) h.clearWatched();
             fav.state(getString(R.string.cleared), Rows.Tone.OK);
-        });
-        Rows.Row resume = Rows.addGlass(pane, R.drawable.ic_history, R.string.settings_clear_resume)
+        }));
+        Rows.Row resume = Rows.add(pane, R.drawable.ic_history, R.string.settings_clear_resume)
                 .sub(R.string.settings_clear_resume_sub);
-        resume.click(v -> {
+        confirms.add(new Confirm(resume.view, resume.title, () -> {
             History h = History.get(this);
             if (h != null) h.clearPlayback();
             resume.state(getString(R.string.cleared), Rows.Tone.OK);
-        });
+        }));
     }
 
     private void groups(Xtream.Section s) {
@@ -315,11 +324,11 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
         }
         syncAll = page.findViewById(R.id.sync_all);
         syncAll.setOnClickListener(v -> SyncStore.get(this).refreshAll());
-        Ui.lift(syncAll, 1.05f);
+        Focus.lift(syncAll);
         cacheClear = page.findViewById(R.id.cache_clear);
         cacheClear.setOnClickListener(v -> clearCache());
-        Ui.lift(cacheClear, 1.05f);
-        updates = Rows.addGlass(page.findViewById(R.id.sync_app_rows), R.drawable.ic_update, R.string.nav_updates).opens()
+        Focus.lift(cacheClear);
+        updates = Rows.add(page.findViewById(R.id.sync_app_rows), R.drawable.ic_update, R.string.nav_updates).opens()
                 .click(v -> startActivity(new Intent(this, UpdatesActivity.class)));
     }
 
@@ -331,7 +340,7 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
         long age = System.currentTimeMillis() - j.at;
         switch (j.phase) {
             case RUNNING:
-                g.running(j.progress, j.bytes > 0 ? getString(R.string.sync_received, RefreshActivity.size(j.bytes))
+                g.running(j.progress, j.bytes > 0 ? getString(R.string.sync_received, Formats.size(this, j.bytes))
                         : getString(R.string.sync_connecting));
                 break;
             case DONE:
@@ -366,7 +375,7 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
                 : getResources().getQuantityString(s == Xtream.Section.LIVE ? R.plurals.sync_count_live
                         : s == Xtream.Section.MOVIES ? R.plurals.sync_count_movies : R.plurals.sync_count_series,
                 lib.all().size(), count(lib.all().size()));
-        String then = withAge || lib.all() == null ? RefreshActivity.ago(lib.loadedAt())
+        String then = withAge || lib.all() == null ? Formats.ago(this, lib.loadedAt())
                 : getResources().getQuantityString(R.plurals.sync_count_groups, groups, count(groups));
         return getString(R.string.sync_loaded, what, then);
     }
@@ -390,7 +399,7 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
         skeleton(R.id.cache_images_skeleton, R.id.cache_images_value);
         Bg.run(() -> Images.diskBytes(this), (bytes, error) -> {
             if (isDestroyed()) return;
-            reveal(R.id.cache_images_skeleton, R.id.cache_images_value, RefreshActivity.size(bytes == null ? 0 : bytes));
+            reveal(R.id.cache_images_skeleton, R.id.cache_images_value, Formats.size(this, bytes == null ? 0 : bytes));
         });
     }
 
@@ -426,8 +435,8 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
             if (isDestroyed()) return;
             cacheClear.setText(R.string.cache_clear);
             cacheStats();
-            GlassToast.show(this, getString(R.string.cache_cleared_toast,
-                    RefreshActivity.size(freed == null ? 0 : Math.max(0, freed))), true);
+            Notice.show(this, getString(R.string.cache_cleared_toast,
+                    Formats.size(this, freed == null ? 0 : Math.max(0, freed))), true);
         });
     }
 

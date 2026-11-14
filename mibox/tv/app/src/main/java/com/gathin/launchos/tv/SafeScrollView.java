@@ -7,7 +7,7 @@ import android.widget.ScrollView;
 
 /**
  * A scrolling column that keeps whatever has the focus out of the mini-player's corner: the bottom right of the
- * screen, where the picture-in-picture sits, plus a 24 dp margin ({@code ds_pip_zone_*}). It works out how much of
+ * screen, where the picture-in-picture sits, plus a 24 dp margin ({@code pip_zone_*}). It works out how much of
  * its own bottom lies in that corner, pads its content by that much so the last row can rise above it, and scrolls
  * a focused row until it clears it. Nothing that matters is ever left under the mini-player.
  */
@@ -22,8 +22,8 @@ public final class SafeScrollView extends ScrollView {
 
     public SafeScrollView(Context c, AttributeSet attrs) {
         super(c, attrs);
-        zoneWidth = c.getResources().getDimensionPixelSize(R.dimen.ds_pip_zone_width);
-        zoneHeight = c.getResources().getDimensionPixelSize(R.dimen.ds_pip_zone_height);
+        zoneWidth = c.getResources().getDimensionPixelSize(R.dimen.pip_zone_width);
+        zoneHeight = c.getResources().getDimensionPixelSize(R.dimen.pip_zone_height);
         setClipToPadding(false);
     }
 

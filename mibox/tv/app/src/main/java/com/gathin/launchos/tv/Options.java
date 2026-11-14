@@ -76,6 +76,26 @@ final class Options {
         p(c).edit().putBoolean("dedupe", on).apply();
     }
 
+    /**
+     * Whether live channels of this account played last time as HLS rather than MPEG-TS, so the next channel asks for
+     * that format first. Keyed by AccountStore.key (a hash), never by the address.
+     */
+    static boolean liveHls(Context c, String accountKey) {
+        return p(c).getBoolean("live_hls_" + accountKey, false);
+    }
+
+    static void setLiveHls(Context c, String accountKey, boolean hls) {
+        if (liveHls(c, accountKey) == hls) return;
+        p(c).edit().putBoolean("live_hls_" + accountKey, hls).apply();
+    }
+
+    /** Forgets what was learnt about accounts (the account was deleted); the owner's choices stay. */
+    static void forgetAccounts(Context c) {
+        SharedPreferences.Editor e = p(c).edit();
+        for (String k : p(c).getAll().keySet()) if (k.startsWith("live_hls_")) e.remove(k);
+        e.apply();
+    }
+
     /** Groups for adults stay out of sight unless shown one by one. */
     static boolean hideAdult(Context c) {
         return p(c).getBoolean("hide_adult", true);

@@ -37,6 +37,12 @@ final class Groups {
         return context;
     }
 
+    /** Forgets every renamed, hidden or pinned group, for every account (the account was deleted). */
+    static void forgetAll(Context c) {
+        c.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().apply();
+        version++;
+    }
+
     /** Changes after every edit, so pages know to show the groups again. */
     static int version() {
         return version;

@@ -15,7 +15,7 @@ public final class HiddenChannelsActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
-        setContentView(R.layout.activity_refresh);
+        setContentView(R.layout.activity_column);
         Rows.header(this, R.drawable.ic_hide, R.string.settings_hidden_channels, R.string.hidden_hint);
         column = findViewById(R.id.column);
         fixedChildren = column.getChildCount();

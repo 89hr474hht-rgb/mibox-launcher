@@ -8,13 +8,18 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gathin.launchos.design.Focus;
+import com.gathin.launchos.design.Motion;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Cards for films, series and channels: a poster (or a logo) with its title underneath, a quality tag, and how far
- * a film was watched. The rows, the full grids and search all use them. A row can end with a "Tout voir" card.
- * Focused, a card grows by 5 % with the accent border; while its picture loads, a skeleton holds its place.
+ * Cards for films, series and channels (rows, grids and search): a poster (or a logo) with its title underneath, a
+ * quality tag, and how far a film was watched. A row can end with a "Tout voir" card. Pictures load through
+ * {@link Images}. Main thread only.
+ * Focused, a card's picture grows by 5 % ({@link Focus#SCALE}) with the white outline (lo_focus_tile); while it loads,
+ * a skeleton holds its place.
  */
 final class Cards {
     enum Shape { POSTER, LOGO, WIDE }
@@ -61,12 +66,16 @@ final class Cards {
                 skeleton = v.findViewById(R.id.skeleton);
                 Ui.roundClip(v.findViewById(R.id.clip));
                 v.setOnFocusChangeListener((view, focused) -> {
-                    float s = focused ? 1.05f : 1f;
+                    float s = focused ? Focus.SCALE : 1f;
                     View frame = view.findViewById(R.id.frame);
                     frame.setPivotY(frame.getHeight());
                     frame.setPivotX(frame.getWidth() / 2f);
-                    frame.animate().scaleX(s).scaleY(s).setDuration(170).start();
-                    view.setTranslationZ(focused ? Ui.dp(view.getContext(), 10) : 0);
+                    if (Motion.on()) {
+                        frame.animate().scaleX(s).scaleY(s).setDuration(Motion.SHORT).setInterpolator(Motion.ENTER).start();
+                    } else {
+                        frame.setScaleX(s);
+                        frame.setScaleY(s);
+                    }
                     if (!focused) return;
                     int p = getBindingAdapterPosition();
                     if (p == RecyclerView.NO_POSITION) return;

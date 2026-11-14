@@ -14,7 +14,10 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.extractor.DefaultExtractorsFactory;
 import androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory;
 
-/** The Media3 player both screens use, and what a playback error means in French. */
+/**
+ * The Media3 player both screens use (LivePlayer for channels, PlayerActivity for films and episodes), a playback
+ * error as a sentence, and time formats. Main thread, like Media3.
+ */
 final class Players {
     private Players() {
     }
@@ -23,7 +26,10 @@ final class Players {
     static ExoPlayer build(Context c) {
         HttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
                 .setUserAgent(Http.USER_AGENT)
-                .setAllowCrossProtocolRedirects(true)
+                // Panels redirect streams to another host, often to another scheme. Media3 allows a change of scheme
+                // in both directions or in none: from an http panel the only change is up to https, so it is allowed;
+                // from an https panel it could only go down to http, so it is refused.
+                .setAllowCrossProtocolRedirects(!secureServer(c))
                 .setConnectTimeoutMs(12_000)
                 .setReadTimeoutMs(20_000);
         // IPTV streams often lack clean key frames or access-unit markers; these flags make MPEG-TS start anyway.
@@ -41,6 +47,12 @@ final class Players {
         return p;
     }
 
+    /** True when the saved account's server is reached over https. */
+    private static boolean secureServer(Context c) {
+        Account a = AccountStore.load(c);
+        return a != null && a.server != null && a.server.regionMatches(true, 0, "https:", 0, 6);
+    }
+
     /** "1:52:07" or "52:07": a position on the player's seek bar. */
     static String elapsed(long ms) {
         long t = Math.max(0, ms) / 1000;
@@ -49,31 +61,33 @@ final class Players {
                 : String.format(java.util.Locale.FRANCE, "%d:%02d", m, sec);
     }
 
-    /** What went wrong, without the address (it holds the account). */
-    static String describe(PlaybackException e) {
-        Throwable c = e.getCause();
-        if (c instanceof HttpDataSource.InvalidResponseCodeException) {
-            int code = ((HttpDataSource.InvalidResponseCodeException) c).responseCode;
-            if (code == 401 || code == 403) {
-                return "Le serveur refuse ce flux (code " + code + "). Une autre lecture est peut-être en cours sur ce compte.";
-            }
-            if (code == 404) return "Ce contenu n'existe plus sur le serveur (code 404).";
-            return "Le serveur a répondu avec une erreur (code " + code + ").";
+    /**
+     * What went wrong, as a plain sentence for the family, without the address (it holds the account). The error's
+     * technical name goes to the log only.
+     */
+    static String describe(Context c, PlaybackException e) {
+        Throwable cause = e.getCause();
+        if (cause instanceof HttpDataSource.InvalidResponseCodeException) {
+            int code = ((HttpDataSource.InvalidResponseCodeException) cause).responseCode;
+            if (code == 401 || code == 403) return c.getString(R.string.play_err_refused, code);
+            if (code == 404) return c.getString(R.string.play_err_gone);
+            return c.getString(R.string.err_server, code);
         }
         switch (e.errorCode) {
             case PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED:
-                return "Impossible de joindre le serveur.";
+                return c.getString(R.string.err_network);
             case PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT:
-                return "Le serveur ne répond pas (délai dépassé).";
+                return c.getString(R.string.err_timeout);
             case PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED:
             case PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED:
-                return "Format du flux non reconnu.";
+                return c.getString(R.string.play_err_format);
             case PlaybackException.ERROR_CODE_DECODER_INIT_FAILED:
             case PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED:
             case PlaybackException.ERROR_CODE_DECODING_FORMAT_EXCEEDS_CAPABILITIES:
-                return "La box ne sait pas décoder ce format vidéo ou audio.";
+                return c.getString(R.string.play_err_decoder);
             default:
-                return "Erreur de lecture (" + e.getErrorCodeName() + ").";
+                Logs.failed("Players.describe", e);
+                return c.getString(R.string.play_err_other);
         }
     }
 

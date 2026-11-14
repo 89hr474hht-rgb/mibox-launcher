@@ -25,15 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Films and episodes, full screen, with LaunchTV OS's own display ({@link Osd}): title and time at the top, a thin
- * seek bar, the controls and audio, subtitles and picture-in-picture at the bottom, hidden after 3 s. Left and
- * Right seek 10 s back or 30 s on.
- * Where it was stopped is remembered for Reprendre; at the end of an episode the next one starts (Réglages).
+ * Films and episodes, full screen, with the app's own display ({@link Osd}): OK is play/pause, Left and Right seek
+ * 10 s back or 30 s on. The position is saved every {@link #SAVE_MS} and on stop (History, for Reprendre); at the
+ * end of an episode the next one of the season starts (Réglages). Everything it needs comes in the Intent, the
+ * season's episodes included, so it survives the process being killed. The player lives from onStart to onStop.
  * Live channels play in the main screen instead ({@link LivePlayer}).
  */
 public final class PlayerActivity extends Activity {
     private static final String EXTRA_URL = "url";
-    private static final String EXTRA_TITLE = "title";
     private static final String EXTRA_START = "start_ms";
     private static final String EXTRA_KIND = "kind";
     private static final String EXTRA_ID = "id";
@@ -45,16 +44,13 @@ public final class PlayerActivity extends Activity {
     private static final String EXTRA_COVER = "cover";
     private static final String EXTRA_SEASON = "season";
     private static final String EXTRA_EPISODE_INDEX = "episode_index";
+    /** The season's episodes, as parallel arrays (ids, names, pictures, extensions, numbers). */
+    private static final String EXTRA_EP_IDS = "ep_ids", EXTRA_EP_NAMES = "ep_names", EXTRA_EP_IMAGES = "ep_images",
+            EXTRA_EP_EXTS = "ep_exts", EXTRA_EP_NUMS = "ep_nums";
     private static final long SAVE_MS = 15_000;
 
-    /** The season the episode was started from, so the next one can follow. */
-    static final class Episodes {
-        static List<Item> list = new ArrayList<>();
-
-        private Episodes() {
-        }
-    }
-
+    /** The season the episode was started from, so the next one can follow; empty for a film. */
+    private final List<Item> episodes = new ArrayList<>();
     private ExoPlayer player;
     private PlayerView view;
     private View error;
@@ -65,6 +61,7 @@ public final class PlayerActivity extends Activity {
     private String seriesId, seriesName, cover;
     private int season, episodeIndex = -1;
     private long startAt;
+    private String url;
     private final Runnable save = new Runnable() {
         @Override
         public void run() {
@@ -74,22 +71,46 @@ public final class PlayerActivity extends Activity {
     };
 
     static Intent film(Context c, Xtream api, Item film, long startMs) {
-        return base(c, film, api.movieUrl(film), film.title, startMs);
+        return base(c, film, api.movieUrl(film), startMs);
     }
 
     static Intent episode(Context c, Xtream api, String seriesId, String seriesName, String cover, int season,
                           List<Item> episodes, int index, long startMs) {
         Item e = episodes.get(index);
-        Episodes.list = new ArrayList<>(episodes);
-        return base(c, e, api.episodeUrl(e), seriesName + " – " + e.title, startMs)
+        int n = episodes.size();
+        String[] ids = new String[n], names = new String[n], images = new String[n], exts = new String[n];
+        int[] nums = new int[n];
+        for (int i = 0; i < n; i++) {
+            Item x = episodes.get(i);
+            ids[i] = x.id;
+            names[i] = x.name;
+            images[i] = x.image;
+            exts[i] = x.ext;
+            nums[i] = x.num;
+        }
+        return base(c, e, api.episodeUrl(e), startMs)
                 .putExtra(EXTRA_SERIES, seriesId).putExtra(EXTRA_SERIES_NAME, seriesName).putExtra(EXTRA_COVER, cover)
-                .putExtra(EXTRA_SEASON, season).putExtra(EXTRA_EPISODE_INDEX, index);
+                .putExtra(EXTRA_SEASON, season).putExtra(EXTRA_EPISODE_INDEX, index)
+                .putExtra(EXTRA_EP_IDS, ids).putExtra(EXTRA_EP_NAMES, names).putExtra(EXTRA_EP_IMAGES, images)
+                .putExtra(EXTRA_EP_EXTS, exts).putExtra(EXTRA_EP_NUMS, nums);
     }
 
-    private static Intent base(Context c, Item i, String url, String title, long startMs) {
-        return new Intent(c, PlayerActivity.class).putExtra(EXTRA_URL, url).putExtra(EXTRA_TITLE, title)
+    private static Intent base(Context c, Item i, String url, long startMs) {
+        return new Intent(c, PlayerActivity.class).putExtra(EXTRA_URL, url)
                 .putExtra(EXTRA_START, startMs).putExtra(EXTRA_KIND, i.kind.name()).putExtra(EXTRA_ID, i.id)
                 .putExtra(EXTRA_NAME, i.name).putExtra(EXTRA_IMAGE, i.image).putExtra(EXTRA_EXT, i.ext);
+    }
+
+    /** The season's episodes from the Intent (empty for a film). */
+    private static List<Item> episodes(Intent in) {
+        List<Item> out = new ArrayList<>();
+        String[] ids = in.getStringArrayExtra(EXTRA_EP_IDS), names = in.getStringArrayExtra(EXTRA_EP_NAMES),
+                images = in.getStringArrayExtra(EXTRA_EP_IMAGES), exts = in.getStringArrayExtra(EXTRA_EP_EXTS);
+        int[] nums = in.getIntArrayExtra(EXTRA_EP_NUMS);
+        if (ids == null || names == null || images == null || exts == null || nums == null) return out;
+        int n = Math.min(Math.min(ids.length, names.length), Math.min(Math.min(images.length, exts.length), nums.length));
+        for (int i = 0; i < n; i++) out.add(Item.episode(ids[i], names[i], images[i], exts[i], nums[i], "", 0));
+        return out;
     }
 
     @Override
@@ -108,20 +129,31 @@ public final class PlayerActivity extends Activity {
             return;
         }
         api = new Xtream(a);
-        Item.Kind kind = Item.Kind.valueOf(in.getStringExtra(EXTRA_KIND));
-        item = new Item(kind, in.getStringExtra(EXTRA_ID), in.getStringExtra(EXTRA_NAME), in.getStringExtra(EXTRA_IMAGE),
-                in.getStringExtra(EXTRA_EXT), 0, "");
         seriesId = in.getStringExtra(EXTRA_SERIES);
         seriesName = in.getStringExtra(EXTRA_SERIES_NAME);
         cover = in.getStringExtra(EXTRA_COVER);
         season = in.getIntExtra(EXTRA_SEASON, 0);
-        episodeIndex = in.getIntExtra(EXTRA_EPISODE_INDEX, -1);
+        episodes.addAll(episodes(in));
+        episodeIndex = state != null ? state.getInt(EXTRA_EPISODE_INDEX, -1) : in.getIntExtra(EXTRA_EPISODE_INDEX, -1);
+        if (seriesId != null && episodeIndex >= 0 && episodeIndex < episodes.size()) {
+            // An episode: the one the season list says (after the next one started, the saved index).
+            item = episodes.get(episodeIndex);
+            url = api.episodeUrl(item);
+        } else {
+            Item.Kind kind = Item.Kind.valueOf(in.getStringExtra(EXTRA_KIND));
+            item = kind == Item.Kind.EPISODE
+                    ? Item.episode(in.getStringExtra(EXTRA_ID), in.getStringExtra(EXTRA_NAME), in.getStringExtra(EXTRA_IMAGE),
+                    in.getStringExtra(EXTRA_EXT), 0, "", 0)
+                    : Item.movie(in.getStringExtra(EXTRA_ID), in.getStringExtra(EXTRA_NAME), in.getStringExtra(EXTRA_IMAGE),
+                    in.getStringExtra(EXTRA_EXT), "");
+            url = in.getStringExtra(EXTRA_URL);
+        }
         startAt = state != null ? state.getLong(EXTRA_START) : in.getLongExtra(EXTRA_START, 0);
         if (seriesId != null) remember();
         osd = new Osd(this, new Osd.Host() {
             @Override
             public boolean hasNext() {
-                return seriesId != null && episodeIndex >= 0 && episodeIndex + 1 < Episodes.list.size();
+                return seriesId != null && episodeIndex >= 0 && episodeIndex + 1 < episodes.size();
             }
 
             @Override
@@ -140,7 +172,7 @@ public final class PlayerActivity extends Activity {
                     enterPictureInPictureMode(new PictureInPictureParams.Builder()
                             .setAspectRatio(new Rational(16, 9)).build());
                 } catch (IllegalStateException | IllegalArgumentException e) {
-                    GlassToast.show(PlayerActivity.this, getString(R.string.osd_pip_none), false);
+                    Notice.show(PlayerActivity.this, getString(R.string.osd_pip_none), false);
                 }
             }
         });
@@ -152,7 +184,7 @@ public final class PlayerActivity extends Activity {
         if (seriesId == null) {
             osd.setTitle(item.title, "");
         } else {
-            osd.setTitle(seriesName, getString(R.string.osd_episode, season, item.title));
+            osd.setTitle(seriesName, getString(R.string.osd_episode, season, Ui.episodeTitle(this, item)));
         }
     }
 
@@ -167,6 +199,7 @@ public final class PlayerActivity extends Activity {
     protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
         out.putLong(EXTRA_START, player != null ? player.getCurrentPosition() : startAt);
+        out.putInt(EXTRA_EPISODE_INDEX, episodeIndex);
     }
 
     @Override
@@ -178,7 +211,7 @@ public final class PlayerActivity extends Activity {
         player.addListener(new Player.Listener() {
             @Override
             public void onPlayerError(PlaybackException e) {
-                errorText.setText(Players.describe(e));
+                errorText.setText(Players.describe(PlayerActivity.this, e));
                 error.setVisibility(View.VISIBLE);
             }
 
@@ -188,7 +221,7 @@ public final class PlayerActivity extends Activity {
                 if (state == Player.STATE_ENDED) ended();
             }
         });
-        play(getIntent().getStringExtra(EXTRA_URL), startAt);
+        play(url, startAt);
         osd.attach(player);
         view.postDelayed(save, SAVE_MS);
     }
@@ -237,8 +270,7 @@ public final class PlayerActivity extends Activity {
             h.finished(item);   // no Reprendre for it
             if (seriesId != null) h.episodeDone(seriesId, item.id);
         }
-        List<Item> eps = Episodes.list;
-        if (seriesId == null || !Options.nextEpisode(this) || episodeIndex < 0 || episodeIndex + 1 >= eps.size()) {
+        if (seriesId == null || !Options.nextEpisode(this) || episodeIndex < 0 || episodeIndex + 1 >= episodes.size()) {
             finish();
             return;
         }
@@ -247,19 +279,20 @@ public final class PlayerActivity extends Activity {
 
     /** The next episode of the season, at the end of one or from the display's button. */
     private void nextEpisode() {
-        List<Item> eps = Episodes.list;
         savePosition();
         episodeIndex++;
-        Item next = eps.get(episodeIndex);
+        Item next = episodes.get(episodeIndex);
         item = next;
+        url = api.episodeUrl(next);
         remember();
-        toast.setText(getString(R.string.next_episode, next.title));
+        toast.setText(getString(R.string.next_episode, Ui.episodeTitle(this, next)));
         toast.setVisibility(View.VISIBLE);
         toast.setAlpha(0f);
         toast.animate().alpha(1f).setDuration(250).start();
         toast.postDelayed(() -> toast.animate().alpha(0f).setDuration(400)
                 .withEndAction(() -> toast.setVisibility(View.GONE)).start(), 4000);
-        play(api.episodeUrl(next), 0);
+        startAt = 0;
+        play(url, 0);
         titles();
     }
 

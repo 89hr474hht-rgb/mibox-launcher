@@ -98,9 +98,10 @@ public class XtreamTest {
         assertEquals("P", s.plot);
         assertEquals(2, s.seasons.size());
         assertEquals(1, s.seasons.get(0).number);
-        assertEquals("Saison 1", s.seasons.get(0).name);
+        assertEquals("", s.seasons.get(0).name);   // no name from the panel: the screen names it
         assertEquals("11", s.seasons.get(0).episodes.get(0).id);
-        assertEquals("Épisode 2", s.seasons.get(0).episodes.get(1).name);
+        assertEquals("", s.seasons.get(0).episodes.get(1).name);   // no title: the screen says "Épisode 2"
+        assertEquals(2, s.seasons.get(0).episodes.get(1).num);
     }
 
     @Test
@@ -132,10 +133,10 @@ public class XtreamTest {
     @Test
     public void streamAddresses() {
         Xtream x = new Xtream(new Account("http://h.example:8080", "u", "p w"));
-        Item ch = new Item(Item.Kind.LIVE, "5", "c", "", "", 1, "");
+        Item ch = Item.live("5", "c", "", 1, "");
         assertEquals("http://h.example:8080/live/u/p%20w/5.ts", x.liveUrl(ch, false));
         assertEquals("http://h.example:8080/live/u/p%20w/5.m3u8", x.liveUrl(ch, true));
-        Item film = new Item(Item.Kind.MOVIE, "9", "f", "", "mkv", 1, "");
+        Item film = Item.movie("9", "f", "", "mkv", "");
         assertEquals("http://h.example:8080/movie/u/p%20w/9.mkv", x.movieUrl(film));
     }
 

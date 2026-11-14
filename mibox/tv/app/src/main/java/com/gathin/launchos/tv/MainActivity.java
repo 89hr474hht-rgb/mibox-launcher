@@ -8,31 +8,38 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gathin.launchos.design.Motion;
+
 /**
- * The main screen. On the left, the rail: a narrow dark strip of icons (Rechercher, Accueil, Chaînes, Guide TV,
- * Films, Séries, then Réglages) that opens over the page only while it has the focus. The page fills the rest:
- * Accueil (the dashboard, shown first), Chaînes with its three panels and the live player, or Films and Séries.
+ * The main screen: the rail (Rechercher, Accueil, Chaînes, Guide TV, Films, Séries, Réglages) and one page at a time
+ * (HomePage, LivePage with the {@link LivePlayer}, or a BrowsePage for Films and Séries). Main thread only.
  *
- * The remote: the arrows move inside a page; Left at a page's left edge opens the rail on the section shown, Right
- * leaves it back where the page was. Back steps out one level at a time (full screen, small window, panel, rail),
- * then leaves the app.
+ * <p>Focus: every arrow goes through {@link Root}'s router ({@link #route}); the rail opens while it has the focus,
+ * Left at a page's left edge enters it on the section shown, Right leaves it where the page was. Back steps out one
+ * level at a time (full screen, small window, panel, rail), then leaves the app.
+ *
+ * <p>Lifecycle: the account is read again in onResume (a changed account reloads every page); the live stream stops
+ * in onStop and starts again in onStart. The start-up screen ({@link StartScreen}) shows only when the app is opened
+ * from the launcher; a key ends it and still reaches the app.
  */
 public final class MainActivity extends Activity {
     static final String EXTRA_PLAY_CHANNEL = "play_channel";
     private static final long SECTION_DELAY_MS = 320;
     private static final int NAV_SEARCH = 0, NAV_HOME = 1, NAV_LIVE = 2, NAV_GUIDE = 3, NAV_MOVIES = 4, NAV_SERIES = 5,
-            NAV_REFRESH = 6, NAV_SETTINGS = 7, NAV_UPDATES = 8, NAV_ACCOUNT = 9;
+            NAV_SETTINGS = 6;
     /** The login screen opens by itself once, when there is no account yet. */
     private static boolean loginOffered;
 
     private Root root;
     private ViewGroup rail;
-    private View railShade, railTitle;
+    private View railShade, railTitle, railEdge;
+    /** The visible width of the rail (its clip), in pixels. */
+    private int railClip;
+    private final Rect railBounds = new Rect();
     private View[] railItems;
     private View[] sectionItems;
     private View navUpdates;
@@ -75,18 +82,18 @@ public final class MainActivity extends Activity {
         rail = findViewById(R.id.rail);
         railShade = findViewById(R.id.rail_shade);
         railTitle = findViewById(R.id.rail_title);
+        railEdge = findViewById(R.id.rail_edge);
+        clipRail(getResources().getDimensionPixelSize(R.dimen.rail_closed));
         status = findViewById(R.id.status);
         banner = findViewById(R.id.update_banner);
         liveLayer = findViewById(R.id.live_layer);
 
         int[] ids = {R.id.nav_search, R.id.nav_home, R.id.nav_live, R.id.nav_guide, R.id.nav_movies, R.id.nav_series,
-                R.id.nav_refresh, R.id.nav_settings, R.id.nav_updates, R.id.nav_account};
+                R.id.nav_settings};
         int[] icons = {R.drawable.ic_search, R.drawable.ic_home, R.drawable.ic_live, R.drawable.ic_guide,
-                R.drawable.ic_movie, R.drawable.ic_series, R.drawable.ic_refresh, R.drawable.ic_settings,
-                R.drawable.ic_update, R.drawable.ic_account};
+                R.drawable.ic_movie, R.drawable.ic_series, R.drawable.ic_settings};
         int[] labels = {R.string.nav_search, R.string.nav_home, R.string.nav_live, R.string.nav_guide,
-                R.string.nav_movies, R.string.nav_series, R.string.nav_refresh, R.string.nav_settings,
-                R.string.nav_updates, R.string.nav_account};
+                R.string.nav_movies, R.string.nav_series, R.string.nav_settings};
         railItems = new View[ids.length];
         for (int i = 0; i < ids.length; i++) {
             View v = findViewById(ids[i]);
@@ -95,11 +102,8 @@ public final class MainActivity extends Activity {
             railItems[i] = v;
         }
         sectionItems = new View[]{railItems[NAV_LIVE], railItems[NAV_MOVIES], railItems[NAV_SERIES]};
-        // A short menu: search, Accueil, the sections and the guide, Réglages. Actualiser, Mises à jour and Compte are
-        // in Réglages; their rail items stay in the layout, out of sight, so Up and Down skip them.
-        railItems[NAV_REFRESH].setVisibility(View.GONE);
-        railItems[NAV_UPDATES].setVisibility(View.GONE);
-        railItems[NAV_ACCOUNT].setVisibility(View.GONE);
+        // A short menu: search, Accueil, the sections and the guide, Réglages (which holds the account, the lists'
+        // refresh and the updates).
         navUpdates = railItems[NAV_SETTINGS];
         Xtream.Section[] sections = Xtream.Section.values();
         for (int i = 0; i < sectionItems.length; i++) {
@@ -132,10 +136,7 @@ public final class MainActivity extends Activity {
         });
         railItems[NAV_SEARCH].setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
         railItems[NAV_GUIDE].setOnClickListener(v -> startActivity(new Intent(this, GuideActivity.class)));
-        railItems[NAV_REFRESH].setOnClickListener(v -> startActivity(new Intent(this, RefreshActivity.class)));
         railItems[NAV_SETTINGS].setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
-        railItems[NAV_UPDATES].setOnClickListener(v -> startActivity(new Intent(this, UpdatesActivity.class)));
-        railItems[NAV_ACCOUNT].setOnClickListener(v -> startActivity(new Intent(this, AccountActivity.class)));
 
         player = new LivePlayer(this, liveLayer, new LivePlayer.Host() {
             @Override
@@ -146,6 +147,7 @@ public final class MainActivity extends Activity {
             @Override
             public void modeChanged(LivePlayer.Mode mode) {
                 rail.setVisibility(mode == LivePlayer.Mode.FULL ? View.INVISIBLE : View.VISIBLE);
+                railEdge.setVisibility(rail.getVisibility());
                 live.modeChanged(mode);
             }
 
@@ -330,8 +332,8 @@ public final class MainActivity extends Activity {
     }
 
     private void markSection() {
-        for (int i = 0; i < sectionItems.length; i++) sectionItems[i].setSelected(!home && i == section.ordinal());
-        railItems[NAV_HOME].setSelected(home);
+        for (int i = 0; i < sectionItems.length; i++) sectionItems[i].setActivated(!home && i == section.ordinal());
+        railItems[NAV_HOME].setActivated(home);
     }
 
     /** The rail item of the page shown. */
@@ -418,21 +420,23 @@ public final class MainActivity extends Activity {
         }
     }
 
-    /** The rail opens over the page (the page is dimmed behind it) and closes back to its icons. */
+    /**
+     * The rail opens over the page (the page is dimmed behind it) and closes back to its icons. It is laid out once at
+     * its open width; only its clip moves, so a frame redraws it without measuring anything.
+     */
     private void openRail(boolean open) {
         railOpen = open;
         if (railAnim != null) railAnim.cancel();
-        int from = rail.getWidth();
         int to = getResources().getDimensionPixelSize(open ? R.dimen.rail_open : R.dimen.rail_closed);
-        railAnim = ValueAnimator.ofInt(from, to);
-        railAnim.setDuration(open ? 240 : 200);
-        railAnim.setInterpolator(new DecelerateInterpolator(1.5f));
-        railAnim.addUpdateListener(a -> {
-            ViewGroup.LayoutParams lp = rail.getLayoutParams();
-            lp.width = (int) a.getAnimatedValue();
-            rail.setLayoutParams(lp);
-        });
-        railAnim.start();
+        if (!Motion.on()) {
+            clipRail(to);
+        } else {
+            railAnim = ValueAnimator.ofInt(railClip, to);
+            railAnim.setDuration(open ? 240 : 200);
+            railAnim.setInterpolator(Motion.MOVE);
+            railAnim.addUpdateListener(a -> clipRail((int) a.getAnimatedValue()));
+            railAnim.start();
+        }
         for (View v : railItems) v.findViewById(R.id.rail_label).animate().alpha(open ? 1f : 0f).setDuration(open ? 260 : 120).start();
         railTitle.animate().alpha(open ? 1f : 0f).setDuration(open ? 260 : 120).start();
         if (open) railShade.setVisibility(View.VISIBLE);
@@ -440,6 +444,14 @@ public final class MainActivity extends Activity {
                 .withEndAction(() -> {
                     if (!railOpen) railShade.setVisibility(View.INVISIBLE);
                 }).start();
+    }
+
+    /** Shows the rail's first width pixels and puts its hairline on that edge. */
+    private void clipRail(int width) {
+        railClip = width;
+        railBounds.set(0, 0, width, Short.MAX_VALUE);
+        rail.setClipBounds(railBounds);
+        railEdge.setTranslationX(width - 1);
     }
 
     /** The first focus is given before the window is shown, when no focus change is reported: catch up here. */
@@ -452,9 +464,8 @@ public final class MainActivity extends Activity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (start != null && start.showing()) {
-            // Any key ends the start-up screen; it does nothing else.
-            if (event.getAction() == KeyEvent.ACTION_UP) start.leave();
-            return true;
+            // Any key ends the start-up screen, and still does what it does (OK, Back, an arrow are not lost).
+            start.leave();
         }
         if (player.key(event)) return true;
         return super.dispatchKeyEvent(event);

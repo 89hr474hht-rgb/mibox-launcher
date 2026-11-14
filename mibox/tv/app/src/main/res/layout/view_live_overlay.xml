@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Over the live player: what is on (full screen), the error panel, and the small window's caption. -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
@@ -27,8 +28,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textColor="#66FFFFFF"
-                android:textSize="24sp" />
+                android:textColor="@color/lo_text_3"
+                android:textSize="@dimen/lo_text_title" />
 
             <ImageView
                 android:id="@+id/info_logo"
@@ -61,7 +62,8 @@
                     android:paddingEnd="8dp"
                     android:paddingBottom="2dp"
                     android:text="@string/live"
-                    android:textSize="11sp" />
+                    android:textColor="@color/lo_on_accent"
+                    android:textSize="@dimen/lo_text_label" />
 
                 <TextView
                     android:id="@+id/info_number"
@@ -69,8 +71,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:fontFamily="@font/launchos_semibold"
-                    android:textColor="#B3FFFFFF"
-                    android:textSize="14sp" />
+                    android:textColor="@color/lo_text_2"
+                    android:textSize="@dimen/lo_text_small" />
 
                 <TextView
                     android:id="@+id/info_sub"
@@ -78,8 +80,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:singleLine="true"
-                    android:textColor="@color/text_dim"
-                    android:textSize="14sp" />
+                    android:textColor="@color/lo_text_2"
+                    android:textSize="@dimen/lo_text_small" />
             </LinearLayout>
 
             <TextView
@@ -90,7 +92,7 @@
                 android:layout_marginTop="6dp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textSize="28sp" />
+                android:textSize="@dimen/lo_text_title" />
 
             <LinearLayout
                 android:id="@+id/info_guide"
@@ -107,14 +109,14 @@
                     android:ellipsize="end"
                     android:fontFamily="@font/launchos_medium"
                     android:singleLine="true"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/lo_text_heading" />
 
                 <FrameLayout
                     android:id="@+id/info_track"
                     android:layout_width="420dp"
                     android:layout_height="4dp"
                     android:layout_marginTop="8dp"
-                    android:background="@drawable/track_bg">
+                    android:background="@drawable/lo_track">
 
                     <View
                         android:id="@+id/info_bar"
@@ -130,8 +132,8 @@
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textColor="@color/text_dim"
-                    android:textSize="15sp" />
+                    android:textColor="@color/lo_text_2"
+                    android:textSize="@dimen/lo_text_body" />
             </LinearLayout>
 
             <TextView
@@ -140,8 +142,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="@string/live_keys"
-                android:textColor="#80FFFFFF"
-                android:textSize="13sp" />
+                android:textColor="@color/lo_text_3"
+                android:textSize="@dimen/lo_text_small" />
         </LinearLayout>
     </LinearLayout>
 
@@ -150,7 +152,7 @@
         android:layout_width="520dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@drawable/sheet_bg"
+        android:background="@drawable/lo_panel"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="30dp"
@@ -161,7 +163,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/play_failed"
-            android:textSize="22sp" />
+            android:textSize="@dimen/lo_text_heading" />
 
         <TextView
             android:id="@+id/error_text"
@@ -170,15 +172,15 @@
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:lineSpacingMultiplier="1.2"
-            android:textColor="@color/text_dim"
-            android:textSize="15sp" />
+            android:textColor="@color/lo_text_2"
+            android:textSize="@dimen/lo_text_body" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/retry_hint"
-            android:textSize="14sp" />
+            android:textSize="@dimen/lo_text_small" />
     </LinearLayout>
 
     <TextView
@@ -194,6 +196,6 @@
         android:paddingEnd="14dp"
         android:paddingBottom="9dp"
         android:singleLine="true"
-        android:textSize="13sp"
+        android:textSize="@dimen/lo_text_small"
         android:visibility="gone" />
 </merge>

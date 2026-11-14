@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gathin.launchos.design.Focus;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,15 +29,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Guide TV, as a timeline: the hours along the top (two hours at a time, from the current half hour), the
  * channels of a group down the left, and their programmes placed along the hours, with a line at the current time.
  * Up and Down go from channel to channel; Right past the window's end moves it on half an hour, Left moves it back
  * (never before now: panels only give what is on now and next). OK plays the channel in Chaînes. The guide of a
- * channel is asked for only when its line is on screen, a few at a time.
+ * channel is asked for only when its line is on screen, on {@link Bg#execute}, and kept {@link #KEEP_MS}.
+ *
+ * <p>Lines are recycled with their programme blocks: a bind reuses the blocks a line already has, and moving the
+ * window of hours rebinds only the blocks ({@link RowAdapter#STRIP}), never the channel part. Main thread only.
  */
 public final class GuideActivity extends Activity {
     private static final int WINDOW_MIN = 120;
@@ -43,8 +47,9 @@ public final class GuideActivity extends Activity {
     private static final int LIMIT = 12;
     private static final long KEEP_MS = 30 * 60 * 1000L;
     private static final int FAVOURITES = 16;
+    /** A programme's box is never narrower than this, so a short one still shows a few letters of its title. */
+    private static final int MIN_BLOCK_DP = 72;
 
-    private static final ExecutorService POOL = Executors.newFixedThreadPool(3);
     private static final Map<String, List<Epg.Programme>> CACHE = new HashMap<>();
     private static final Map<String, Long> FETCHED = new HashMap<>();
     private static int cacheAccount = -1;
@@ -72,6 +77,7 @@ public final class GuideActivity extends Activity {
     private FrameLayout axis;
     private View nowLine;
     private TextView clock, detailTitle, detailText, status;
+    private View retry;
     private long base, from;
     private float px;
     private boolean shownOnce;
@@ -86,7 +92,7 @@ public final class GuideActivity extends Activity {
                 base = Timeline.windowStart(now);
                 if (from < base) from = base;
                 layoutTimes();
-                adapter.refresh();
+                adapter.strips();
             }
             clock.setText(hm.format(new Date()));
             placeNow();
@@ -116,24 +122,35 @@ public final class GuideActivity extends Activity {
         detailTitle = findViewById(R.id.guide_detail_title);
         detailText = findViewById(R.id.guide_detail_text);
         status = findViewById(R.id.guide_status);
+        retry = findViewById(R.id.retry);
+        retry.setOnClickListener(v -> load());
+        Focus.lift(retry);
         rows.setLayoutManager(new LinearLayoutManager(this));
         rows.setItemAnimator(null);
         rows.setAdapter(adapter);
         base = Timeline.windowStart(System.currentTimeMillis() / 1000);
         from = base;
-        status(getString(R.string.loading));
         rows.post(() -> {
             measure();
             layoutTimes();
-            adapter.refresh();
-            focusFirst(0);
+            adapter.strips();
+            focusFirstWhenLaid();
         });
-        Library lib = Library.of(Xtream.Section.LIVE);
         Library.forAccount(AccountStore.version());
+        load();
+    }
+
+    /** Reads the channels' list; on failure, the reason and Réessayer, which takes the focus. */
+    private void load() {
+        retry.setVisibility(View.GONE);
+        status(getString(R.string.loading));
+        Library lib = Library.of(Xtream.Section.LIVE);
         lib.load(api, () -> {
             if (isDestroyed()) return;
             if (lib.error() != null && !lib.ready()) {
-                status(lib.error().french());
+                status(lib.error().text(this));
+                retry.setVisibility(View.VISIBLE);
+                retry.requestFocus();
                 return;
             }
             buildGroups();
@@ -177,6 +194,7 @@ public final class GuideActivity extends Activity {
             TextView t = (TextView) LayoutInflater.from(this).inflate(R.layout.item_sort_pill, row, false);
             t.setText(gr.name);
             t.setOnClickListener(v -> choose(gr));
+            Focus.lift(t);
             row.addView(t);
             groupViews.add(t);
         }
@@ -237,22 +255,38 @@ public final class GuideActivity extends Activity {
         rows.scrollToPosition(0);
         // The first list goes straight to the grid; later ones keep the focus on the group just chosen.
         View f = getCurrentFocus();
-        if (!shownOnce || f == null || !Root.inside(f, findViewById(R.id.guide_groups))) focusFirst(0);
+        if (!shownOnce || f == null || !Root.inside(f, findViewById(R.id.guide_groups))) focusFirstWhenLaid();
         shownOnce = true;
     }
 
-    /** Puts the focus on the first line's programme once the lines are laid out (a few frames at most). */
-    private void focusFirst(int tries) {
-        if (channels.isEmpty() || tries > 20) return;
+    /**
+     * Puts the focus on the first line's first programme as soon as that line is laid out: now when it already is,
+     * else at the end of the next layout pass of the list (one listener, removed once used).
+     */
+    private void focusFirstWhenLaid() {
+        if (focusFirst()) return;
+        rows.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+            private int passes;
+
+            @Override
+            public void onGlobalLayout() {
+                // A few passes at most: the list lays out its first lines in the pass after the data arrives.
+                if (isDestroyed() || channels.isEmpty() || focusFirst() || ++passes > 8) {
+                    rows.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            }
+        });
+    }
+
+    /** True when the focus is now in the lines (put there, or already there). */
+    private boolean focusFirst() {
         View f = getCurrentFocus();
-        if (f != null && Root.inside(f, rows)) return;
+        if (f != null && Root.inside(f, rows)) return true;
+        if (channels.isEmpty() || px <= 0) return false;
         RecyclerView.ViewHolder h = rows.findViewHolderForAdapterPosition(0);
-        ViewGroup strip = h == null ? null : h.itemView.findViewById(R.id.guide_strip);
-        if (strip == null || strip.getChildCount() == 0) {
-            rows.postDelayed(() -> focusFirst(tries + 1), 50);
-            return;
-        }
+        if (h == null || !h.itemView.isLaidOut()) return false;
         focusRow(0, -1);
+        return true;
     }
 
     // ---- the hours ----
@@ -270,8 +304,8 @@ public final class GuideActivity extends Activity {
         for (int m = 0; m < WINDOW_MIN; m += Timeline.STEP_MIN) {
             TextView t = new TextView(this);
             t.setText(hm.format(new Date((from + m * 60L) * 1000)));
-            t.setTextColor(getColor(R.color.ds_text_dim));
-            t.setTextSize(12);
+            t.setTextColor(getColor(R.color.lo_text_2));
+            t.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.lo_text_small));
             t.setGravity(Gravity.CENTER_VERTICAL);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
@@ -309,7 +343,7 @@ public final class GuideActivity extends Activity {
         if (l == null && loading.add(c.id)) {
             String id = c.id;
             Xtream x = api;
-            POOL.execute(() -> {
+            Bg.execute(() -> {
                 List<Epg.Programme> got;
                 try {
                     got = x.shortEpg(id, LIMIT);
@@ -323,7 +357,7 @@ public final class GuideActivity extends Activity {
                     FETCHED.put(id, System.currentTimeMillis());
                     if (isDestroyed()) return;
                     for (int i = 0; i < channels.size(); i++) {
-                        if (channels.get(i).id.equals(id)) adapter.notifyItemChanged(i);
+                        if (channels.get(i).id.equals(id)) adapter.notifyItemChanged(i, RowAdapter.STRIP);
                     }
                 });
             });
@@ -386,7 +420,7 @@ public final class GuideActivity extends Activity {
                 RecyclerView.ViewHolder h = rows.findContainingViewHolder(f);
                 int position = h == null ? -1 : h.getBindingAdapterPosition();
                 if (shift(right ? Timeline.STEP_MIN : -Timeline.STEP_MIN)) {
-                    adapter.refresh();
+                    adapter.strips();
                     if (position >= 0) {
                         int[] at = new int[2];
                         f.getLocationOnScreen(at);
@@ -403,12 +437,19 @@ public final class GuideActivity extends Activity {
 
     // ---- lines ----
 
+    /** Spare programme blocks, taken off lines that needed fewer, for lines that need more. */
+    private final java.util.ArrayDeque<FrameLayout> spareBlocks = new java.util.ArrayDeque<>();
+
     private final class RowAdapter extends RecyclerView.Adapter<RowAdapter.Holder> {
+        /** Payload: only the programmes changed (the window of hours moved, or a channel's guide arrived). */
+        static final String STRIP = "strip";
+
         final class Holder extends RecyclerView.ViewHolder {
             final View channel, skeleton;
             final ImageView logo;
             final TextView initials, name;
             final FrameLayout strip;
+            Item item;
 
             Holder(View v) {
                 super(v);
@@ -418,12 +459,23 @@ public final class GuideActivity extends Activity {
                 initials = v.findViewById(R.id.guide_initials);
                 name = v.findViewById(R.id.guide_name);
                 strip = v.findViewById(R.id.guide_strip);
+                channel.setOnClickListener(x -> {
+                    if (item != null) play(item);
+                });
+                channel.setOnFocusChangeListener((x, focused) -> {
+                    if (focused && item != null) detail(item, null);
+                });
             }
         }
 
-        @SuppressWarnings("NotifyDataSetChanged") // the window of hours moved: every line changes
+        @SuppressWarnings("NotifyDataSetChanged") // a new group: every line changes
         void refresh() {
             notifyDataSetChanged();
+        }
+
+        /** The window of hours moved: every line's programmes, not their channels. */
+        void strips() {
+            notifyItemRangeChanged(0, getItemCount(), STRIP);
         }
 
         @Override
@@ -432,17 +484,27 @@ public final class GuideActivity extends Activity {
         }
 
         @Override
+        public void onBindViewHolder(Holder h, int position, List<Object> payloads) {
+            if (payloads.contains(STRIP) && h.item != null) {
+                bindStrip(h, h.item);
+                return;
+            }
+            super.onBindViewHolder(h, position, payloads);
+        }
+
+        @Override
         public void onBindViewHolder(Holder h, int position) {
             Item c = channels.get(position);
+            h.item = c;
             String display = LivePage.display(GuideActivity.this, c);
             h.name.setText(c.num > 0 ? c.num + "  " + display : display);
             h.initials.setText(Ui.initials(display));
             Images.load(h.logo, c.image, Ui.dp(GuideActivity.this, 56), h.initials, h.skeleton);
-            h.channel.setOnClickListener(v -> play(c));
-            h.channel.setOnFocusChangeListener((v, focused) -> {
-                if (focused) detail(c, null);
-            });
+            bindStrip(h, c);
+        }
 
+        /** Lays out the line's programmes, reusing the blocks it already has. */
+        private void bindStrip(Holder h, Item c) {
             // What had the focus in this line, to put it back on the programme at the same time.
             long focusedAt = -1;
             for (int i = 0; i < h.strip.getChildCount(); i++) {
@@ -450,76 +512,102 @@ public final class GuideActivity extends Activity {
                 if (b.isFocused() && b.getTag() instanceof Long) focusedAt = (Long) b.getTag();
             }
             boolean hadFocus = h.strip.hasFocus();
-            h.strip.removeAllViews();
-            if (px <= 0) return;
+            if (px <= 0) {
+                release(h.strip, 0);
+                return;
+            }
             List<Epg.Programme> list = guide(c);
             long now = System.currentTimeMillis() / 1000;
+            int total = Math.max(1, rows.getWidth() - stripStart);
+            int gap = Ui.dp(GuideActivity.this, 4), min = Ui.dp(GuideActivity.this, MIN_BLOCK_DP);
             View refocus = null;
+            int used = 0;
             if (list == null) {
-                FrameLayout wait = block(0, WINDOW_MIN, null, false);
-                SkeletonView s = new SkeletonView(GuideActivity.this);
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        Ui.dp(GuideActivity.this, 12), Gravity.CENTER_VERTICAL);
-                lp.setMargins(Ui.dp(GuideActivity.this, 14), 0, Ui.dp(GuideActivity.this, 120), 0);
-                wait.addView(s, lp);
-                wait.setOnClickListener(v -> play(c));
-                wait.setOnFocusChangeListener((v, focused) -> {
-                    if (focused) detail(c, null);
-                });
-                h.strip.addView(wait);
-                refocus = wait;
+                // Not there yet: one block across the window, with a skeleton.
+                refocus = block(h.strip, used++, 0, total, null, false, true, c, null);
             } else {
-                int shown = 0;
+                List<Epg.Programme> shown = new ArrayList<>();
+                List<float[]> spans = new ArrayList<>();
                 for (Epg.Programme p : list) {
                     float[] span = Timeline.span(p.start, p.end, from, WINDOW_MIN);
                     if (span == null) continue;
-                    FrameLayout b = block(span[0], span[1], p.title, p.start <= now && now < p.end);
+                    shown.add(p);
+                    spans.add(span);
+                }
+                int[][] at = Timeline.place(spans.toArray(new float[0][]), px, gap, min, total);
+                for (int i = 0; i < shown.size(); i++) {
+                    if (at[i] == null) continue;
+                    Epg.Programme p = shown.get(i);
+                    View b = block(h.strip, used++, at[i][0], at[i][1], p.title, p.start <= now && now < p.end, false, c, p);
                     b.setTag(p.start);
-                    b.setOnClickListener(v -> play(c));
-                    b.setOnFocusChangeListener((v, focused) -> {
-                        if (focused) detail(c, p);
-                    });
-                    h.strip.addView(b);
-                    shown++;
                     if (refocus == null || (focusedAt >= 0 && p.start <= focusedAt && focusedAt < p.end)) refocus = b;
                 }
-                if (shown == 0) {
-                    FrameLayout none = block(0, WINDOW_MIN, getString(R.string.guide_none), false);
-                    none.setOnClickListener(v -> play(c));
-                    none.setOnFocusChangeListener((v, focused) -> {
-                        if (focused) detail(c, null);
-                    });
-                    h.strip.addView(none);
-                    refocus = none;
-                }
+                if (used == 0) refocus = block(h.strip, used++, 0, total, getString(R.string.guide_none), false, false, c, null);
             }
+            release(h.strip, used);
             if (hadFocus && refocus != null) refocus.requestFocus();
         }
 
-        /** A programme's box, from minute a to minute b of the window. */
-        private FrameLayout block(float a, float b, String title, boolean now) {
-            FrameLayout box = new FrameLayout(GuideActivity.this);
-            box.setBackgroundResource(R.drawable.ds_programme_bg);
-            box.setFocusable(true);
-            box.setActivated(now);
-            int gap = Ui.dp(GuideActivity.this, 4);
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(Math.max(gap * 3, Math.round((b - a) * px) - gap),
-                    ViewGroup.LayoutParams.MATCH_PARENT);
-            lp.leftMargin = Math.round(a * px);
-            box.setLayoutParams(lp);
-            if (title != null) {
-                TextView t = new TextView(GuideActivity.this);
-                t.setText(title);
-                t.setSingleLine(true);
-                t.setEllipsize(TextUtils.TruncateAt.END);
-                t.setTextSize(13);
-                t.setTextColor(getColor(now ? R.color.ds_text : R.color.ds_text_dim));
-                t.setGravity(Gravity.CENTER_VERTICAL);
-                t.setPadding(Ui.dp(GuideActivity.this, 12), 0, Ui.dp(GuideActivity.this, 8), 0);
-                box.addView(t, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT));
-                box.setContentDescription(title);
+        /** Gives back the blocks of a line from index from on to the spare ones. */
+        private void release(FrameLayout strip, int from) {
+            while (strip.getChildCount() > from) {
+                View v = strip.getChildAt(strip.getChildCount() - 1);
+                strip.removeViewAt(strip.getChildCount() - 1);
+                v.setTag(null);
+                spareBlocks.push((FrameLayout) v);
             }
+        }
+
+        /** The index-th block of a line (reused, or a spare one, or a new one), set for one programme. */
+        private View block(FrameLayout strip, int index, int left, int width, String title, boolean now, boolean waiting,
+                           Item c, Epg.Programme p) {
+            FrameLayout box;
+            if (index < strip.getChildCount()) {
+                box = (FrameLayout) strip.getChildAt(index);
+            } else {
+                box = spareBlocks.isEmpty() ? newBlock() : spareBlocks.pop();
+                strip.addView(box);
+            }
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) box.getLayoutParams();
+            if (lp.leftMargin != left || lp.width != width) {
+                lp.leftMargin = left;
+                lp.width = width;
+                box.setLayoutParams(lp);
+            }
+            box.setActivated(now);
+            TextView t = (TextView) box.getChildAt(0);
+            t.setText(title);
+            t.setVisibility(title == null ? View.GONE : View.VISIBLE);
+            box.getChildAt(1).setVisibility(waiting ? View.VISIBLE : View.GONE);
+            box.setContentDescription(title);
+            box.setOnClickListener(v -> play(c));
+            box.setOnFocusChangeListener((v, focused) -> {
+                if (focused) detail(c, p);
+            });
+            return box;
+        }
+
+        /** A programme's box: its title (16 sp, dark on the white focus) and a skeleton while the guide loads. */
+        private FrameLayout newBlock() {
+            FrameLayout box = new FrameLayout(GuideActivity.this);
+            box.setBackgroundResource(R.drawable.programme_bg);
+            box.setFocusable(true);
+            box.setLayoutParams(new FrameLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT));
+            TextView t = new TextView(GuideActivity.this);
+            t.setSingleLine(true);
+            t.setEllipsize(TextUtils.TruncateAt.END);
+            t.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.lo_text_body));
+            t.setTextColor(getColorStateList(R.color.lo_text_on_focus));
+            t.setDuplicateParentStateEnabled(true);
+            t.setGravity(Gravity.CENTER_VERTICAL);
+            t.setPadding(Ui.dp(GuideActivity.this, 12), 0, Ui.dp(GuideActivity.this, 8), 0);
+            box.addView(t, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            SkeletonView s = new SkeletonView(GuideActivity.this);
+            FrameLayout.LayoutParams sl = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    Ui.dp(GuideActivity.this, 12), Gravity.CENTER_VERTICAL);
+            sl.setMargins(Ui.dp(GuideActivity.this, 14), 0, Ui.dp(GuideActivity.this, 120), 0);
+            box.addView(s, sl);
             return box;
         }
 

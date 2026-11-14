@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- What a picture is cut to (clipToOutline), and its colour until it arrives. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FF1F2430" />
-    <corners android:radius="11dp" />
+    <solid android:color="@color/lo_surface_2" />
+    <corners android:radius="@dimen/lo_radius_row" />
 </shape>

@@ -17,7 +17,7 @@ public class SmartTest {
     }
 
     private static Item ch(String id, String name) {
-        return new Item(Item.Kind.LIVE, id, name, "", "ts", 0, "");
+        return Item.live(id, name, "", 0, "");
     }
 
     private static List<String> names(List<Xtream.Category> l) {

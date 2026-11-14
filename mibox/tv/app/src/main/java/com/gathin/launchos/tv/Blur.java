@@ -4,9 +4,10 @@ import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 /**
- * A blurred copy of a picture, for the background of a title's page. The Mi Box (Android 11) has no live blur
- * (RenderEffect needs Android 12), so the picture is shrunk to a few dozen pixels, blurred three times with a box
- * filter (close to a gaussian) off the main thread, and stretched back by the ImageView: soft, and nearly free.
+ * A blurred copy of a picture, for the background of a film's or a series' page. The Mi Box (Android 11) has no live
+ * blur (RenderEffect needs Android 12), so the picture is shrunk to {@link #SMALL_WIDTH} pixels wide, blurred three
+ * times with a box filter (close to a gaussian) on {@link Bg#run}, and stretched back by the ImageView. Still once
+ * shown: one fade in, no animation after.
  */
 final class Blur {
     private static final int SMALL_WIDTH = 48;
@@ -18,6 +19,7 @@ final class Blur {
     /** Loads url, blurs it and fades it into view (at alpha); nothing happens when there is no picture. */
     static void into(ImageView view, String url, float alpha) {
         if (url == null || url.isEmpty()) return;
+        if (url.equals(view.getTag(R.id.image_url)) && view.getDrawable() != null) return;
         view.setTag(R.id.image_url, url);
         Images.get(view.getContext(), url, SMALL_WIDTH * 4, bitmap -> {
             if (bitmap == null || !url.equals(view.getTag(R.id.image_url))) return;

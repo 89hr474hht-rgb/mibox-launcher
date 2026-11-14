@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One category in the settings list: icon, name, and a dot when something waits there (an update). -->
+<!-- One category in the settings list: icon, name, and a dot when something waits there (an update). The open
+     category is activated (a faint fill, its text in the accent). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="52dp"
-    android:layout_marginBottom="6dp"
-    android:background="@drawable/ds_category_bg"
+    android:layout_height="@dimen/lo_button_height"
+    android:layout_marginBottom="@dimen/lo_space_1"
+    android:background="@drawable/lo_focus_row"
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
@@ -17,7 +18,7 @@
         android:layout_height="22dp"
         android:duplicateParentState="true"
         android:importantForAccessibility="no"
-        android:tint="@color/ds_category_icon" />
+        android:tint="@color/lo_icon_on_focus" />
 
     <TextView
         android:id="@+id/cat_title"
@@ -29,8 +30,8 @@
         android:ellipsize="end"
         android:fontFamily="@font/launchos_medium"
         android:singleLine="true"
-        android:textColor="@color/ds_category_text"
-        android:textSize="16sp" />
+        android:textColor="@color/lo_text_on_focus"
+        android:textSize="@dimen/lo_text_body" />
 
     <View
         android:id="@+id/cat_dot"

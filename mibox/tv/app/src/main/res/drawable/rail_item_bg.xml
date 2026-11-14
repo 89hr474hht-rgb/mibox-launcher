@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A rail item: white when focused, like every focused row (lo_focus_row). The section shown is marked by its accent
+     icon and label (activated), not by a fill, since the closed rail is clipped through its items. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
+    <item android:state_focused="true">
+        <shape><solid android:color="@color/lo_focus" /><corners android:radius="@dimen/lo_radius_row" /></shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

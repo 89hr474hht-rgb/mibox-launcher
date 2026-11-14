@@ -11,14 +11,16 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gathin.launchos.design.Focus;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
- * Chaînes: three panels side by side. The groups (Favoris, the most watched channels, then Toutes les chaînes and
- * the groups A to Z), the chosen group's channels with what is on now, and the focused channel's details under the
- * small player. Left and Right move from panel to panel, Up and Down stay inside one.
+ * Chaînes: three panels side by side. The groups (Favoris, then Toutes les chaînes and the groups in the order chosen
+ * in Réglages), the chosen group's channels with what is on now, and the focused channel's details above the small
+ * player's slot. Left and Right move from panel to panel, Up and Down stay inside one. Main thread only; the list
+ * comes from {@link Library}, the programmes from {@link Epg}, and playing goes to the {@link LivePlayer}.
  */
 final class LivePage {
     private static final long GROUP_DELAY_MS = 250;
@@ -49,7 +51,7 @@ final class LivePage {
     private final LivePlayer player;
     private final RecyclerView groupsView, channelsView;
     private final TextView groupsCount, groupTitle, groupCount, channelsStatus;
-    private final View groupsColumn, channelsColumn, pipSlot;
+    private final View groupsColumn, channelsColumn, pipSlot, retry;
     private final GroupAdapter groupAdapter = new GroupAdapter();
     private final ChannelAdapter channelAdapter = new ChannelAdapter();
     private final Detail detail;
@@ -76,6 +78,12 @@ final class LivePage {
         groupsColumn = root.findViewById(R.id.groups_column);
         channelsColumn = root.findViewById(R.id.channels_column);
         pipSlot = root.findViewById(R.id.pip_slot);
+        retry = root.findViewById(R.id.retry);
+        retry.setOnClickListener(v -> {
+            retry.setVisibility(View.GONE);
+            show(this.api);
+        });
+        Focus.lift(retry);
         detail = new Detail(root);
         groupsView.setLayoutManager(new LinearLayoutManager(activity));
         groupsView.setAdapter(groupAdapter);
@@ -113,7 +121,10 @@ final class LivePage {
         lib.load(api, () -> {
             if (activity.isDestroyed()) return;
             if (lib.error() != null && !lib.ready()) {
-                status(lib.error().french());
+                status(lib.error().text(activity));
+                // The list could not be read: Réessayer, which takes the focus unless the rail has it.
+                retry.setVisibility(View.VISIBLE);
+                if (activity.showing(this) && !activity.inRail() && !player.isFull()) retry.requestFocus();
                 return;
             }
             rebuild(true);
@@ -157,7 +168,7 @@ final class LivePage {
                     items == null ? null : arranged(items, chs)));
             shownGroups++;
         }
-        groupsCount.setText(String.format(Locale.FRANCE, "%d groupe%s", shownGroups, shownGroups > 1 ? "s" : ""));
+        groupsCount.setText(activity.getResources().getQuantityString(R.plurals.count_groups, shownGroups, shownGroups));
         groupAdapter.set(list);
         if (list.isEmpty()) {
             group = null;
@@ -191,6 +202,7 @@ final class LivePage {
     private void status(String text) {
         channelsStatus.setText(text);
         channelsStatus.setVisibility(View.VISIBLE);
+        retry.setVisibility(View.GONE);
     }
 
     private void select(Group g, boolean now) {
@@ -225,7 +237,7 @@ final class LivePage {
             return;
         }
         List<Item> items = g.channels == null ? new ArrayList<>() : g.channels;
-        groupCount.setText(String.format(Locale.FRANCE, "%d chaîne%s", items.size(), items.size() > 1 ? "s" : ""));
+        groupCount.setText(activity.getResources().getQuantityString(R.plurals.count_channels, items.size(), items.size()));
         channelAdapter.set(items);
         if (items.isEmpty()) status(activity.getString(g.kind == Kind.FAVOURITES ? R.string.favourites_hint : R.string.empty));
         else channelsStatus.setVisibility(View.GONE);
@@ -271,6 +283,7 @@ final class LivePage {
     // ---- focus ----
 
     View defaultFocus() {
+        if (retry.getVisibility() == View.VISIBLE) return retry;
         View v = channelRow(true);
         return v != null ? v : groupRow();
     }
@@ -365,7 +378,8 @@ final class LivePage {
             }
             if (inChannels) {
                 View v = groupRow();
-                return v != null ? v : focused;
+                // No groups (the list failed): straight to the rail.
+                return v != null ? v : groupAdapter.getItemCount() == 0 ? null : focused;
             }
             if (inGroups) return null;   // the rail
         }
@@ -418,8 +432,8 @@ final class LivePage {
             tag.setVisibility(tidy && !c.tag.isEmpty() ? View.VISIBLE : View.GONE);
             History h = History.get(activity);
             long ms = h == null ? 0 : h.watchedMs(c.id);
-            watched.setText(ms >= 60_000 ? "Regardée " + Players.duration(ms)
-                    : c.num > 0 ? "Chaîne " + c.num : "");
+            watched.setText(ms >= 60_000 ? activity.getString(R.string.live_watched, Players.duration(ms))
+                    : c.num > 0 ? activity.getString(R.string.live_number, c.num) : "");
             initials.setText(Ui.initials(c.title));
             Images.load(logo, c.image, Ui.dp(activity, 150), initials);
             guide.setVisibility(View.INVISIBLE);

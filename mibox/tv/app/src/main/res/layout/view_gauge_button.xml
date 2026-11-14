@@ -1,46 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Inside a GaugeButton: the fill that grows from the left, then the icon, title, status and percentage. -->
+<!-- Inside a GaugeButton: the fill that grows from the left (the accent, faint), then the icon, title, status and
+     percentage. The texts follow the tile's focus (white tile, dark text). -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <View
         android:id="@+id/gauge_fill"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/ds_gauge_fill" />
+        android:alpha="0.3"
+        android:background="@drawable/gauge_fill" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:duplicateParentState="true"
         android:orientation="vertical"
-        android:padding="18dp">
+        android:padding="@dimen/lo_space_4">
 
         <ImageView
             android:id="@+id/gauge_icon"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginBottom="12dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="@dimen/lo_space_3"
+            android:duplicateParentState="true"
             android:importantForAccessibility="no"
-            android:tint="@color/ds_accent_light" />
+            android:tint="@color/lo_icon_on_focus" />
 
         <TextView
             android:id="@+id/gauge_title"
             style="@style/Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:duplicateParentState="true"
             android:singleLine="true"
-            android:textSize="17sp" />
+            android:textColor="@color/lo_text_on_focus"
+            android:textSize="@dimen/lo_text_body" />
 
         <TextView
             android:id="@+id/gauge_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="2dp"
+            android:duplicateParentState="true"
             android:ellipsize="end"
             android:maxLines="2"
             android:minLines="2"
-            android:textColor="@color/ds_text_dim"
-            android:textSize="12sp" />
+            android:textColor="@color/lo_text_2_on_focus"
+            android:textSize="@dimen/lo_text_small" />
     </LinearLayout>
 
     <TextView
@@ -48,9 +55,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/lo_space_4"
+        android:duplicateParentState="true"
         android:fontFamily="@font/launchos_bold"
-        android:textColor="@color/ds_text"
-        android:textSize="20sp"
+        android:textColor="@color/lo_text_on_focus"
+        android:textSize="@dimen/lo_text_heading"
         android:visibility="gone" />
 </merge>

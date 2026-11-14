@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Réglages, master-detail: the categories on a glass panel at the left (30 %), the open category's page at the
-  right (70 %). The page scrolls in a SafeScrollView, which keeps focused rows out of the mini-player's corner.
+  Réglages, master-detail: the categories on a panel at the left (30 %), the open category's page at the right
+  (70 %). The page scrolls in a SafeScrollView, which keeps focused rows out of the mini-player's corner.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ds_page_bg">
+    android:background="@color/lo_black">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,19 +14,19 @@
         android:baselineAligned="false"
         android:clipChildren="false"
         android:orientation="horizontal"
-        android:paddingStart="@dimen/ds_page_x"
-        android:paddingTop="@dimen/ds_page_y"
-        android:paddingEnd="@dimen/ds_page_x"
-        android:paddingBottom="@dimen/ds_page_y">
+        android:paddingStart="@dimen/lo_page_x"
+        android:paddingTop="@dimen/lo_page_y"
+        android:paddingEnd="@dimen/lo_page_x"
+        android:paddingBottom="@dimen/lo_page_y">
 
         <FrameLayout
             android:id="@+id/master"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:background="@drawable/ds_glass_panel"
+            android:background="@drawable/lo_panel"
             android:clipChildren="false"
-            android:padding="16dp">
+            android:padding="@dimen/lo_space_4">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -44,8 +44,8 @@
                 android:paddingStart="4dp">
 
                 <FrameLayout
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/header_tile_bg">
 
                     <ImageView
@@ -54,7 +54,7 @@
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_settings"
-                        android:tint="#FFFFFFFF" />
+                        android:tint="@color/lo_text" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -70,14 +70,14 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/launchos_bold"
                         android:text="@string/settings_title"
-                        android:textSize="22sp" />
+                        android:textSize="@dimen/lo_text_heading" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/ds_brand"
-                        android:textColor="@color/ds_text_faint"
-                        android:textSize="12sp" />
+                        android:text="@string/app_name"
+                        android:textColor="@color/lo_text_3"
+                        android:textSize="@dimen/lo_text_small" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -95,12 +95,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:paddingStart="6dp"
-                android:textColor="@color/ds_text_faint"
-                android:textSize="12sp" />
+                android:textColor="@color/lo_text_3"
+                android:textSize="@dimen/lo_text_small" />
         </FrameLayout>
 
         <Space
-            android:layout_width="@dimen/ds_gap"
+            android:layout_width="@dimen/lo_space_5"
             android:layout_height="match_parent" />
 
         <com.gathin.launchos.tv.SafeScrollView

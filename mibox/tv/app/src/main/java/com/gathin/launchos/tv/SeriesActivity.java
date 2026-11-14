@@ -13,12 +13,16 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gathin.launchos.design.Focus;
+import com.gathin.launchos.design.Motion;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * One series: its picture full screen, its summary, Regarder (or Reprendre where it was left), the seasons, and the
- * chosen season's episodes side by side. Moving along the seasons shows each one's episodes.
+ * One series, laid out like a film (MovieActivity): its picture blurred behind the page, its summary, Regarder (or
+ * Reprendre where it was left), the seasons as chips, and the chosen season's episodes side by side. The episodes
+ * come from get_series_info on {@link Bg#run}; a failure shows Réessayer.
  */
 public final class SeriesActivity extends Activity {
     private static final String EXTRA_ID = "series_id", EXTRA_NAME = "series_name", EXTRA_COVER = "series_cover",
@@ -30,7 +34,9 @@ public final class SeriesActivity extends Activity {
     private int season;
     private RecyclerView seasonsView, episodesView;
     private TextView status, play, meta, plot;
-    private Backdrop backdrop;
+    private View statusBox, retry;
+    private ImageView blur;
+    private boolean autoplay;
     private final SeasonAdapter seasonAdapter = new SeasonAdapter();
     private final EpisodeAdapter episodeAdapter = new EpisodeAdapter();
     private Xtream.SeriesInfo info;
@@ -54,10 +60,10 @@ public final class SeriesActivity extends Activity {
         String id = in.getStringExtra(EXTRA_ID);
         series = Library.of(Xtream.Section.SERIES).find(id);
         if (series == null) {
-            series = new Item(Item.Kind.SERIES, id, in.getStringExtra(EXTRA_NAME), in.getStringExtra(EXTRA_COVER), "", 0, "");
+            series = Item.series(id, in.getStringExtra(EXTRA_NAME), in.getStringExtra(EXTRA_COVER), 0);
         }
-        backdrop = new Backdrop(findViewById(R.id.backdrop_a), findViewById(R.id.backdrop_b));
-        backdrop.show(series.backdrop, series.image);
+        blur = findViewById(R.id.blur);
+        Blur.into(blur, !series.backdrop.isEmpty() ? series.backdrop : series.image, 0.85f);
         ((TextView) findViewById(R.id.title)).setText(series.title);
         ((TextView) findViewById(R.id.label)).setText(series.genre.isEmpty() ? getString(R.string.nav_series) : series.genre);
         meta = findViewById(R.id.meta);
@@ -65,7 +71,12 @@ public final class SeriesActivity extends Activity {
         plot.setText(series.plot);
         meta.setText(Ui.meta(series.year > 0 ? String.valueOf(series.year) : "", Ui.rating(series.rating)));
         status = findViewById(R.id.status);
+        statusBox = findViewById(R.id.status_box);
+        retry = findViewById(R.id.retry);
         play = findViewById(R.id.play);
+        Focus.lift(play);
+        Focus.lift(retry);
+        retry.setOnClickListener(v -> load());
         seasonsView = findViewById(R.id.seasons);
         episodesView = findViewById(R.id.episodes);
         seasonsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -76,29 +87,37 @@ public final class SeriesActivity extends Activity {
         episodesView.setItemAnimator(null);
         play.setOnClickListener(v -> playNext());
 
-        status.setText(R.string.loading);
-        status.setVisibility(View.VISIBLE);
-        boolean autoplay = in.getBooleanExtra(EXTRA_PLAY, false);
+        autoplay = in.getBooleanExtra(EXTRA_PLAY, false);
+        load();
+    }
+
+    /** Asks the panel for the seasons and episodes; on failure, the reason and Réessayer (which takes the focus). */
+    private void load() {
+        status(getString(R.string.loading), false);
+        String id = series.id;
         Bg.run(() -> api.seriesInfo(id), (i, error) -> {
             if (isDestroyed()) return;
             if (error != null) {
-                status.setText(error.french());
+                status(error.text(this), true);
                 return;
             }
             info = i;
             if (!i.plot.isEmpty()) plot.setText(i.plot);
-            backdrop.show(i.backdrop, series.backdrop, i.cover, series.image);
+            String picture = !i.backdrop.isEmpty() ? i.backdrop : !series.backdrop.isEmpty() ? series.backdrop
+                    : !i.cover.isEmpty() ? i.cover : series.image;
+            Blur.into(blur, picture, 0.85f);
             seasons = i.seasons;
             int year = series.year > 0 ? series.year : i.year;
             float rating = series.rating > 0 ? series.rating : i.rating;
             meta.setText(Ui.meta(year > 0 ? String.valueOf(year) : "",
-                    seasons.size() == 1 ? "1 saison" : seasons.size() > 1 ? seasons.size() + " saisons" : "",
+                    seasons.isEmpty() ? "" : getResources().getQuantityString(R.plurals.count_seasons, seasons.size(),
+                            seasons.size()),
                     Ui.rating(rating), i.genre.isEmpty() ? series.genre : i.genre));
             if (seasons.isEmpty()) {
-                status.setText(R.string.empty);
+                status(getString(R.string.empty), false);
                 return;
             }
-            status.setVisibility(View.GONE);
+            statusBox.setVisibility(View.GONE);
             int[] last = last();
             seasonAdapter.notifyItemRangeInserted(0, seasons.size());
             showSeason(last[0]);
@@ -106,8 +125,18 @@ public final class SeriesActivity extends Activity {
             updatePlay();
             play.setVisibility(View.VISIBLE);
             play.requestFocus();
-            if (autoplay) playNext();
+            if (autoplay) {
+                autoplay = false;
+                playNext();
+            }
         });
+    }
+
+    private void status(String text, boolean failed) {
+        statusBox.setVisibility(View.VISIBLE);
+        status.setText(text);
+        retry.setVisibility(failed ? View.VISIBLE : View.GONE);
+        if (failed) retry.requestFocus();
     }
 
     @Override
@@ -189,7 +218,7 @@ public final class SeriesActivity extends Activity {
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
             TextView t = (TextView) h.itemView;
-            t.setText(seasons.get(position).name);
+            t.setText(Ui.seasonName(SeriesActivity.this, seasons.get(position)));
             t.setSelected(position == season);
             t.setOnFocusChangeListener((v, focused) -> {
                 int p = h.getBindingAdapterPosition();
@@ -224,9 +253,10 @@ public final class SeriesActivity extends Activity {
                 Ui.roundClip(v.findViewById(R.id.clip));
                 v.setOnFocusChangeListener((view, focused) -> {
                     View frame = view.findViewById(R.id.frame);
-                    float s = focused ? 1.06f : 1f;
+                    float s = focused ? Focus.SCALE : 1f;
                     frame.setPivotY(frame.getHeight());
-                    frame.animate().scaleX(s).scaleY(s).setDuration(170).start();
+                    frame.setPivotX(frame.getWidth() / 2f);
+                    frame.animate().scaleX(s).scaleY(s).setDuration(Motion.SHORT).setInterpolator(Motion.ENTER).start();
                 });
             }
         }
@@ -247,7 +277,8 @@ public final class SeriesActivity extends Activity {
             Item e = items.get(position);
             int n = e.num > 0 ? e.num : position + 1;
             h.number.setText(String.valueOf(n));
-            h.title.setText(getString(R.string.episode_title, n, Names.episode(series.title, e.title)));
+            h.title.setText(e.title.isEmpty() ? getString(R.string.episode_name, n)
+                    : getString(R.string.episode_title, n, Names.episode(series.title, e.title)));
             String length = e.seconds > 0 ? Players.duration(e.seconds * 1000L) : "";
             h.plot.setText(Ui.meta(length, e.plot));
             Images.load(h.image, e.image, Ui.dp(h.itemView.getContext(), 224));

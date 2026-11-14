@@ -214,6 +214,11 @@ final class Xtream {
         }
     }
 
+    /** The account's short name (AccountStore.key), for settings kept per account. */
+    String accountKey() {
+        return AccountStore.key(account);
+    }
+
     // ---- stream addresses ----
 
     String liveUrl(Item channel, boolean hls) {
@@ -383,8 +388,8 @@ final class Xtream {
         r.endObject();
         if (id.isEmpty() || id.equals("null")) return null;
         long when = parseLong(series && !modified.isEmpty() ? modified : added);
-        return new Item(kind, id, name, image, ext, (int) parseLong(num), plot, cat.isEmpty() ? cats : cat, when,
-                rating(rating, rating5), genre, backdrop, year(release), 0);
+        return Item.listed(kind, id, name, image, ext, (int) parseLong(num), plot, cat.isEmpty() ? cats : cat, when,
+                rating(rating, rating5), genre, backdrop, year(release));
     }
 
     /** A rating out of 10 from "7.2" or, failing that, from rating_5based. */
@@ -394,22 +399,29 @@ final class Xtream {
         return r > 0 && r <= 10 ? r : 0f;
     }
 
+    private static final java.util.regex.Pattern YEAR = java.util.regex.Pattern.compile("(?<!\\d)(19\\d\\d|20\\d\\d)(?!\\d)");
+
     /** The year in "2019-05-01", "2019" or "01/05/2019"; 0 when none. */
     static int year(String date) {
         if (date == null) return 0;
-        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?<!\\d)(19\\d\\d|20\\d\\d)(?!\\d)").matcher(date);
+        java.util.regex.Matcher m = YEAR.matcher(date);
         return m.find() ? Integer.parseInt(m.group(1)) : 0;
+    }
+
+    /** A sheet's wide picture: backdrop_path is a list on most panels, a plain string on some; "" when none. */
+    static String backdrop(JSONObject info) {
+        Object b = info.opt("backdrop_path");
+        String s = "";
+        if (b instanceof JSONArray && ((JSONArray) b).length() > 0) s = ((JSONArray) b).optString(0, "");
+        else if (b instanceof String) s = (String) b;
+        return s.equals("null") ? "" : s;
     }
 
     static VodInfo parseVodInfo(Object json) {
         JSONObject root = json instanceof JSONObject ? (JSONObject) json : new JSONObject();
         JSONObject info = root.optJSONObject("info");
         if (info == null) info = new JSONObject();
-        String backdrop = "";
-        Object b = info.opt("backdrop_path");
-        if (b instanceof JSONArray && ((JSONArray) b).length() > 0) backdrop = ((JSONArray) b).optString(0, "");
-        else if (b instanceof String) backdrop = (String) b;
-        if (backdrop.equals("null")) backdrop = "";
+        String backdrop = backdrop(info);
         String cast = str(info, "cast");
         if (cast.isEmpty()) cast = str(info, "actors");
         String release = str(info, "releasedate");
@@ -442,11 +454,7 @@ final class Xtream {
         if (info == null) info = new JSONObject();
         String plot = str(info, "plot");
         String cover = str(info, "cover");
-        String backdrop = "";
-        Object b = info.opt("backdrop_path");
-        if (b instanceof JSONArray && ((JSONArray) b).length() > 0) backdrop = ((JSONArray) b).optString(0, "");
-        else if (b instanceof String) backdrop = (String) b;
-        if (backdrop.equals("null")) backdrop = "";
+        String backdrop = backdrop(info);
         String release = str(info, "releaseDate");
         if (release.isEmpty()) release = str(info, "release_date");
 
@@ -484,7 +492,8 @@ final class Xtream {
             List<Item> list = s.getValue();
             list.sort((x, y) -> Integer.compare(x.num, y.num));
             String name = names.get(s.getKey());
-            out.add(new Season(s.getKey(), name == null || name.isEmpty() ? "Saison " + s.getKey() : name, list));
+            // No name from the panel: "" here, the screen says "Saison 2" in its own language.
+            out.add(new Season(s.getKey(), name == null ? "" : name, list));
         }
         return new SeriesInfo(plot, cover, out, backdrop, str(info, "genre"), str(info, "cast"),
                 rating(str(info, "rating"), str(info, "rating_5based")), year(release));
@@ -512,9 +521,9 @@ final class Xtream {
             seconds = (int) num(info, "duration_secs");
             if (seconds <= 0) seconds = clockSeconds(str(info, "duration"));
         }
-        return new Item(Item.Kind.EPISODE, id, title.isEmpty() ? "Épisode " + n : title,
-                info != null ? str(info, "movie_image") : "", str(o, "container_extension"), n,
-                info != null ? str(info, "plot") : "", "", 0, 0f, "", "", 0, seconds);
+        // No title from the panel: "" here, the screen says "Épisode 3" in its own language.
+        return Item.episode(id, title, info != null ? str(info, "movie_image") : "", str(o, "container_extension"), n,
+                info != null ? str(info, "plot") : "", seconds);
     }
 
     /** Some panels send an object keyed by index instead of a list. */

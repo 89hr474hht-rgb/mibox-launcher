@@ -19,7 +19,7 @@
             android:layout_height="28dp"
             android:layout_gravity="center"
             android:importantForAccessibility="no"
-            android:tint="#FFFFFFFF" />
+            android:tint="@color/lo_text" />
     </FrameLayout>
 
     <LinearLayout
@@ -34,7 +34,7 @@
             style="@style/Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="28sp" />
+            android:textSize="@dimen/lo_text_title" />
 
         <TextView
             android:id="@+id/page_hint"
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:lineSpacingMultiplier="1.15"
-            android:textColor="@color/text_dim"
-            android:textSize="14sp" />
+            android:textColor="@color/lo_text_2"
+            android:textSize="@dimen/lo_text_small" />
     </LinearLayout>
 </LinearLayout>

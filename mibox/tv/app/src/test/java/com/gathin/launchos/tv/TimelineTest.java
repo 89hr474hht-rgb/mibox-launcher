@@ -37,4 +37,21 @@ public class TimelineTest {
         assertEquals(-1f, Timeline.nowAt(T - 60, T, 120), 0.001f);
         assertEquals(-1f, Timeline.nowAt(T + 7300, T, 120), 0.001f);
     }
+
+    @Test
+    public void shortProgrammesKeepAReadableWidthWithoutOverlapping() {
+        // 10 px a minute, 4 px gaps, at least 70 px: a 3-minute programme still gets 70 px and pushes the next.
+        int[][] at = Timeline.place(new float[][]{{0, 30}, {30, 33}, {33, 60}}, 10f, 4, 70, 1200);
+        org.junit.Assert.assertArrayEquals(new int[]{0, 296}, at[0]);
+        org.junit.Assert.assertArrayEquals(new int[]{300, 70}, at[1]);
+        org.junit.Assert.assertEquals(374, at[2][0]);
+        org.junit.Assert.assertEquals(596 - 374, at[2][1]);
+    }
+
+    @Test
+    public void aProgrammePushedPastTheEndIsLeftOut() {
+        int[][] at = Timeline.place(new float[][]{{0, 118}, {118, 120}}, 10f, 4, 70, 1200);
+        org.junit.Assert.assertNotNull(at[0]);
+        org.junit.Assert.assertNull(at[1]);
+    }
 }

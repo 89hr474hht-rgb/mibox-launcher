@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  A whole group (or every film or series): a glass header that stays at the top (title, count, order and genre
-  filters) over a grid of 2:3 posters whose number of columns follows the screen's width.
+  A whole group (or every film or series): a header that stays at the top (title, count, order and genre filters)
+  over a grid of 2:3 posters whose number of columns follows the screen's width.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ds_page_bg"
+    android:background="@color/lo_black"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ds_header_bar"
-        android:elevation="6dp"
+        android:background="@drawable/header_bar"
         android:orientation="vertical"
-        android:paddingTop="24dp"
+        android:paddingTop="@dimen/lo_page_y"
         android:paddingBottom="14dp">
 
     <LinearLayout
@@ -41,14 +40,14 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textSize="28sp" />
+                android:textSize="@dimen/lo_text_title" />
 
             <TextView
                 android:id="@+id/count"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_dim"
-                android:textSize="13sp" />
+                android:textColor="@color/lo_text_2"
+                android:textSize="@dimen/lo_text_small" />
         </LinearLayout>
 
         <LinearLayout
@@ -89,7 +88,7 @@
             android:clipToPadding="false"
             android:paddingStart="44dp"
             android:paddingTop="18dp"
-            android:paddingEnd="40dp"
+            android:paddingEnd="42dp"
             android:paddingBottom="30dp" />
 
         <TextView
@@ -98,8 +97,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
             android:gravity="center"
-            android:textColor="@color/text_dim"
-            android:textSize="17sp"
+            android:textColor="@color/lo_text_2"
+            android:textSize="@dimen/lo_text_body"
             android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

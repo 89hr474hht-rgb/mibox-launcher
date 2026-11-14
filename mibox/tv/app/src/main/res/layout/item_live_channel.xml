@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="62dp"
+    android:layout_height="64dp"
     android:layout_marginBottom="4dp"
-    android:background="@drawable/live_row_bg"
+    android:background="@drawable/lo_focus_row"
     android:baselineAligned="false"
     android:focusable="true"
     android:gravity="center_vertical"
@@ -19,8 +19,8 @@
         android:fontFamily="@font/launchos_medium"
         android:gravity="center"
         android:singleLine="true"
-        android:textColor="@color/row_sub"
-        android:textSize="13sp" />
+        android:textColor="@color/lo_text_2_on_focus"
+        android:textSize="@dimen/lo_text_small" />
 
     <FrameLayout
         android:layout_width="64dp"
@@ -34,8 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:textColor="#66FFFFFF"
-            android:textSize="15sp" />
+            android:textColor="@color/lo_text_3"
+            android:textSize="@dimen/lo_text_body" />
 
         <ImageView
             android:id="@+id/image"
@@ -70,18 +70,18 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/launchos_semibold"
                 android:singleLine="true"
-                android:textColor="@color/row_text"
-                android:textSize="15sp" />
+                android:textColor="@color/lo_text_on_focus"
+                android:textSize="@dimen/lo_text_body" />
 
             <ImageView
                 android:id="@+id/star"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_marginStart="6dp"
                 android:duplicateParentState="true"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_star"
-                android:tint="@color/row_sub"
+                android:tint="@color/lo_text_2_on_focus"
                 android:visibility="gone" />
 
             <TextView
@@ -89,7 +89,7 @@
                 style="@style/Tag"
                 android:layout_marginStart="6dp"
                 android:duplicateParentState="true"
-                android:textColor="@color/row_sub"
+                android:textColor="@color/lo_text_2_on_focus"
                 android:visibility="gone" />
         </LinearLayout>
 
@@ -101,15 +101,15 @@
             android:duplicateParentState="true"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="@color/row_sub"
-            android:textSize="12sp" />
+            android:textColor="@color/lo_text_2_on_focus"
+            android:textSize="@dimen/lo_text_small" />
 
         <FrameLayout
             android:id="@+id/track"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginTop="4dp"
-            android:background="@drawable/track_bg"
+            android:background="@drawable/lo_track"
             android:visibility="invisible">
 
             <View

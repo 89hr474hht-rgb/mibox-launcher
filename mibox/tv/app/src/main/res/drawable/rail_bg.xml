@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Darkens the page behind the open rail. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient android:angle="0" android:startColor="#FA080A0F" android:centerX="0.75" android:centerColor="#E6080A0F" android:endColor="#00080A0F" />
+    <gradient android:angle="0" android:startColor="#FA000000" android:centerX="0.75" android:centerColor="#E6000000"
+        android:endColor="#00000000" />
 </shape>

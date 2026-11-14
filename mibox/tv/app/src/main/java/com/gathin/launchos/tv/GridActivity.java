@@ -11,9 +11,10 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gathin.launchos.design.Focus;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A whole group, or every film or series, as a grid of posters: Récents, A → Z, Mieux notés or Année, and the most
@@ -82,6 +83,7 @@ public final class GridActivity extends Activity {
                 getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString("sort", s.name()).apply();
                 apply();
             });
+            Focus.lift(t);
             sorts.addView(t);
             sortViews[s.ordinal()] = t;
         }
@@ -128,7 +130,7 @@ public final class GridActivity extends Activity {
     /** How many posters fit across: the grid's width over a card's (poster plus its margins). */
     private int columns() {
         float density = getResources().getDisplayMetrics().density;
-        float widthDp = getResources().getDisplayMetrics().widthPixels / density - 84;
+        float widthDp = getResources().getDisplayMetrics().widthPixels / density - 86;
         float cardDp = getResources().getDimension(R.dimen.poster_width) / density + 12;
         return Math.max(3, (int) (widthDp / cardDp));
     }
@@ -157,6 +159,7 @@ public final class GridActivity extends Activity {
                 genre = g;
                 apply();
             });
+            Focus.lift(t);
             row.addView(t);
             genreViews.add(t);
         }
@@ -182,7 +185,7 @@ public final class GridActivity extends Activity {
                 break;
         }
         adapter.set(l, -1);
-        count.setText(String.format(Locale.FRANCE, "%d titre%s", l.size(), l.size() > 1 ? "s" : ""));
+        count.setText(getResources().getQuantityString(R.plurals.count_titles, l.size(), l.size()));
         status.setVisibility(l.isEmpty() ? View.VISIBLE : View.GONE);
         status.setText(R.string.empty);
         grid.scrollToPosition(0);

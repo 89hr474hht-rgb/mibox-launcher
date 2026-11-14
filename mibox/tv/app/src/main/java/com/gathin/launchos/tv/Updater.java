@@ -144,7 +144,8 @@ final class Updater {
             } catch (UpdateException e) {
                 fail(app, release, e.text(app));
             } catch (IOException | RuntimeException e) {
-                fail(app, release, app.getString(R.string.upd_err_install, e.getClass().getSimpleName()));
+                Logs.failed("Updater.install", e);
+                fail(app, release, app.getString(R.string.upd_err_install));
             } finally {
                 clean(dir);
             }
@@ -198,7 +199,9 @@ final class Updater {
             state.add(version, UpdateState.R_CANCELLED, null);
             error = null;
         } else if (message != null) {
-            error = app.getString(R.string.upd_err_install, message);
+            // Android's own message stays out of the screen (it is technical); the history keeps the plain sentence.
+            Logs.missing("Updater.finished", "install confirmation");
+            error = app.getString(R.string.upd_err_install);
             state.add(version, UpdateState.R_FAILED, error);
         }
         set(Phase.IDLE, 0);

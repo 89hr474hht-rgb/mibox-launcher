@@ -7,9 +7,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gathin.launchos.design.Focus;
+
 /**
- * The pieces every secondary screen is made of, so they all look and move the same: a header with the screen's
- * icon, section labels, and rows with an icon, a title, a line under it, and a state, a switch or an arrow.
+ * Builds the parts of the secondary screens (Réglages, the hidden channels, the groups): a header with the screen's
+ * icon, section labels, and rows (item_setting_row) with an icon, a title, a line under it, and a state, a switch or
+ * an arrow. Main thread only.
  */
 final class Rows {
     enum Tone { NORMAL, OK, ERROR }
@@ -33,23 +36,14 @@ final class Rows {
         column.addView(t);
     }
 
+    /** A row: icon, title, a line under it (hidden until set) and room for a state, a switch or an arrow. */
     static Row add(ViewGroup column, int icon, int title) {
-        return add(column, icon, title, false);
-    }
-
-    /** A row of the new screens: glass that keeps its dark fill when focused, with the accent border. */
-    static Row addGlass(ViewGroup column, int icon, int title) {
-        return add(column, icon, title, true);
-    }
-
-    private static Row add(ViewGroup column, int icon, int title, boolean glass) {
-        View v = LayoutInflater.from(column.getContext())
-                .inflate(glass ? R.layout.item_ds_row : R.layout.item_refresh, column, false);
-        Row r = new Row(v, glass);
+        View v = LayoutInflater.from(column.getContext()).inflate(R.layout.item_setting_row, column, false);
+        Row r = new Row(v);
         r.icon.setImageResource(icon);
         r.title.setText(title);
         r.sub.setVisibility(View.GONE);
-        Ui.lift(v, 1.02f);
+        Focus.lift(v, Focus.SCALE_LARGE);
         column.addView(v);
         return r;
     }
@@ -59,11 +53,9 @@ final class Rows {
         final ImageView icon;
         final TextView title, sub, state;
         private final View toggle, chevron;
-        private final boolean glass;
 
-        Row(View v, boolean glass) {
+        Row(View v) {
             view = v;
-            this.glass = glass;
             icon = v.findViewById(R.id.icon);
             title = v.findViewById(R.id.title);
             sub = v.findViewById(R.id.sub);
@@ -104,13 +96,8 @@ final class Rows {
 
         Row state(CharSequence text, Tone tone) {
             state.setText(text);
-            if (glass) {
-                state.setTextColor(view.getContext().getColor(tone == Tone.ERROR ? R.color.ds_danger
-                        : tone == Tone.OK ? R.color.ds_ok : R.color.ds_text_dim));
-            } else {
-                state.setTextColor(view.getContext().getColorStateList(tone == Tone.ERROR ? R.color.row_error
-                        : tone == Tone.OK ? R.color.row_ok : R.color.row_sub));
-            }
+            state.setTextColor(view.getContext().getColorStateList(tone == Tone.ERROR ? R.color.row_error
+                    : tone == Tone.OK ? R.color.row_ok : R.color.lo_text_2_on_focus));
             return this;
         }
 

@@ -15,10 +15,10 @@ import android.widget.LinearLayout;
 import com.gathin.launchos.design.Monogram;
 
 /**
- * LaunchOS TV's start-up screen, when the app is opened (not when coming back to it): on true black, the "lo" monogram
- * writes itself in one line, its coral dot settles in, and "LaunchOS TV" comes in beside it. Then it fades away while
- * the app settles into place behind. About two and a half seconds; any key makes it leave at once. With Android's
- * animations off it is shown still, briefly.
+ * The start-up screen, shown over the activity's window when the app is opened from the launcher (not when coming
+ * back to it): the "lo" monogram writes itself, its dot settles, and "LaunchOS TV" comes in beside it; then it fades
+ * out. {@link #LENGTH_MS} in all, one animator; MainActivity calls {@link #leave} on any key and lets the key through.
+ * With Android's animations off it is shown still, briefly. Main thread only.
  */
 final class StartScreen {
     private static final long LENGTH_MS = 2500;
@@ -39,7 +39,7 @@ final class StartScreen {
         still = Settings.Global.getFloat(a.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f;
         float dp = a.getResources().getDisplayMetrics().density;
         screen = new FrameLayout(a);
-        screen.setBackgroundColor(0xFF000000);
+        screen.setBackgroundColor(a.getColor(R.color.lo_black));
         screen.setClickable(true);
         lockup = new LinearLayout(a);
         lockup.setOrientation(LinearLayout.HORIZONTAL);

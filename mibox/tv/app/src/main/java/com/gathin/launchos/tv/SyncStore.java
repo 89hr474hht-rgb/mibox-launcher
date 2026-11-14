@@ -8,14 +8,11 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * The one place that knows whether the provider's lists are being read again, and how far along each one is.
- * Screens never run a refresh themselves: they ask the store, then listen. The work runs on {@link Bg}'s threads
- * and keeps going when the screen that started it is left; the screen that comes back gets the current state at
- * once. Progress comes from the bytes of the list as they arrive, and reaches the main thread at most every
- * {@link #FRAME_MS}, so a fast connection never floods the screen with redraws.
- *
- * <p>Each state is an immutable {@link Job}: a screen draws what it is given, nothing more (one-way data flow).
- * Main thread only, apart from the progress callbacks, which only write two volatile numbers.
+ * Refreshes of the provider's lists, one {@link Job} per section. Screens start one ({@link #refresh}) and listen
+ * ({@link #observe}, {@link #forget}); a listener gets every section's current state at once. The download runs on
+ * {@link Bg#sync} through Library and outlives the screen that started it. Progress comes from the bytes read and is
+ * posted to listeners at most every {@link #FRAME_MS}. Jobs are immutable. Main thread only, except the download
+ * thread's progress callback, which only writes two volatile fields of {@link Meter}.
  */
 final class SyncStore {
     enum Phase { IDLE, RUNNING, DONE, FAILED }
@@ -66,6 +63,15 @@ final class SyncStore {
     static SyncStore get(Context c) {
         if (instance == null) instance = new SyncStore(c.getApplicationContext());
         return instance;
+    }
+
+    /** Forgets the lists' sizes and the last states (the account was deleted). Main thread. */
+    static void forgetAll(Context c) {
+        c.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().apply();
+        if (instance == null) return;
+        for (Xtream.Section s : Xtream.Section.values()) {
+            if (instance.job(s).phase != Phase.RUNNING) instance.set(new Job(s, Phase.IDLE, 0, 0, null));
+        }
     }
 
     Job job(Xtream.Section s) {
@@ -122,7 +128,7 @@ final class SyncStore {
                 set(new Job(s, Phase.DONE, 1f, meter.read, null));
             } else {
                 XtreamException e = lib.error();
-                set(new Job(s, Phase.FAILED, 0, meter.read, e == null ? app.getString(R.string.sync_failed) : e.french()));
+                set(new Job(s, Phase.FAILED, 0, meter.read, e == null ? app.getString(R.string.sync_failed) : e.text(app)));
             }
         }, meter);
     }

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Main screen: the pages (Accueil, Chaînes, Films, Séries), the live player above them (full screen or the small
-     window at the bottom right), and the rail on the left: a dark strip of icons that opens over the page only while it has the
-     focus, so it never mixes with the page's own columns. -->
+     window at the bottom right), and the rail on the left: a black strip of icons that opens over the page only while
+     it has the focus. The rail is laid out at its open width once; MainActivity clips it to its closed width and
+     animates the clip, and rail_edge is its hairline, which follows the clip. -->
 <com.gathin.launchos.tv.Root xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/page">
+    android:background="@color/lo_black">
 
     <FrameLayout
         android:id="@+id/pages"
@@ -42,8 +43,8 @@
             android:lineSpacingMultiplier="1.25"
             android:paddingStart="120dp"
             android:paddingEnd="48dp"
-            android:textColor="@color/text_dim"
-            android:textSize="17sp"
+            android:textColor="@color/lo_text_2"
+            android:textSize="@dimen/lo_text_body"
             android:visibility="gone" />
     </FrameLayout>
 
@@ -57,14 +58,14 @@
 
     <LinearLayout
         android:id="@+id/rail"
-        android:layout_width="@dimen/rail_closed"
+        android:layout_width="@dimen/rail_open"
         android:layout_height="match_parent"
-        android:background="@drawable/rail_strip_bg"
+        android:background="@color/lo_black"
         android:orientation="vertical"
         android:paddingStart="10dp"
-        android:paddingTop="22dp"
+        android:paddingTop="@dimen/lo_page_y"
         android:paddingEnd="10dp"
-        android:paddingBottom="18dp">
+        android:paddingBottom="@dimen/lo_page_y">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -89,7 +90,7 @@
                 android:alpha="0"
                 android:singleLine="true"
                 android:text="@string/app_name"
-                android:textSize="17sp" />
+                android:textSize="@dimen/lo_text_heading" />
         </LinearLayout>
 
         <LinearLayout
@@ -146,14 +147,6 @@
             android:layout_weight="1" />
 
         <LinearLayout
-            android:id="@+id/nav_refresh"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_refresh">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/nav_settings"
             style="@style/RailItem"
             android:contentDescription="@string/nav_settings">
@@ -161,22 +154,13 @@
             <include layout="@layout/rail_item" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/nav_updates"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_updates">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_account"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_account">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
     </LinearLayout>
+
+    <View
+        android:id="@+id/rail_edge"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/lo_line" />
 
     <FrameLayout
         android:id="@+id/live_layer"
@@ -213,11 +197,10 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="26dp"
         android:layout_marginBottom="26dp"
-        android:background="@drawable/banner_bg"
-        android:elevation="12dp"
+        android:background="@drawable/lo_panel"
         android:fontFamily="@font/launchos_semibold"
         android:lineSpacingMultiplier="1.2"
         android:padding="16dp"
-        android:textSize="15sp"
+        android:textSize="@dimen/lo_text_body"
         android:visibility="gone" />
 </com.gathin.launchos.tv.Root>

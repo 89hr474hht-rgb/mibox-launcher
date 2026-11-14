@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  LaunchOS TV's own colours. Everything else comes from the shared palette (mibox/design, lo_*); lo_accent is set in
+  lo_accent.xml. These two are the loading placeholders' fill and the light that sweeps over it (SkeletonView).
+-->
 <resources>
-    <color name="page">#FF000000</color>
-    <color name="text">#FFF2F4F8</color>
-    <color name="text_dim">#FF9AA3B2</color>
-    <color name="accent">#FF4F7BFF</color>
-    <color name="accent_light">#FF8FB0FF</color>
-    <color name="danger">#FFFF6B6B</color>
-    <color name="ok">#FF4ADE80</color>
+    <color name="skeleton">#14FFFFFF</color>
+    <color name="skeleton_shine">#22FFFFFF</color>
 </resources>

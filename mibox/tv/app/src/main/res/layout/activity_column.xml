@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A secondary screen of one column (the hidden channels): a header, then rows built in code. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lo_black"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/column"
+        android:layout_width="@dimen/screen_width"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:clipChildren="false"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/screen_top"
+        android:paddingBottom="@dimen/lo_space_6">
+
+        <include layout="@layout/view_header" />
+    </LinearLayout>
+</ScrollView>
