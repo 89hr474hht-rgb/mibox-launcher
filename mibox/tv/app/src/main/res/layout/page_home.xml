@@ -1,115 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Accueil: the hero in the top third (what is being watched, or the newest, over its picture full screen fading
-  to black at the bottom), then the shelves: Reprendre la lecture, your channels, the newest films and series.
+  Accueil, on the charcoal page Films and Séries use: the spotlight is a rounded card set in from the edges (what is
+  being watched, or the newest, over its picture inside the card), then the shelves underneath: Reprendre la lecture,
+  your channels, the newest films and series.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/lo_black"
-    android:clipChildren="false">
+    android:background="@drawable/browse_bg"
+    android:clipChildren="false"
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/backdrop_a"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:alpha="0"
-        android:importantForAccessibility="no"
-        android:scaleType="centerCrop" />
-
-    <ImageView
-        android:id="@+id/backdrop_b"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:alpha="0"
-        android:importantForAccessibility="no"
-        android:scaleType="centerCrop" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/home_scrim" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:id="@+id/home_hero"
-            android:layout_width="600dp"
-            android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
+        <FrameLayout
+            android:id="@+id/home_card"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/home_card_height"
             android:layout_marginStart="@dimen/page_start"
-            android:layout_marginTop="@dimen/page_top"
-            android:orientation="vertical">
+            android:layout_marginTop="@dimen/hero_card_top"
+            android:layout_marginEnd="@dimen/page_start"
+            android:background="@drawable/hero_card_bg">
 
-            <TextView
-                android:id="@+id/home_label"
-                style="@style/Label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/home_title"
-                style="@style/Title"
+            <ImageView
+                android:id="@+id/backdrop_a"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/launchos_bold"
-                android:singleLine="true"
-                android:textSize="@dimen/lo_text_display" />
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:alpha="0"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop" />
 
-            <TextView
-                android:id="@+id/home_meta"
+            <ImageView
+                android:id="@+id/backdrop_b"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:fontFamily="@font/launchos_medium"
-                android:singleLine="true"
-                android:textColor="@color/lo_text"
-                android:textSize="@dimen/lo_text_small" />
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:alpha="0"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop" />
 
-            <TextView
-                android:id="@+id/home_plot"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:ellipsize="end"
-                android:lineSpacingMultiplier="1.2"
-                android:maxLines="2"
-                android:minLines="2"
-                android:textColor="@color/lo_text_2"
-                android:textSize="@dimen/lo_text_body" />
+                android:layout_height="match_parent"
+                android:background="@drawable/hero_card_scrim" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:layout_gravity="bottom"
+                android:alpha="0.8"
+                android:background="@drawable/hero_card_scrim_bottom" />
 
             <LinearLayout
-                android:id="@+id/home_buttons"
-                android:layout_width="wrap_content"
+                android:id="@+id/home_hero"
+                android:layout_width="460dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="22dp"
                 android:clipChildren="false"
-            android:clipToPadding="false"
-                android:orientation="horizontal">
+                android:clipToPadding="false"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/home_play"
-                    style="@style/Button.Primary"
-                    android:drawableStart="@drawable/ic_play"
-                    android:text="@string/hero_play" />
+                    android:id="@+id/home_label"
+                    style="@style/Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/logo_mark_small"
+                    android:drawablePadding="6dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/lo_text"
+                    android:textSize="11sp" />
 
                 <TextView
-                    android:id="@+id/home_info"
-                    style="@style/Button"
-                    android:layout_marginStart="12dp"
-                    android:drawableStart="@drawable/ic_info"
-                    android:text="@string/hero_info" />
+                    android:id="@+id/home_title"
+                    style="@style/Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/launchos_bold"
+                    android:singleLine="true"
+                    android:textSize="@dimen/hero_title" />
+
+                <TextView
+                    android:id="@+id/home_meta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/launchos_semibold"
+                    android:singleLine="true"
+                    android:textColor="@color/lo_text"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/home_plot"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:ellipsize="end"
+                    android:lineSpacingMultiplier="1.2"
+                    android:maxLines="2"
+                    android:minLines="2"
+                    android:textColor="@color/lo_text"
+                    android:textSize="@dimen/lo_text_small" />
+
+                <LinearLayout
+                    android:id="@+id/home_buttons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/home_play"
+                        style="@style/Button.Glass"
+                        android:drawableStart="@drawable/ic_play"
+                        android:text="@string/hero_play" />
+
+                    <TextView
+                        android:id="@+id/home_info"
+                        style="@style/Button.Glass"
+                        android:layout_marginStart="10dp"
+                        android:drawableStart="@drawable/ic_info"
+                        android:text="@string/hero_info" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </FrameLayout>
 
         <!-- Clips the shelves to their area, so a shelf scrolled up never draws over the hero. -->
         <FrameLayout
@@ -154,5 +172,4 @@
                 android:textSize="@dimen/lo_text_body"
                 android:visibility="gone" />
         </FrameLayout>
-    </LinearLayout>
-</FrameLayout>
+</LinearLayout>

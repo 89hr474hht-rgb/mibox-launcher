@@ -69,6 +69,8 @@ final class HomePage {
         this.root = root;
         backdrop = new Backdrop(root.findViewById(R.id.backdrop_a), root.findViewById(R.id.backdrop_b));
         hero = root.findViewById(R.id.home_hero);
+        // The card's picture is cut to its rounded corners (the outline of its background).
+        root.findViewById(R.id.home_card).setClipToOutline(true);
         buttons = root.findViewById(R.id.home_buttons);
         skeleton = root.findViewById(R.id.home_skeleton);
         label = root.findViewById(R.id.home_label);

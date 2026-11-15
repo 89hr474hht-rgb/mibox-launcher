@@ -13,6 +13,8 @@
     <dimen name="hero_card_top">70dp</dimen>
     <dimen name="hero_card_height">300dp</dimen>
     <dimen name="hero_title">30sp</dimen>
+    <!-- Accueil: its spotlight card, lower than Films and Séries' so a whole shelf fits under it. -->
+    <dimen name="home_card_height">230dp</dimen>
     <dimen name="rows_height">272dp</dimen>
     <dimen name="row_height">262dp</dimen>
     <dimen name="poster_width">124dp</dimen>
