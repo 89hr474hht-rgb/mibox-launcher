@@ -97,15 +97,29 @@
         <item name="android:tint">@color/lo_icon_on_focus</item>
     </style>
 
-    <style name="RailItem">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/lo_button_height</item>
-        <item name="android:layout_marginBottom">@dimen/lo_space_1</item>
-        <item name="android:background">@drawable/rail_item_bg</item>
+    <!-- A section in the top bar: its name, white when focused, in the accent while it is shown. -->
+    <style name="NavTab">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginEnd">@dimen/lo_space_1</item>
+        <item name="android:background">@drawable/nav_tab_bg</item>
         <item name="android:focusable">true</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:orientation">horizontal</item>
-        <item name="android:paddingStart">15dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">@dimen/lo_space_4</item>
+        <item name="android:paddingEnd">@dimen/lo_space_4</item>
+        <item name="android:fontFamily">@font/launchos_medium</item>
+        <item name="android:textSize">@dimen/lo_text_body</item>
+        <item name="android:textColor">@color/lo_text_on_focus</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <!-- An icon in the top bar (Réglages, Rechercher): round, white when focused. -->
+    <style name="NavIcon">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginEnd">@dimen/lo_space_1</item>
+        <item name="android:background">@drawable/nav_tab_bg</item>
+        <item name="android:focusable">true</item>
     </style>
 
     <!-- A tiny badge (quality, Épinglé): the only text allowed at the label size. -->

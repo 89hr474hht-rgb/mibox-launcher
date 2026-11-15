@@ -315,14 +315,19 @@ final class HomePage {
         return shelves.cardIn(0, -1);
     }
 
-    /** Where an arrow goes inside the page; null hands it to the main screen (the rail). */
+    /** True while the focus is above the shelves (the bar stays shown). */
+    boolean atTop(View focused) {
+        return !Root.inside(focused, rowsView);
+    }
+
+    /** Where an arrow goes inside the page; null hands it to the main screen (Up: the bar; else nothing moves). */
     View route(View focused, int direction, View proposed) {
         boolean inRows = Root.inside(focused, rowsView);
         if (inRows) {
             RecyclerView.ViewHolder holder = rowsView.findContainingViewHolder(focused);
             int row = holder == null ? 0 : holder.getBindingAdapterPosition();
             if (direction == View.FOCUS_UP) {
-                if (row <= 0) return heroItem != null ? play : focused;
+                if (row <= 0) return heroItem != null ? play : null;   // no hero: up to the bar
                 return shelves.move(focused, row - 1, -1);
             }
             if (direction == View.FOCUS_DOWN) {
@@ -337,7 +342,7 @@ final class HomePage {
                 View card = shelves.cardIn(0, -1);
                 return card != null ? card : focused;
             }
-            if (direction == View.FOCUS_UP) return focused;
+            if (direction == View.FOCUS_UP) return null;   // the bar
             if (direction == View.FOCUS_LEFT) return Root.inside(proposed, buttons) ? proposed : null;
             if (direction == View.FOCUS_RIGHT) return Root.inside(proposed, buttons) ? proposed : focused;
         }

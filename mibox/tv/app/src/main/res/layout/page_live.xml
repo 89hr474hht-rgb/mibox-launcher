@@ -9,7 +9,7 @@
     android:background="@color/lo_black"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    android:paddingStart="@dimen/rail_closed">
+    android:paddingTop="@dimen/topbar_height">
 
     <LinearLayout
         android:id="@+id/groups_column"

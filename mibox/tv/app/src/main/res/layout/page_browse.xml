@@ -49,7 +49,7 @@
         android:layout_width="560dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/page_start"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="124dp"
         android:orientation="vertical">
 
         <TextView
@@ -87,7 +87,7 @@
             android:layout_marginTop="10dp"
             android:ellipsize="end"
             android:lineSpacingMultiplier="1.25"
-            android:maxLines="3"
+            android:maxLines="2"
             android:textColor="@color/lo_text_2"
             android:textSize="@dimen/lo_text_body" />
 
@@ -127,7 +127,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_marginTop="@dimen/lo_page_y"
+        android:layout_marginTop="@dimen/page_top"
         android:layout_marginEnd="@dimen/lo_page_x"
         android:orientation="horizontal">
 

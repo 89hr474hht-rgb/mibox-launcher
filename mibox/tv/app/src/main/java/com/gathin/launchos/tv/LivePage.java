@@ -122,9 +122,9 @@ final class LivePage {
             if (activity.isDestroyed()) return;
             if (lib.error() != null && !lib.ready()) {
                 status(lib.error().text(activity));
-                // The list could not be read: Réessayer, which takes the focus unless the rail has it.
+                // The list could not be read: Réessayer, which takes the focus unless the bar has it.
                 retry.setVisibility(View.VISIBLE);
-                if (activity.showing(this) && !activity.inRail() && !player.isFull()) retry.requestFocus();
+                if (activity.showing(this) && !activity.inBar() && !player.isFull()) retry.requestFocus();
                 return;
             }
             rebuild(true);
@@ -183,8 +183,8 @@ final class LivePage {
         for (Group x : list) if (x.key().equals(groupKey)) keep = x;
         group = null;
         select(keep, true);
-        // Not while the remote is in the rail: previewing Chaînes from there must not pull the focus away.
-        if (focusDefault && activity.showing(this) && !player.isFull() && !activity.inRail()) focusGroups();
+        // Not while the remote is in the bar: previewing TV from there must not pull the focus away.
+        if (focusDefault && activity.showing(this) && !player.isFull() && !activity.inBar()) focusGroups();
     }
 
     /** What decides how the lists look, apart from the groups themselves: a change means building them again. */
@@ -346,16 +346,17 @@ final class LivePage {
         return v;
     }
 
-    /** Where an arrow goes inside the page; null hands it back to the main screen (the rail). */
+    /** Where an arrow goes inside the page; null hands it back to the main screen (Up: the bar; else nothing moves). */
     View route(View focused, int direction, View proposed) {
         boolean inGroups = Root.inside(focused, groupsColumn);
         boolean inChannels = Root.inside(focused, channelsColumn);
         boolean inPip = focused == activity.liveLayer();
         boolean vertical = direction == View.FOCUS_UP || direction == View.FOCUS_DOWN;
         if (vertical) {
-            // Up and Down never leave a panel: at the top or the bottom of a list, nothing moves.
-            if (inGroups && !Root.inside(proposed, groupsColumn)) return focused;
-            if (inChannels && !Root.inside(proposed, channelsColumn)) return focused;
+            // Up and Down stay in a panel; Up at the top of a list goes to the bar, Down at the bottom stays.
+            boolean up = direction == View.FOCUS_UP;
+            if (inGroups && !Root.inside(proposed, groupsColumn)) return up ? null : focused;
+            if (inChannels && !Root.inside(proposed, channelsColumn)) return up ? null : focused;
             if (inPip) return focused;
             return proposed;
         }
@@ -378,10 +379,9 @@ final class LivePage {
             }
             if (inChannels) {
                 View v = groupRow();
-                // No groups (the list failed): straight to the rail.
-                return v != null ? v : groupAdapter.getItemCount() == 0 ? null : focused;
+                return v != null ? v : focused;
             }
-            if (inGroups) return null;   // the rail
+            if (inGroups) return focused;
         }
         return proposed;
     }

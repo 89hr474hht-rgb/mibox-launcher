@@ -7,7 +7,7 @@ import android.widget.FrameLayout;
 
 /**
  * The main screen's root. Every move of the remote's arrows passes here, so the screen decides where the focus goes
- * instead of the nearest view on screen: into the rail at the section shown, out of it back where the page was, and
+ * instead of the nearest view on screen: up into the bar at the section shown, down out of it back where the page was, and
  * never from one column into another by accident.
  */
 public final class Root extends FrameLayout {

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Main screen: the pages (Accueil, Chaînes, Films, Séries), the live player above them (full screen or the small
-     window at the bottom right), and the rail on the left: a black strip of icons that opens over the page only while
-     it has the focus. The rail is laid out at its open width once; MainActivity clips it to its closed width and
-     animates the clip, and rail_edge is its hairline, which follows the clip. -->
+<!-- Main screen: the pages (Accueil, TV, Films, Séries), the navigation bar along the top, and the live player
+     above them (full screen or the small window at the bottom right). -->
 <com.gathin.launchos.tv.Root xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
@@ -41,126 +39,90 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:lineSpacingMultiplier="1.25"
-            android:paddingStart="120dp"
-            android:paddingEnd="48dp"
+            android:paddingStart="@dimen/lo_page_x"
+            android:paddingEnd="@dimen/lo_page_x"
             android:textColor="@color/lo_text_2"
             android:textSize="@dimen/lo_text_body"
             android:visibility="gone" />
     </FrameLayout>
 
-    <View
-        android:id="@+id/rail_shade"
-        android:layout_width="520dp"
-        android:layout_height="match_parent"
-        android:alpha="0"
-        android:background="@drawable/rail_bg"
-        android:visibility="invisible" />
-
+    <!-- The navigation bar: Réglages on the left, the sections, the app's small logo on the right. It fades out
+         while the remote is down in a page's rows and comes back at the top (MainActivity). -->
     <LinearLayout
-        android:id="@+id/rail"
-        android:layout_width="@dimen/rail_open"
-        android:layout_height="match_parent"
-        android:background="@color/lo_black"
-        android:orientation="vertical"
-        android:paddingStart="10dp"
-        android:paddingTop="@dimen/lo_page_y"
-        android:paddingEnd="10dp"
-        android:paddingBottom="@dimen/lo_page_y">
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/topbar_height"
+        android:background="@drawable/topbar_scrim"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/lo_page_x"
+        android:paddingTop="@dimen/lo_space_2"
+        android:paddingEnd="@dimen/lo_page_x">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginBottom="18dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="12dp">
-
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/logo_mark" />
-
-            <TextView
-                android:id="@+id/rail_title"
-                style="@style/Title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:alpha="0"
-                android:singleLine="true"
-                android:text="@string/app_name"
-                android:textSize="@dimen/lo_text_heading" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_search"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_search">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_home"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_home">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_live"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_live">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_guide"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_guide">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_movies"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_movies">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_series"
-            style="@style/RailItem"
-            android:contentDescription="@string/nav_series">
-
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/nav_settings"
-            style="@style/RailItem"
+            style="@style/NavIcon"
             android:contentDescription="@string/nav_settings">
 
-            <include layout="@layout/rail_item" />
-        </LinearLayout>
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:duplicateParentState="true"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_settings"
+                android:tint="@color/lo_icon_on_focus" />
 
+            <View
+                android:id="@+id/nav_dot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="7dp"
+                android:layout_marginEnd="7dp"
+                android:background="@drawable/dot_accent"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="@dimen/lo_space_2"
+            android:layout_marginEnd="@dimen/lo_space_3"
+            android:background="@color/lo_line" />
+
+        <FrameLayout
+            android:id="@+id/nav_search"
+            style="@style/NavIcon"
+            android:contentDescription="@string/nav_search">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:duplicateParentState="true"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_search"
+                android:tint="@color/lo_icon_on_focus" />
+        </FrameLayout>
+
+        <TextView android:id="@+id/nav_home" style="@style/NavTab" android:text="@string/nav_home" />
+        <TextView android:id="@+id/nav_live" style="@style/NavTab" android:text="@string/nav_tv" />
+        <TextView android:id="@+id/nav_guide" style="@style/NavTab" android:text="@string/nav_guide" />
+        <TextView android:id="@+id/nav_movies" style="@style/NavTab" android:text="@string/nav_movies" />
+        <TextView android:id="@+id/nav_series" style="@style/NavTab" android:text="@string/nav_series" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/logo_mark" />
     </LinearLayout>
-
-    <View
-        android:id="@+id/rail_edge"
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="@color/lo_line" />
 
     <FrameLayout
         android:id="@+id/live_layer"

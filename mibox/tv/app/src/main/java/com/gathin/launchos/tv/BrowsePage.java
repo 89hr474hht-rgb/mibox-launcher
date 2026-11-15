@@ -196,11 +196,11 @@ final class BrowsePage {
         retry.setVisibility(View.GONE);
     }
 
-    /** The list could not be read: the reason, and Réessayer, which takes the focus unless the rail has it. */
+    /** The list could not be read: the reason, and Réessayer, which takes the focus unless the bar has it. */
     private void failed(String text) {
         status(text);
         retry.setVisibility(View.VISIBLE);
-        if (activity.showing(this) && !activity.inRail()) retry.requestFocus();
+        if (activity.showing(this) && !activity.inBar()) retry.requestFocus();
     }
 
     private void build() {
@@ -522,7 +522,12 @@ final class BrowsePage {
         return root.findViewById(R.id.action_search);
     }
 
-    /** Where an arrow goes inside the page; null hands it to the main screen (the rail). */
+    /** Where an arrow goes inside the page; null hands it to the main screen (Up: the bar; else nothing moves). */
+    /** True while the focus is above the shelves (the bar stays shown). */
+    boolean atTop(View focused) {
+        return !Root.inside(focused, rowsView);
+    }
+
     View route(View focused, int direction, View proposed) {
         boolean inRows = Root.inside(focused, rowsView);
         boolean inHero = Root.inside(focused, heroButtons);
@@ -542,7 +547,7 @@ final class BrowsePage {
                 if (row >= rowAdapter.getItemCount() - 1) return focused;
                 return shelves.move(focused, row + 1, 1);
             }
-            // Left and Right stay in the row; Left at its first card opens the rail.
+            // Left and Right stay in the row.
             if (proposed != null && rowHolder != null && Root.inside(proposed, rowHolder.itemView)) return proposed;
             return direction == View.FOCUS_LEFT ? null : focused;
         }
@@ -569,7 +574,7 @@ final class BrowsePage {
         }
         if (inTop) {
             if (direction == View.FOCUS_DOWN) return !hero.isEmpty() ? heroPlay : shelves.cardIn(0, -1);
-            if (direction == View.FOCUS_UP) return focused;
+            if (direction == View.FOCUS_UP) return null;   // the bar
             if (direction == View.FOCUS_LEFT) return Root.inside(proposed, topActions) ? proposed : null;
             if (direction == View.FOCUS_RIGHT) return Root.inside(proposed, topActions) ? proposed : focused;
         }

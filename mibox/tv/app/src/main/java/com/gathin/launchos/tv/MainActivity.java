@@ -1,6 +1,5 @@
 package com.gathin.launchos.tv;
 
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -9,18 +8,20 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gathin.launchos.design.Focus;
 import com.gathin.launchos.design.Motion;
 
 /**
- * The main screen: the rail (Rechercher, Accueil, Chaînes, Guide TV, Films, Séries, Réglages) and one page at a time
- * (HomePage, LivePage with the {@link LivePlayer}, or a BrowsePage for Films and Séries). Main thread only.
+ * The main screen: the navigation bar along the top (Réglages, Rechercher, Accueil, TV, Guide TV, Films, Séries, and
+ * the app's logo) and one page at a time (HomePage, LivePage with the {@link LivePlayer}, or a BrowsePage for Films
+ * and Séries). Main thread only.
  *
- * <p>Focus: every arrow goes through {@link Root}'s router ({@link #route}); the rail opens while it has the focus,
- * Left at a page's left edge enters it on the section shown, Right leaves it where the page was. Back steps out one
- * level at a time (full screen, small window, panel, rail), then leaves the app.
+ * <p>Focus: every arrow goes through {@link Root}'s router ({@link #route}). Up at the top of a page enters the bar on
+ * the section shown; Left and Right move along the bar, showing a section after a short pause; Down goes back into
+ * the page where it was. The bar fades out while the remote is down in a page's rows. Back steps out one level at a
+ * time (full screen, small window, panel, the bar), then leaves the app.
  *
  * <p>Lifecycle: the account is read again in onResume (a changed account reloads every page); the live stream stops
  * in onStop and starts again in onStart. The start-up screen ({@link StartScreen}) shows only when the app is opened
@@ -35,19 +36,17 @@ public final class MainActivity extends Activity {
     private static boolean loginOffered;
 
     private Root root;
-    private ViewGroup rail;
-    private View railShade, railTitle, railEdge;
-    /** The visible width of the rail (its clip), in pixels. */
-    private int railClip;
-    private final Rect railBounds = new Rect();
-    private View[] railItems;
+    private ViewGroup bar;
+    /** The bar's items by NAV_*, and in the order they sit on screen (for Left and Right). */
+    private View[] navItems, barOrder;
+    private boolean barShown = true;
     private View[] sectionItems;
     private View navUpdates;
     private TextView banner, status;
     private LivePage live;
     private BrowsePage moviesPage, seriesPage;
     private HomePage homePage;
-    /** Accueil is shown (section then only says which section the rail last had). */
+    /** Accueil is shown (section then only says which section the bar last had). */
     private boolean home = true;
     private boolean pendingHome;
     private LivePlayer player;
@@ -56,9 +55,7 @@ public final class MainActivity extends Activity {
     private Xtream api;
     private int accountVersion = -1;
     private Xtream.Section section = Xtream.Section.LIVE;
-    private boolean railOpen;
-    private ValueAnimator railAnim;
-    /** The last view focused in the page, to go back to when the rail closes. */
+    /** The last view focused in the page, to go back to from the bar. */
     private View pageFocus;
     private boolean resumed;
     /** The start-up screen, while it shows (opened from the launcher, not when coming back). */
@@ -79,64 +76,55 @@ public final class MainActivity extends Activity {
             start = StartScreen.show(this);
         }
         root = findViewById(R.id.root);
-        rail = findViewById(R.id.rail);
-        railShade = findViewById(R.id.rail_shade);
-        railTitle = findViewById(R.id.rail_title);
-        railEdge = findViewById(R.id.rail_edge);
-        clipRail(getResources().getDimensionPixelSize(R.dimen.rail_closed));
+        bar = findViewById(R.id.topbar);
         status = findViewById(R.id.status);
         banner = findViewById(R.id.update_banner);
         liveLayer = findViewById(R.id.live_layer);
 
         int[] ids = {R.id.nav_search, R.id.nav_home, R.id.nav_live, R.id.nav_guide, R.id.nav_movies, R.id.nav_series,
                 R.id.nav_settings};
-        int[] icons = {R.drawable.ic_search, R.drawable.ic_home, R.drawable.ic_live, R.drawable.ic_guide,
-                R.drawable.ic_movie, R.drawable.ic_series, R.drawable.ic_settings};
-        int[] labels = {R.string.nav_search, R.string.nav_home, R.string.nav_live, R.string.nav_guide,
-                R.string.nav_movies, R.string.nav_series, R.string.nav_settings};
-        railItems = new View[ids.length];
+        navItems = new View[ids.length];
         for (int i = 0; i < ids.length; i++) {
-            View v = findViewById(ids[i]);
-            ((ImageView) v.findViewById(R.id.rail_icon)).setImageResource(icons[i]);
-            ((TextView) v.findViewById(R.id.rail_label)).setText(labels[i]);
-            railItems[i] = v;
+            navItems[i] = findViewById(ids[i]);
+            Focus.lift(navItems[i]);
         }
-        sectionItems = new View[]{railItems[NAV_LIVE], railItems[NAV_MOVIES], railItems[NAV_SERIES]};
-        // A short menu: search, Accueil, the sections and the guide, Réglages (which holds the account, the lists'
-        // refresh and the updates).
-        navUpdates = railItems[NAV_SETTINGS];
+        barOrder = new View[]{navItems[NAV_SETTINGS], navItems[NAV_SEARCH], navItems[NAV_HOME], navItems[NAV_LIVE],
+                navItems[NAV_GUIDE], navItems[NAV_MOVIES], navItems[NAV_SERIES]};
+        sectionItems = new View[]{navItems[NAV_LIVE], navItems[NAV_MOVIES], navItems[NAV_SERIES]};
+        // Réglages holds the account, the lists' refresh and the updates.
+        navUpdates = navItems[NAV_SETTINGS];
         Xtream.Section[] sections = Xtream.Section.values();
         for (int i = 0; i < sectionItems.length; i++) {
             Xtream.Section s = sections[i];
             sectionItems[i].setOnFocusChangeListener((v, focused) -> {
                 if (!focused || (s == section && !home)) return;
-                // Moving along the rail previews the section after a short pause, not at every step.
+                // Moving along the bar shows the section after a short pause, not at every step.
                 pendingSection = s;
                 pendingHome = false;
-                rail.removeCallbacks(switchSection);
-                rail.postDelayed(switchSection, SECTION_DELAY_MS);
+                bar.removeCallbacks(switchSection);
+                bar.postDelayed(switchSection, SECTION_DELAY_MS);
             });
             sectionItems[i].setOnClickListener(v -> {
-                rail.removeCallbacks(switchSection);
+                bar.removeCallbacks(switchSection);
                 if (s != section || home) showSection(s, false);
                 enterPage();
             });
         }
-        railItems[NAV_HOME].setOnFocusChangeListener((v, focused) -> {
+        navItems[NAV_HOME].setOnFocusChangeListener((v, focused) -> {
             if (!focused || home) return;
             pendingHome = true;
             pendingSection = null;
-            rail.removeCallbacks(switchSection);
-            rail.postDelayed(switchSection, SECTION_DELAY_MS);
+            bar.removeCallbacks(switchSection);
+            bar.postDelayed(switchSection, SECTION_DELAY_MS);
         });
-        railItems[NAV_HOME].setOnClickListener(v -> {
-            rail.removeCallbacks(switchSection);
+        navItems[NAV_HOME].setOnClickListener(v -> {
+            bar.removeCallbacks(switchSection);
             if (!home) showHome(false);
             enterPage();
         });
-        railItems[NAV_SEARCH].setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
-        railItems[NAV_GUIDE].setOnClickListener(v -> startActivity(new Intent(this, GuideActivity.class)));
-        railItems[NAV_SETTINGS].setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        navItems[NAV_SEARCH].setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
+        navItems[NAV_GUIDE].setOnClickListener(v -> startActivity(new Intent(this, GuideActivity.class)));
+        navItems[NAV_SETTINGS].setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
 
         player = new LivePlayer(this, liveLayer, new LivePlayer.Host() {
             @Override
@@ -146,8 +134,7 @@ public final class MainActivity extends Activity {
 
             @Override
             public void modeChanged(LivePlayer.Mode mode) {
-                rail.setVisibility(mode == LivePlayer.Mode.FULL ? View.INVISIBLE : View.VISIBLE);
-                railEdge.setVisibility(rail.getVisibility());
+                bar.setVisibility(mode == LivePlayer.Mode.FULL ? View.INVISIBLE : View.VISIBLE);
                 live.modeChanged(mode);
             }
 
@@ -198,10 +185,10 @@ public final class MainActivity extends Activity {
         handle(intent);
     }
 
-    /** True while the focus is in the rail (a page loading then leaves the focus where it is). */
-    boolean inRail() {
+    /** True while the focus is in the bar (a page loading then leaves the focus where it is). */
+    boolean inBar() {
         View f = getCurrentFocus();
-        return f != null && Root.inside(f, rail);
+        return f != null && Root.inside(f, bar);
     }
 
     /** A channel chosen on Accueil plays in Chaînes. */
@@ -264,7 +251,7 @@ public final class MainActivity extends Activity {
             status.setText(R.string.no_account);
             status.setVisibility(View.VISIBLE);
             markSection();
-            railItems[NAV_SETTINGS].requestFocus();
+            navItems[NAV_SETTINGS].requestFocus();
             // No account yet: the login screen opens by itself, once.
             if (!loginOffered) {
                 loginOffered = true;
@@ -333,12 +320,12 @@ public final class MainActivity extends Activity {
 
     private void markSection() {
         for (int i = 0; i < sectionItems.length; i++) sectionItems[i].setActivated(!home && i == section.ordinal());
-        railItems[NAV_HOME].setActivated(home);
+        navItems[NAV_HOME].setActivated(home);
     }
 
-    /** The rail item of the page shown. */
+    /** The bar item of the page shown. */
     private View shownItem() {
-        return home ? railItems[NAV_HOME] : sectionItems[section.ordinal()];
+        return home ? navItems[NAV_HOME] : sectionItems[section.ordinal()];
     }
 
     private View shownRoot() {
@@ -368,18 +355,17 @@ public final class MainActivity extends Activity {
     private View route(View focused, int direction, View proposed) {
         if (player.isFull()) return focused;
         if (focused == null) return proposed;
-        if (Root.inside(focused, rail)) {
-            if (direction == View.FOCUS_RIGHT) {
+        if (Root.inside(focused, bar)) {
+            if (direction == View.FOCUS_DOWN) {
                 if (api == null) return focused;
-                rail.removeCallbacks(switchSection);
+                bar.removeCallbacks(switchSection);
                 if (pendingHome && !home) showHome(false);
                 else if (pendingSection != null && (home || pendingSection != section)) showSection(pendingSection, false);
                 View v = pageTarget();
                 return v != null ? v : focused;
             }
-            if (direction == View.FOCUS_LEFT) return focused;
-            if (direction == View.FOCUS_UP || direction == View.FOCUS_DOWN) {
-                return railStep(focused, direction == View.FOCUS_DOWN ? 1 : -1);
+            if (direction == View.FOCUS_LEFT || direction == View.FOCUS_RIGHT) {
+                return barStep(focused, direction == View.FOCUS_RIGHT ? 1 : -1);
             }
             return focused;
         }
@@ -387,71 +373,60 @@ public final class MainActivity extends Activity {
         if (home) r = homePage.route(focused, direction, proposed);
         else if (section == Xtream.Section.LIVE) r = live.route(focused, direction, proposed);
         else r = (section == Xtream.Section.MOVIES ? moviesPage : seriesPage).route(focused, direction, proposed);
-        // Into the rail only on purpose, and then on the section shown.
-        if (r == null || Root.inside(r, rail)) {
-            return direction == View.FOCUS_LEFT ? shownItem() : focused;
+        // A page hands Up at its top (null) to the bar, on the section shown; other edges stay where they are.
+        if (r == null || Root.inside(r, bar)) {
+            return direction == View.FOCUS_UP ? shownItem() : focused;
         }
         return r;
     }
 
     /**
-     * Up and Down in the rail go to the next item shown, in order. Android's own search looks for the nearest view
-     * and, across the gap under Séries, finds the page instead: Actualiser, Réglages and Compte were out of reach.
+     * Left and Right in the bar go to the next item, in screen order. Android's own search could jump down into the
+     * page from an item far from its neighbour; this keeps the remote on the bar.
      */
-    private View railStep(View focused, int step) {
+    private View barStep(View focused, int step) {
         int at = -1;
-        for (int i = 0; i < railItems.length; i++) if (Root.inside(focused, railItems[i])) at = i;
+        for (int i = 0; i < barOrder.length; i++) if (Root.inside(focused, barOrder[i])) at = i;
         if (at < 0) return focused;
-        for (int i = at + step; i >= 0 && i < railItems.length; i += step) {
-            if (railItems[i].getVisibility() == View.VISIBLE && railItems[i].isFocusable()) return railItems[i];
+        for (int i = at + step; i >= 0 && i < barOrder.length; i += step) {
+            if (barOrder[i].getVisibility() == View.VISIBLE && barOrder[i].isFocusable()) return barOrder[i];
         }
         return focused;
     }
 
     private void focusMoved(View now) {
         if (now == null) return;
-        boolean inRail = Root.inside(now, rail);
-        if (inRail != railOpen) openRail(inRail);
-        if (!inRail) {
+        boolean inBar = Root.inside(now, bar);
+        if (!inBar) {
             pageFocus = now;
             if (home) homePage.focusChanged(now);
             else if (section == Xtream.Section.MOVIES) moviesPage.focusChanged(now);
             else if (section == Xtream.Section.SERIES) seriesPage.focusChanged(now);
         }
+        showBar(inBar || pageAtTop(now));
     }
 
-    /**
-     * The rail opens over the page (the page is dimmed behind it) and closes back to its icons. It is laid out once at
-     * its open width; only its clip moves, so a frame redraws it without measuring anything.
-     */
-    private void openRail(boolean open) {
-        railOpen = open;
-        if (railAnim != null) railAnim.cancel();
-        int to = getResources().getDimensionPixelSize(open ? R.dimen.rail_open : R.dimen.rail_closed);
+    /** True while the focus is at the top of the page shown (not down in the rows of Accueil, Films or Séries). */
+    private boolean pageAtTop(View focused) {
+        if (home) return homePage.atTop(focused);
+        if (section == Xtream.Section.MOVIES) return moviesPage.atTop(focused);
+        if (section == Xtream.Section.SERIES) return seriesPage.atTop(focused);
+        return true;
+    }
+
+    /** The bar fades out while the remote is down in a page's rows, and back in at the top. */
+    private void showBar(boolean show) {
+        if (show == barShown) return;
+        barShown = show;
+        bar.animate().cancel();
+        float up = -Ui.dp(this, 12);
         if (!Motion.on()) {
-            clipRail(to);
-        } else {
-            railAnim = ValueAnimator.ofInt(railClip, to);
-            railAnim.setDuration(open ? 240 : 200);
-            railAnim.setInterpolator(Motion.MOVE);
-            railAnim.addUpdateListener(a -> clipRail((int) a.getAnimatedValue()));
-            railAnim.start();
+            bar.setAlpha(show ? 1f : 0f);
+            bar.setTranslationY(show ? 0 : up);
+            return;
         }
-        for (View v : railItems) v.findViewById(R.id.rail_label).animate().alpha(open ? 1f : 0f).setDuration(open ? 260 : 120).start();
-        railTitle.animate().alpha(open ? 1f : 0f).setDuration(open ? 260 : 120).start();
-        if (open) railShade.setVisibility(View.VISIBLE);
-        railShade.animate().alpha(open ? 1f : 0f).setDuration(240)
-                .withEndAction(() -> {
-                    if (!railOpen) railShade.setVisibility(View.INVISIBLE);
-                }).start();
-    }
-
-    /** Shows the rail's first width pixels and puts its hairline on that edge. */
-    private void clipRail(int width) {
-        railClip = width;
-        railBounds.set(0, 0, width, Short.MAX_VALUE);
-        rail.setClipBounds(railBounds);
-        railEdge.setTranslationX(width - 1);
+        bar.animate().alpha(show ? 1f : 0f).translationY(show ? 0 : up).setDuration(show ? Motion.MEDIUM : Motion.SHORT)
+                .setInterpolator(show ? Motion.ENTER : Motion.MOVE).start();
     }
 
     /** The first focus is given before the window is shown, when no focus change is reported: catch up here. */
@@ -475,14 +450,14 @@ public final class MainActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode != KeyEvent.KEYCODE_BACK) return super.onKeyDown(keyCode, event);
         View f = getCurrentFocus();
-        if (f != null && !Root.inside(f, rail)) {
+        if (f != null && !Root.inside(f, bar)) {
             if (home) {
                 View start = homePage.defaultFocus();
                 if (start != null && f != start) {
                     start.requestFocus();
                     return true;
                 }
-                railItems[NAV_HOME].requestFocus();
+                navItems[NAV_HOME].requestFocus();
                 return true;
             }
             if (section == Xtream.Section.LIVE && live.back(f)) return true;
@@ -507,13 +482,13 @@ public final class MainActivity extends Activity {
 
     // ---- updates ----
 
-    /** Réglages in the rail says when a newer version is waiting; the banner says it once per version and session. */
+    /** Réglages in the bar says when a newer version is waiting; the banner says it once per version and session. */
     private void showUpdate() {
         UpdateState state = new UpdateState(this);
         Release r = state.available();
         boolean newer = r != null && r.version.isNewerThan(UpdateState.installed(this));
-        ((TextView) navUpdates.findViewById(R.id.rail_label)).setText(newer ? R.string.nav_settings_update : R.string.nav_settings);
-        navUpdates.findViewById(R.id.rail_dot).setVisibility(newer ? View.VISIBLE : View.GONE);
+        navUpdates.setContentDescription(getString(newer ? R.string.nav_settings_update : R.string.nav_settings));
+        navUpdates.findViewById(R.id.nav_dot).setVisibility(newer ? View.VISIBLE : View.GONE);
         if (newer && state.shouldPrompt(this) && !String.valueOf(r.version).equals(bannerShownFor)) {
             bannerShownFor = String.valueOf(r.version);
             banner.setText(getString(R.string.upd_banner, bannerShownFor));

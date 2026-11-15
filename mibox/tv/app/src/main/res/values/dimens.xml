@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="rail_closed">72dp</dimen>
-    <dimen name="rail_open">244dp</dimen>
-    <!-- Where a page's text starts, right of the closed rail. -->
-    <dimen name="page_start">104dp</dimen>
+    <!-- The navigation bar along the top of the main screen, and where a page's content starts under it. -->
+    <dimen name="topbar_height">64dp</dimen>
+    <dimen name="page_top">76dp</dimen>
+    <!-- Where a page's text starts: the page frame. -->
+    <dimen name="page_start">48dp</dimen>
     <!-- A row's first card, so its focus ring lines up with the titles. -->
-    <dimen name="row_start">98dp</dimen>
+    <dimen name="row_start">42dp</dimen>
     <dimen name="pip_width">306dp</dimen>
     <dimen name="pip_height">172dp</dimen>
     <dimen name="rows_height">272dp</dimen>

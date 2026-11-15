@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">LaunchOS TV</string>
     <string name="nav_live">Chaînes</string>
+    <string name="nav_tv">TV</string>
     <string name="nav_movies">Films</string>
     <string name="nav_series">Séries</string>
     <string name="nav_account">Compte</string>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A top-bar item: a white pill while focused, nothing otherwise (the section shown is told by its colour). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
+    <item android:state_focused="true">
+        <shape><solid android:color="@color/lo_focus" /><corners android:radius="@dimen/lo_radius_pill" /></shape>
+    </item>
+    <item>
+        <shape><solid android:color="@android:color/transparent" /><corners android:radius="@dimen/lo_radius_pill" /></shape>
+    </item>
+</selector>
