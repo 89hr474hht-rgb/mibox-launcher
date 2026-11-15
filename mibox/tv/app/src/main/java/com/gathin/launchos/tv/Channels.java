@@ -79,6 +79,40 @@ final class Channels {
         version++;
     }
 
+    /**
+     * Moves a channel of Favoris to another place among those added by hand (0 is the first); the others keep their
+     * order. Nothing happens for a channel that was not added by hand.
+     */
+    void moveStarred(String id, int to) {
+        List<Item> order = starredItems();
+        int from = -1;
+        for (int i = 0; i < order.size(); i++) if (order.get(i).id.equals(id)) from = i;
+        if (from < 0) return;
+        to = Math.max(0, Math.min(order.size() - 1, to));
+        if (to == from) return;
+        order.add(to, order.remove(from));
+        SharedPreferences.Editor e = prefs.edit();
+        for (int i = 0; i < order.size(); i++) {
+            String k = key(STAR, order.get(i).id);
+            try {
+                JSONArray a = new JSONArray(prefs.getString(k, "[]"));
+                a.put(0, i + 1L);   // the place is the first field: small numbers keep every later addition after them
+                e.putString(k, a.toString());
+            } catch (JSONException ignored) {
+                // A damaged entry keeps its place.
+            }
+        }
+        e.apply();
+        version++;
+    }
+
+    /** Where a channel stands among those added to Favoris by hand, -1 when it is not one of them. */
+    int starredIndex(String id) {
+        List<Item> order = starredItems();
+        for (int i = 0; i < order.size(); i++) if (order.get(i).id.equals(id)) return i;
+        return -1;
+    }
+
     /** Channels added to Favoris, first added first. */
     List<Item> starredItems() {
         return items(STAR);

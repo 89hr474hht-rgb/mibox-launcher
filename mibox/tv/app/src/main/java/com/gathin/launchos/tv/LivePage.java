@@ -202,7 +202,7 @@ final class LivePage {
             // Favoris: the channels added by hand, in that order, then the most watched ones.
             if (chs != null) in.favourites.addAll(chs.starredItems());
             if (h != null) {
-                in.favourites.addAll(h.favourites(FAVOURITES));
+                if (!Options.favouritesByHand(activity)) in.favourites.addAll(h.favourites(FAVOURITES));
                 in.recent.addAll(h.recentChannels(RECENT));
             }
             for (TvShelves.Shelf sh : TvShelves.build(in)) list.add(new Group(sh, shelfName(sh)));
@@ -252,7 +252,8 @@ final class LivePage {
     /** What decides how the lists look, apart from the groups themselves: a change means building them again. */
     private String stamp() {
         return Options.tidyNames(activity) + "|" + Options.channelOrder(activity) + "|" + Options.dedupe(activity) + "|"
-                + Options.hideAdult(activity) + "|" + Options.groupOrder(activity) + "|" + Channels.version();
+                + Options.hideAdult(activity) + "|" + Options.groupOrder(activity) + "|" + Channels.version() + "|"
+                + Options.favouritesByHand(activity);
     }
 
     /** A shelf's name: Favoris, Récentes, the theme, or the country. */
@@ -420,7 +421,7 @@ final class LivePage {
         java.util.Set<String> seen = new java.util.HashSet<>();
         List<Item> found = new ArrayList<>();
         if (chs != null) found.addAll(chs.starredItems());
-        if (h != null) found.addAll(h.favourites(FAVOURITES));
+        if (h != null && !Options.favouritesByHand(activity)) found.addAll(h.favourites(FAVOURITES));
         for (Item i : found) {
             if (chs != null && chs.hidden(i.id)) continue;
             if (seen.add(i.id)) list.add(i);
@@ -917,7 +918,19 @@ final class LivePage {
                     int keep = lastChannel;
                     rebuild(false);
                     channelsView.post(() -> focusChannelAt(keep));
-                });
+                }, group != null && group.shelf != null && group.shelf.kind == TvShelves.Kind.FAVOURITES ? id -> {
+                    // Moved among Favoris: the list behind follows, the focus with the channel.
+                    rebuild(false);
+                    channelsView.post(() -> {
+                        for (int i = 0; i < channelAdapter.items.size(); i++) {
+                            Item x = channelAdapter.items.get(i);
+                            if (x.id.equals(id) || versionsOf(x).stream().anyMatch(ver -> ver.id.equals(id))) {
+                                focusChannelAt(i);
+                                return;
+                            }
+                        }
+                    });
+                } : null);
                 return true;
             });
         }

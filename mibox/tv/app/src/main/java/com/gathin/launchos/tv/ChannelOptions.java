@@ -19,6 +19,15 @@ final class ChannelOptions {
     }
 
     static void show(Activity a, Item item, List<Item> versions, Consumer<Item> play, Runnable changed) {
+        show(a, item, versions, play, changed, null);
+    }
+
+    /**
+     * moved, when given, is told after the channel moved among Favoris (Monter, Descendre, En premier): the sheet
+     * stays open, so OK again moves it on, and the list behind follows.
+     */
+    static void show(Activity a, Item item, List<Item> versions, Consumer<Item> play, Runnable changed,
+                     Consumer<String> moved) {
         Channels chs = Channels.get(a);
         if (chs == null) return;
         Item target = item;
@@ -37,6 +46,12 @@ final class ChannelOptions {
                     d.dismiss();
                     changed.run();
                 });
+        if (moved != null) {
+            LinearLayout moves = new LinearLayout(a);
+            moves.setOrientation(LinearLayout.VERTICAL);
+            body.addView(moves);
+            fillMoves(a, chs, fav, moves, moved);
+        }
         int n = 1;
         for (Item v : versions) {
             n++;
@@ -56,5 +71,27 @@ final class ChannelOptions {
         });
         d.show();
         first.requestFocus();
+    }
+
+    /** Monter, Descendre and En premier, for a channel added to Favoris by hand; rebuilt after each move. */
+    private static void fillMoves(Activity a, Channels chs, Item fav, LinearLayout moves, Consumer<String> moved) {
+        moves.removeAllViews();
+        int at = chs.starredIndex(fav.id), count = chs.starredItems().size();
+        if (at < 0 || count < 2) return;
+        Consumer<Integer> to = place -> {
+            chs.moveStarred(fav.id, place);
+            moved.accept(fav.id);
+            View focused = moves.findFocus();
+            int keep = focused == null ? -1 : moves.indexOfChild(focused);
+            fillMoves(a, chs, fav, moves, moved);
+            // OK again on the same action keeps moving the channel; at the end of the list the focus goes to the next one.
+            if (moves.getChildCount() > 0) moves.getChildAt(Math.max(0, Math.min(keep, moves.getChildCount() - 1))).requestFocus();
+        };
+        if (at > 0) GroupOptions.action(a, moves, R.drawable.ic_move_up, a.getString(R.string.channel_move_up),
+                () -> to.accept(chs.starredIndex(fav.id) - 1));
+        if (at < count - 1) GroupOptions.action(a, moves, R.drawable.ic_move_down, a.getString(R.string.channel_move_down),
+                () -> to.accept(chs.starredIndex(fav.id) + 1));
+        if (at > 1) GroupOptions.action(a, moves, R.drawable.ic_move_top, a.getString(R.string.channel_move_first),
+                () -> to.accept(0));
     }
 }

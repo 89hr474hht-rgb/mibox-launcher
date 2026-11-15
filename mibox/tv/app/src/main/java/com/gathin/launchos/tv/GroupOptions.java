@@ -32,9 +32,14 @@ final class GroupOptions {
             rename(a, s, c, changed);
         });
         action(a, body, R.drawable.ic_hide, a.getString(hidden ? R.string.group_show : R.string.group_hide), () -> {
-            g.setHidden(s, c.id, !hidden);
             d.dismiss();
-            changed.run();
+            // Showing a group for adults asks for the parental code first, when one is set.
+            Runnable apply = () -> {
+                g.setHidden(s, c.id, !hidden);
+                changed.run();
+            };
+            if (hidden && g.forAdults(s, c.id)) Parental.unlockThen(a, apply);
+            else apply.run();
         });
         action(a, body, R.drawable.ic_pin, a.getString(pinned ? R.string.group_unpin : R.string.group_pin), () -> {
             g.setPinned(s, c.id, !pinned);

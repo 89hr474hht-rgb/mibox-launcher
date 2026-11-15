@@ -46,4 +46,25 @@
     <string name="set_list_hours">Actualiser les listes</string>
     <string name="set_list_hours_sub">Les listes du fournisseur se rechargent seules au bout de ce délai</string>
     <string name="set_list_hours_n">%1$d h</string>
+    <!-- Favoris and the parental code (Chaînes et guide). -->
+    <string name="set_fav_by_hand">Favoris : mes chaînes seulement</string>
+    <string name="set_fav_by_hand_sub">Sans les chaînes les plus regardées, ajoutées d\'office</string>
+    <string name="channel_move_up">Monter dans les favoris</string>
+    <string name="channel_move_down">Descendre dans les favoris</string>
+    <string name="channel_move_first">Mettre en premier</string>
+    <string name="set_pin">Code parental</string>
+    <string name="set_pin_off_sub">Aucun code : le réglage au-dessus suffit à montrer les contenus adultes</string>
+    <string name="set_pin_on_sub">Code actif : demandé pour les montrer ; ils se cachent à nouveau quand l\'appli quitte l\'écran</string>
+    <string name="pin_enter">Code parental</string>
+    <string name="pin_enter_sub">Le code est demandé pour montrer les contenus adultes</string>
+    <string name="pin_current_sub">Entrez le code actuel</string>
+    <string name="pin_new">Nouveau code parental</string>
+    <string name="pin_new_sub">Choisissez 4 chiffres</string>
+    <string name="pin_confirm">Confirmez le code</string>
+    <string name="pin_confirm_sub">Entrez les mêmes 4 chiffres</string>
+    <string name="pin_wrong">Code incorrect, réessayez</string>
+    <string name="pin_mismatch">Les deux codes ne correspondent pas, réessayez</string>
+    <string name="pin_keys">Haut et Bas : chiffre · Gauche et Droite : case · OK : valider</string>
+    <string name="pin_change">Changer le code</string>
+    <string name="pin_remove">Supprimer le code</string>
 </resources>

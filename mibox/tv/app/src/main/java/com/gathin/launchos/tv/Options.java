@@ -96,9 +96,18 @@ final class Options {
         e.apply();
     }
 
-    /** Groups for adults stay out of sight unless shown one by one. */
+    /** Favoris holds only the channels added by hand, without the most watched ones added by themselves. */
+    static boolean favouritesByHand(Context c) {
+        return p(c).getBoolean("favourites_by_hand", false);
+    }
+
+    static void setFavouritesByHand(Context c, boolean on) {
+        p(c).edit().putBoolean("favourites_by_hand", on).apply();
+    }
+
+    /** Groups for adults stay out of sight unless shown one by one; always, while the parental code is not given. */
     static boolean hideAdult(Context c) {
-        return p(c).getBoolean("hide_adult", true);
+        return p(c).getBoolean("hide_adult", true) || Parental.locked(c);
     }
 
     static void setHideAdult(Context c, boolean on) {

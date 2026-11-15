@@ -75,8 +75,15 @@ final class Groups {
     /** Hidden by the owner, or a group for adults while Réglages keeps those out of sight (the owner can show one). */
     boolean hidden(Xtream.Section s, String id) {
         String k = key(s, id, "h");
+        // Behind the parental code, a group for adults stays hidden even if it was shown one by one.
+        if (Parental.locked(context) && adult(s, id)) return true;
         if (prefs.contains(k)) return prefs.getBoolean(k, false);
         return Options.hideAdult(context) && adult(s, id);
+    }
+
+    /** A group for adults, as told by its name. */
+    boolean forAdults(Xtream.Section s, String id) {
+        return adult(s, id);
     }
 
     /** Hidden only because it is for adults. */

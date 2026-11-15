@@ -217,6 +217,13 @@ public final class MainActivity extends Activity {
         player.resume();
     }
 
+    /** Every screen of the app left the TV: content for adults hides again behind the parental code. */
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= TRIM_MEMORY_UI_HIDDEN) Parental.lock();
+    }
+
     @Override
     protected void onStop() {
         super.onStop();

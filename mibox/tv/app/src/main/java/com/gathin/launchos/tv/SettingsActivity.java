@@ -45,7 +45,7 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
     private SafeScrollView scroll;
     private int shown = -1;
 
-    private Rows.Row account, updates, dedupe, adult, hiddenChannels, mini, next, tidy, zap;
+    private Rows.Row account, updates, dedupe, adult, hiddenChannels, mini, next, tidy, zap, byHand, parental;
     private Rows.Choice start, groupOrder, channelOrder, guideShift, picture, listHours;
     private final GaugeButton[] gauges = new GaugeButton[Xtream.Section.values().length];
     private TextView syncAll, cacheClear;
@@ -280,6 +280,11 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
             Groups.touch();
             states();
         });
+        byHand = Rows.add(pane, R.drawable.ic_star_line, R.string.set_fav_by_hand).sub(R.string.set_fav_by_hand_sub)
+                .click(v -> {
+                    Options.setFavouritesByHand(this, !Options.favouritesByHand(this));
+                    states();
+                });
         Rows.section(pane, R.string.set_sec_guide);
         String[] shifts = new String[Options.GUIDE_SHIFTS.length];
         for (int i = 0; i < shifts.length; i++) {
@@ -295,14 +300,67 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
         Rows.section(pane, R.string.set_sec_hidden);
         adult = Rows.add(pane, R.drawable.ic_lock, R.string.settings_adult).sub(R.string.settings_adult_sub)
                 .click(v -> {
-                    Options.setHideAdult(this, !Options.hideAdult(this));
-                    Groups.touch();
-                    states();
+                    // Showing content for adults asks for the parental code, when one is set; hiding never does.
+                    if (Options.hideAdult(this)) {
+                        Parental.unlockThen(this, () -> {
+                            Options.setHideAdult(this, false);
+                            Groups.touch();
+                            states();
+                        });
+                    } else {
+                        Options.setHideAdult(this, true);
+                        Groups.touch();
+                        states();
+                    }
                 });
+        parental = Rows.add(pane, R.drawable.ic_key, R.string.set_pin).opens().click(v -> parentalCode());
         hiddenChannels = Rows.add(pane, R.drawable.ic_hide, R.string.settings_hidden_channels).opens()
                 .click(v -> startActivity(new Intent(this, HiddenChannelsActivity.class)));
         Rows.add(pane, R.drawable.ic_folder, R.string.settings_groups_live).sub(R.string.settings_groups_sub).opens()
                 .click(v -> groups(Xtream.Section.LIVE));
+    }
+
+    /** Code parental: choose one; with one set, give it, then change it or take it away. */
+    private void parentalCode() {
+        if (!Parental.hasCode(this)) {
+            newCode();
+            return;
+        }
+        PinDialog.ask(this, getString(R.string.pin_enter), getString(R.string.pin_current_sub), code -> {
+            if (!Parental.check(this, code)) return false;
+            android.app.Dialog d = GroupOptions.dialog(this, R.layout.dialog_group);
+            ((android.widget.TextView) d.findViewById(R.id.dialog_title)).setText(R.string.set_pin);
+            d.findViewById(R.id.dialog_sub).setVisibility(View.GONE);
+            android.widget.LinearLayout body = d.findViewById(R.id.dialog_body);
+            android.widget.TextView first = GroupOptions.action(this, body, R.drawable.ic_key,
+                    getString(R.string.pin_change), () -> {
+                        d.dismiss();
+                        newCode();
+                    });
+            GroupOptions.action(this, body, R.drawable.ic_trash, getString(R.string.pin_remove), () -> {
+                d.dismiss();
+                Parental.setCode(this, null);
+                states();
+            });
+            d.show();
+            first.requestFocus();
+            return true;
+        });
+    }
+
+    /** A new code, typed twice. */
+    private void newCode() {
+        PinDialog.ask(this, getString(R.string.pin_new), getString(R.string.pin_new_sub), first -> {
+            // The first one is taken as it is; the second must match it.
+            getWindow().getDecorView().post(() -> PinDialog.ask(this, getString(R.string.pin_confirm),
+                    getString(R.string.pin_confirm_sub), R.string.pin_mismatch, again -> {
+                        if (!again.equals(first)) return false;
+                        Parental.setCode(this, first);
+                        states();
+                        return true;
+                    }));
+            return true;
+        });
     }
 
     private void buildVod(ViewGroup pane) {
@@ -536,6 +594,8 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
         zap.toggle(Options.zapInverted(this));
         dedupe.toggle(Options.dedupe(this));
         adult.toggle(Options.hideAdult(this));
+        byHand.toggle(Options.favouritesByHand(this));
+        parental.sub(Parental.hasCode(this) ? R.string.set_pin_on_sub : R.string.set_pin_off_sub);
         Channels chs = Channels.get(this);
         int hidden = chs == null ? 0 : chs.hiddenItems().size();
         hiddenChannels.sub(hidden == 0 ? getString(R.string.settings_hidden_none)
