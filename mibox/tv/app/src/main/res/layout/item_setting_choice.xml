@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A setting with a few values: icon, title and the line saying what the current value does, and the values on
+     the right in a SegmentBar, whose pill glides to the one chosen. The row itself takes no focus; its values do. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/lo_space_1"
+    android:baselineAligned="false"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:gravity="center_vertical"
+    android:minHeight="56dp"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/lo_space_4"
+    android:paddingTop="8dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="8dp">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/lo_icon"
+        android:layout_height="@dimen/lo_icon"
+        android:importantForAccessibility="no"
+        android:tint="@color/lo_text" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/lo_space_4"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/launchos_semibold"
+            android:textColor="@color/lo_text"
+            android:textSize="@dimen/lo_text_body" />
+
+        <TextView
+            android:id="@+id/sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/lo_text_2"
+            android:textSize="@dimen/lo_text_small" />
+    </LinearLayout>
+
+    <com.gathin.launchos.design.SegmentBar
+        android:id="@+id/segments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/lo_space_4"
+        android:orientation="horizontal"
+        android:paddingStart="3dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="3dp"
+        android:paddingBottom="3dp" />
+</LinearLayout>

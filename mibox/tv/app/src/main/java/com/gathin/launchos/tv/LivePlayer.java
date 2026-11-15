@@ -141,6 +141,23 @@ final class LivePlayer {
         setMode(Mode.FULL, true);
     }
 
+    /**
+     * The whole list arrived while a channel played alone (started from History before the list was read): Up and
+     * Down now go through it, from that channel, and the stream goes on untouched.
+     */
+    void widen(List<Item> list, String groupName) {
+        Item now = current();
+        if (now == null || channels.size() > 1) return;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).id.equals(now.id)) {
+                channels = new ArrayList<>(list);
+                index = i;
+                group = groupName;
+                return;
+            }
+        }
+    }
+
     void full() {
         if (mode == Mode.HIDDEN) return;
         setMode(Mode.FULL, true);
@@ -168,6 +185,7 @@ final class LivePlayer {
     }
 
     void resume() {
+        Players.picture(video, activity);
         if (mode == Mode.HIDDEN || channels.isEmpty() || api == null) return;
         if (mode == Mode.MINI && host.miniBounds() == null) {
             setMode(Mode.HIDDEN, false);
@@ -190,12 +208,15 @@ final class LivePlayer {
         int n = channels.size();
         switch (k) {
             case KeyEvent.KEYCODE_CHANNEL_UP:
-            case KeyEvent.KEYCODE_DPAD_UP:
-                if (n > 1) playChannel((index + 1) % n);
-                return true;
             case KeyEvent.KEYCODE_CHANNEL_DOWN:
+            case KeyEvent.KEYCODE_DPAD_UP:
             case KeyEvent.KEYCODE_DPAD_DOWN:
-                if (n > 1) playChannel((index - 1 + n) % n);
+                // The remote's Chaîne +/- keys always go up and down the list; the arrows follow Réglages › Lecture.
+                boolean next = k == KeyEvent.KEYCODE_CHANNEL_UP || k == KeyEvent.KEYCODE_DPAD_UP;
+                if ((k == KeyEvent.KEYCODE_DPAD_UP || k == KeyEvent.KEYCODE_DPAD_DOWN) && Options.zapInverted(activity)) {
+                    next = !next;
+                }
+                if (n > 1) playChannel(next ? (index + 1) % n : (index - 1 + n) % n);
                 return true;
             case KeyEvent.KEYCODE_DPAD_CENTER:
             case KeyEvent.KEYCODE_ENTER:
@@ -236,6 +257,7 @@ final class LivePlayer {
         if (player != null) return;
         player = Players.build(activity);
         video.setPlayer(player);
+        Players.picture(video, activity);
         player.addListener(new Player.Listener() {
             @Override
             public void onPlayerError(PlaybackException e) {

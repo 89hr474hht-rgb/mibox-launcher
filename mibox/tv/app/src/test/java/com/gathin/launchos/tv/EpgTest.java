@@ -89,4 +89,20 @@ public class EpgTest {
         assertTrue(empty.fresh(1_000_000 + 29 * 60_000));
         assertFalse(empty.fresh(1_000_000 + 31 * 60_000));
     }
+
+    @Test
+    public void shiftMovesEveryProgrammeAndKeepsTheRest() {
+        List<Epg.Programme> in = java.util.Arrays.asList(new Epg.Programme("Journal", "Infos", 1000, 2800),
+                new Epg.Programme("Film", "", 2800, 9000));
+        List<Epg.Programme> out = Epg.shift(in, 3600);
+        assertEquals(2, out.size());
+        assertEquals(4600, out.get(0).start);
+        assertEquals(6400, out.get(0).end);
+        assertEquals("Journal", out.get(0).title);
+        assertEquals("Infos", out.get(0).description);
+        assertEquals(6400, out.get(1).start);
+        assertEquals(1000, in.get(0).start);                 // the panel's own listing is left as it was
+        assertTrue(Epg.shift(in, 0) == in);                  // no shift: nothing copied
+        assertEquals(-6200, Epg.shift(in, -7200).get(0).start);
+    }
 }

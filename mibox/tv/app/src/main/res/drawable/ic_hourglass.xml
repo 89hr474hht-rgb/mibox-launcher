@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Actualiser les listes: an hourglass, for how long the lists are kept. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp" android:height="22dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75" android:strokeLineCap="round"
+        android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M6.5,3.5h11M6.5,20.5h11M7.5,3.5c0,4.5 4.5,5.5 4.5,8.5c0,3 -4.5,4 -4.5,8.5M16.5,3.5c0,4.5 -4.5,5.5 -4.5,8.5c0,3 4.5,4 4.5,8.5" />
+</vector>

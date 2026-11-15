@@ -191,7 +191,8 @@ final class Xtream {
 
     /** The next limit programmes of a channel (the guide's timeline asks for a few hours' worth). */
     List<Epg.Programme> shortEpg(String streamId, int limit) throws XtreamException {
-        return Epg.parse(fetch("get_short_epg", "&stream_id=" + enc(streamId) + "&limit=" + limit, MAX_EPG_BYTES));
+        return Epg.shift(Epg.parse(fetch("get_short_epg", "&stream_id=" + enc(streamId) + "&limit=" + limit, MAX_EPG_BYTES)),
+                Epg.shiftSeconds());
     }
 
     private Object fetch(String action, String extra) throws XtreamException {

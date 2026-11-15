@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.gathin.launchos.design.Focus;
 import com.gathin.launchos.design.Motion;
 
+import java.util.List;
+
 /**
  * The main screen: the navigation bar along the top (Réglages, Rechercher, Accueil, TV, Films, Séries, and
  * the app's logo) and one page at a time (HomePage, LivePage with the {@link LivePlayer}, or a BrowsePage for Films
@@ -59,6 +61,8 @@ public final class MainActivity extends Activity {
     private boolean resumed;
     /** The start-up screen, while it shows (opened from the launcher, not when coming back). */
     private StartScreen start;
+    /** Where the app opens (Réglages › Général), used once, when it was started from the home screen. */
+    private Options.StartPage opening;
     private static String bannerShownFor;
     private final Updater.Listener updates = this::showUpdate;
     private Xtream.Section pendingSection;
@@ -73,7 +77,9 @@ public final class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         if (state == null && android.content.Intent.ACTION_MAIN.equals(getIntent().getAction())) {
             start = StartScreen.show(this);
+            opening = Options.startPage(this);
         }
+        Options.applyGlobals(this);
         root = findViewById(R.id.root);
         bar = findViewById(R.id.topbar);
         status = findViewById(R.id.status);
@@ -258,8 +264,27 @@ public final class MainActivity extends Activity {
             return;
         }
         status.setVisibility(View.GONE);
+        Options.StartPage open = opening;
+        opening = null;
+        if (open == Options.StartPage.LIVE || open == Options.StartPage.LAST_CHANNEL) {
+            home = false;
+            section = Xtream.Section.LIVE;
+        }
         if (home) showHome(first);
         else showSection(section, first);
+        if (open == Options.StartPage.LAST_CHANNEL) {
+            // The channel watched last plays at once, from History, even before the list is read again.
+            History h = History.get(this);
+            List<Item> last = h == null ? null : h.recentChannels(1);
+            if (last != null && !last.isEmpty()) {
+                playChannel(last.get(0));
+                // Once the list is read, Up and Down zap through it from that channel.
+                Library lib = Library.of(Xtream.Section.LIVE);
+                lib.load(api, () -> {
+                    if (lib.all() != null) player.widen(lib.all(), getString(R.string.group_all_channels));
+                });
+            }
+        }
     }
 
     // ---- sections ----

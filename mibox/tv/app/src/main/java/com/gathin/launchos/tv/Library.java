@@ -11,11 +11,13 @@ import java.util.Map;
  * One section's catalogue (channels, films or series), kept for the whole app: the categories, then every item
  * at once, read as it arrives, so the home pages can show the newest films, rows by group and search across
  * everything. A panel that refuses the whole list is read one category at a time instead ({@link #partial}).
- * Everything is kept for {@link #MAX_AGE_MS}; SyncStore drops it to read it again. Main thread only; the whole list is
+ * Everything is kept for {@link #MAX_AGE_MS} (or what Réglages chose, {@link #keepHours}); SyncStore drops it to read it again. Main thread only; the whole list is
  * read on {@link Bg#sync}, a single category on {@link Bg#run}.
  */
 final class Library {
     static final long MAX_AGE_MS = 6 * 60 * 60 * 1000L;
+    /** How long the lists are kept, as chosen in Réglages › Données (6 h unless chosen). */
+    private static long maxAgeMs = MAX_AGE_MS;
     /** How many of the newest items the home page and its hero use. */
     private static final int RECENT = 60;
 
@@ -244,9 +246,14 @@ final class Library {
         for (Runnable r : all) r.run();
     }
 
+    /** Main thread. The lists are read again by themselves once they are that many hours old. */
+    static void keepHours(int hours) {
+        maxAgeMs = Math.max(1, hours) * 60 * 60 * 1000L;
+    }
+
     private boolean fresh() {
         long age = System.currentTimeMillis() - loadedAt;
-        return age >= 0 && age < MAX_AGE_MS;
+        return age >= 0 && age < maxAgeMs;
     }
 
     // ---- indexing (background thread) ----

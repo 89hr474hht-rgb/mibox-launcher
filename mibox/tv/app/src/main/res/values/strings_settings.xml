@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Réglages since 0.10: the categories and sections, and the settings added then. -->
+<resources>
+    <string name="settings_cat_general">Général</string>
+    <string name="settings_cat_data">Données</string>
+    <string name="settings_pane_general">Le compte du fournisseur, l\'écran d\'ouverture et les mises à jour de l\'app.</string>
+    <string name="settings_pane_data">Recharger les listes du fournisseur, voir et vider ce qui est gardé sur la box, et effacer ce que l\'app retient.</string>
+
+    <string name="set_sec_start">Démarrage</string>
+    <string name="set_sec_app">Application</string>
+    <string name="set_sec_sort">Rangement</string>
+    <string name="set_sec_guide">Guide des programmes</string>
+    <string name="set_sec_hidden">Ce qui est masqué</string>
+    <string name="set_sec_groups">Groupes</string>
+    <string name="set_sec_episodes">Épisodes</string>
+    <string name="set_sec_live">Télévision</string>
+    <string name="set_sec_picture">Image</string>
+
+    <string name="set_start">Ouvrir sur</string>
+    <string name="set_start_home">Accueil</string>
+    <string name="set_start_live">TV</string>
+    <string name="set_start_last">Dernière chaîne</string>
+    <string name="set_start_home_sub">L\'accueil, avec les nouveautés et les reprises</string>
+    <string name="set_start_live_sub">La TV, sur les rayons des chaînes</string>
+    <string name="set_start_last_sub">La dernière chaîne regardée démarre tout de suite</string>
+
+    <string name="set_guide_shift">Décalage du guide</string>
+    <string name="set_guide_shift_sub">Si les programmes affichés sont en avance ou en retard sur l\'heure</string>
+    <string name="set_guide_shift_none">Aucun</string>
+    <string name="set_guide_shift_plus">+%1$d h</string>
+    <string name="set_guide_shift_minus">−%1$d h</string>
+
+    <string name="set_zap">Inverser Haut et Bas pour zapper</string>
+    <string name="set_zap_sub">Haut passe à la chaîne précédente. Les touches Chaîne + et − ne changent pas</string>
+
+    <string name="set_picture">Format de l\'image</string>
+    <string name="set_picture_fit">Adapté</string>
+    <string name="set_picture_zoom">Zoom</string>
+    <string name="set_picture_stretch">Étiré</string>
+    <string name="set_picture_fit_sub">Toute l\'image, avec des bandes noires si besoin</string>
+    <string name="set_picture_zoom_sub">Remplit l\'écran, les bords de l\'image sont coupés</string>
+    <string name="set_picture_stretch_sub">Remplit l\'écran, l\'image est étirée</string>
+
+    <string name="set_list_hours">Actualiser les listes</string>
+    <string name="set_list_hours_sub">Les listes du fournisseur se rechargent seules au bout de ce délai</string>
+    <string name="set_list_hours_n">%1$d h</string>
+</resources>

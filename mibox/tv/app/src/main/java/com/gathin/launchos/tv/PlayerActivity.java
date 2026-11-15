@@ -208,6 +208,7 @@ public final class PlayerActivity extends Activity {
         if (api == null) return;
         player = Players.build(this);
         view.setPlayer(player);
+        Players.picture(view, this);
         player.addListener(new Player.Listener() {
             @Override
             public void onPlayerError(PlaybackException e) {

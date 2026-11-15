@@ -9,12 +9,12 @@
     android:baselineAligned="false"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:minHeight="64dp"
+    android:minHeight="56dp"
     android:orientation="horizontal"
     android:paddingStart="@dimen/lo_space_4"
-    android:paddingTop="10dp"
+    android:paddingTop="8dp"
     android:paddingEnd="@dimen/lo_space_4"
-    android:paddingBottom="10dp">
+    android:paddingBottom="8dp">
 
     <ImageView
         android:id="@+id/icon"
@@ -63,12 +63,11 @@
         android:textColor="@color/lo_text_2_on_focus"
         android:textSize="@dimen/lo_text_small" />
 
-    <View
+    <com.gathin.launchos.tv.ToggleView
         android:id="@+id/toggle"
         android:layout_width="46dp"
         android:layout_height="26dp"
         android:layout_marginStart="@dimen/lo_space_3"
-        android:background="@drawable/switch_bg"
         android:visibility="gone" />
 
     <ImageView

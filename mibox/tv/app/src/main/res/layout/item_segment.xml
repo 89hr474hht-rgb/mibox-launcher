@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One value of a SegmentBar: white when focused, else clear over the bar's track and pill. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="36dp"
+    android:background="@drawable/segment_bg"
+    android:focusable="true"
+    android:clickable="true"
+    android:fontFamily="@font/launchos_medium"
+    android:gravity="center"
+    android:minWidth="58dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
+    android:singleLine="true"
+    android:textColor="@color/segment_text"
+    android:textSize="@dimen/lo_text_small" />

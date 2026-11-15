@@ -47,6 +47,15 @@ final class Players {
         return p;
     }
 
+    /** How the picture fills the screen, as chosen in Réglages › Lecture. */
+    @OptIn(markerClass = UnstableApi.class)
+    static void picture(androidx.media3.ui.PlayerView v, Context c) {
+        Options.Picture p = Options.picture(c);
+        v.setResizeMode(p == Options.Picture.ZOOM ? androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                : p == Options.Picture.STRETCH ? androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL
+                : androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT);
+    }
+
     /** True when the saved account's server is reached over https. */
     private static boolean secureServer(Context c) {
         Account a = AccountStore.load(c);

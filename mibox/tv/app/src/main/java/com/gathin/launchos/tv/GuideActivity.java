@@ -106,6 +106,7 @@ public final class GuideActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_guide);
+        Options.applyGlobals(this);
         Account a = AccountStore.load(this);
         if (a == null) {
             finish();

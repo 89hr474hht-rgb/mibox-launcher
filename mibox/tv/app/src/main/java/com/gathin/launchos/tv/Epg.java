@@ -92,6 +92,8 @@ final class Epg {
     private static final Map<String, List<Callback>> LOADING = new HashMap<>();
     private static int accountVersion = -1;
     private static int epoch;
+    /** Seconds added to every programme time (Réglages › Chaînes et guide), for a panel off by a time zone. */
+    private static volatile long shiftSec;
 
     private Epg() {
     }
@@ -147,6 +149,26 @@ final class Epg {
                 for (Callback w : all) w.done(result);
             });
         });
+    }
+
+    /** Main thread. Moves the guide by that many hours; a change drops what was read with the old times. */
+    static void shiftHours(int hours) {
+        long s = hours * 3600L;
+        if (s == shiftSec) return;
+        shiftSec = s;
+        clear();
+    }
+
+    static long shiftSeconds() {
+        return shiftSec;
+    }
+
+    /** The same programmes, moved by seconds (none when 0). Pure, for plain JVM tests. */
+    static List<Programme> shift(List<Programme> in, long seconds) {
+        if (seconds == 0) return in;
+        List<Programme> out = new ArrayList<>(in.size());
+        for (Programme p : in) out.add(new Programme(p.title, p.description, p.start + seconds, p.end + seconds));
+        return out;
     }
 
     /** Main thread. Drops every listing; answers still on their way are thrown away. */

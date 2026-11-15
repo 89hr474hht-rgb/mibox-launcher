@@ -3,22 +3,16 @@
 <resources>
     <string name="settings_version">Version %1$s</string>
 
-    <string name="settings_cat_account">Compte</string>
-    <string name="settings_cat_channels">Chaînes</string>
+    <string name="settings_cat_channels">Chaînes et guide</string>
     <string name="settings_cat_vod">Films et séries</string>
     <string name="settings_cat_play">Lecture</string>
-    <string name="settings_cat_sync">Mise à jour &amp; Cache</string>
     <string name="settings_cat_history">Historique</string>
 
-    <string name="settings_pane_account">Le compte du fournisseur utilisé sur cette box. Les réglages restent sur la box, pour ce compte.</string>
-    <string name="settings_pane_channels">Le rangement des groupes, l\'ordre des chaînes, les doublons et ce qui est masqué.</string>
+    <string name="settings_pane_channels">Le rangement des chaînes, le décalage du guide et ce qui est masqué.</string>
     <string name="settings_pane_vod">Renommer, masquer ou épingler les groupes de films et de séries.</string>
-    <string name="settings_pane_play">Ce qui se passe pendant et après la lecture.</string>
-    <string name="settings_pane_sync">Recharger les listes du fournisseur, voir et vider ce qui est gardé sur la box, et les mises à jour de l\'app.</string>
-    <string name="settings_pane_history">Ce que l\'app retient de ce qui a été regardé.</string>
+    <string name="settings_pane_play">Ce qui se passe pendant la lecture : le mini-lecteur, le zapping et le format de l\'image.</string>
 
     <string name="sync_section_lists">Listes du fournisseur</string>
-    <string name="sync_section_app">Application</string>
     <string name="sync_live">Chaînes</string>
     <string name="sync_movies">Films</string>
     <string name="sync_series">Séries</string>

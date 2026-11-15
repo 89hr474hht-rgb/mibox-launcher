@@ -104,4 +104,76 @@ final class Options {
     static void setHideAdult(Context c, boolean on) {
         p(c).edit().putBoolean("hide_adult", on).apply();
     }
+
+    /** Puts the choices the app-wide caches read (lists' age, the guide's shift) into effect. Main thread. */
+    static void applyGlobals(Context c) {
+        Library.keepHours(listHours(c));
+        Epg.shiftHours(guideShiftHours(c));
+    }
+
+    // ---- added in 0.10: each one's default is how the app behaved before, so nothing changes until chosen ----
+
+    /** Where the app opens when started from the home screen. */
+    enum StartPage { HOME, LIVE, LAST_CHANNEL }
+
+    static StartPage startPage(Context c) {
+        try {
+            return StartPage.valueOf(p(c).getString("start_page", StartPage.HOME.name()));
+        } catch (IllegalArgumentException e) {
+            return StartPage.HOME;
+        }
+    }
+
+    static void setStartPage(Context c, StartPage s) {
+        p(c).edit().putString("start_page", s.name()).apply();
+    }
+
+    /** The hours the guide is moved by, for a panel whose programme times are off by a time zone (-2 to +2). */
+    static final int[] GUIDE_SHIFTS = {-2, -1, 0, 1, 2};
+
+    static int guideShiftHours(Context c) {
+        int h = p(c).getInt("guide_shift_hours", 0);
+        return h < -2 || h > 2 ? 0 : h;
+    }
+
+    static void setGuideShiftHours(Context c, int hours) {
+        p(c).edit().putInt("guide_shift_hours", Math.max(-2, Math.min(2, hours))).apply();
+    }
+
+    /** Up on the remote while watching goes to the channel before rather than the next one. */
+    static boolean zapInverted(Context c) {
+        return p(c).getBoolean("zap_inverted", false);
+    }
+
+    static void setZapInverted(Context c, boolean on) {
+        p(c).edit().putBoolean("zap_inverted", on).apply();
+    }
+
+    /** How the picture fills the screen: whole picture, zoomed to fill (edges cut), or stretched. */
+    enum Picture { FIT, ZOOM, STRETCH }
+
+    static Picture picture(Context c) {
+        try {
+            return Picture.valueOf(p(c).getString("picture", Picture.FIT.name()));
+        } catch (IllegalArgumentException e) {
+            return Picture.FIT;
+        }
+    }
+
+    static void setPicture(Context c, Picture pic) {
+        p(c).edit().putString("picture", pic.name()).apply();
+    }
+
+    /** How long the provider's lists are kept before they are read again by themselves, in hours. */
+    static final int[] LIST_HOURS = {6, 12, 24};
+
+    static int listHours(Context c) {
+        int h = p(c).getInt("list_hours", 6);
+        for (int x : LIST_HOURS) if (x == h) return h;
+        return 6;
+    }
+
+    static void setListHours(Context c, int hours) {
+        p(c).edit().putInt("list_hours", hours).apply();
+    }
 }
