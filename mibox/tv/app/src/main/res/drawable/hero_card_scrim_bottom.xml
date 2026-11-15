@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Inside the card, at its foot: the picture settles into the card's edge and the badge stays readable. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient android:angle="90" android:startColor="#B3000000" android:endColor="#00000000" />
+</shape>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A button over a picture: frosted (translucent white) at rest, white when focused like every focused thing. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:exitFadeDuration="120">
+    <item android:state_focused="true">
+        <shape><solid android:color="@color/lo_focus" /><corners android:radius="@dimen/lo_radius_pill" /></shape>
+    </item>
+    <item>
+        <shape><solid android:color="#47FFFFFF" /><corners android:radius="@dimen/lo_radius_pill" /></shape>
+    </item>
+</selector>

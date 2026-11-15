@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Films and Séries: the badge in the spotlight card's corner. -->
+<resources>
+    <string name="badge_added_today">Ajouté aujourd\'hui</string>
+    <string name="badge_added_yesterday">Ajouté hier</string>
+    <plurals name="badge_added_days">
+        <item quantity="one">Ajouté il y a %d jour</item>
+        <item quantity="other">Ajouté il y a %d jours</item>
+    </plurals>
+    <string name="badge_updated_today">Mis à jour aujourd\'hui</string>
+    <string name="badge_updated_yesterday">Mis à jour hier</string>
+    <plurals name="badge_updated_days">
+        <item quantity="one">Mis à jour il y a %d jour</item>
+        <item quantity="other">Mis à jour il y a %d jours</item>
+    </plurals>
+</resources>

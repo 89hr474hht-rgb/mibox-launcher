@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gathin.launchos.design.Focus;
+import com.gathin.launchos.design.Motion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ final class BrowsePage {
     private static final long HERO_MS = 8000;
     private static final long SPOT_DELAY_MS = 160, PICTURE_DELAY_MS = 420, INFO_DELAY_MS = 550;
     private static final int ROW_ITEMS = 40;
+    /** The card's height once folded to its text, and how far the rows sit under it while the spotlight shows. */
+    private static final int FOLDED_DP = 186, ROWS_SHIFT_DP = 114;
 
     private enum RowKind { CONTINUE, RECENT, GROUP }
 
@@ -59,7 +62,11 @@ final class BrowsePage {
     final Xtream.Section section;
     private final boolean movies;
     private final Backdrop backdrop;
-    private final View spotlight, heroButtons, topActions, scrim;
+    private final View spotlight, heroButtons, topActions, scrim, heroCard;
+    private final TextView badge;
+    /** How far the card is folded to its text: 0 open (the spotlight), 1 folded (the rows have the focus). */
+    private float fold;
+    private android.animation.ValueAnimator folding;
     private final TextView label, title, meta, plot, heroPlay, browseStatus;
     private final View statusBox, retry;
     private final LinearLayout dots;
@@ -105,6 +112,17 @@ final class BrowsePage {
         heroButtons = root.findViewById(R.id.hero_buttons);
         topActions = root.findViewById(R.id.top_actions);
         scrim = root.findViewById(R.id.scrim_bottom);
+        heroCard = root.findViewById(R.id.hero_card);
+        badge = root.findViewById(R.id.hero_badge);
+        // The card is clipped to a rounded outline whose bottom rises as it folds: no layout pass per frame.
+        heroCard.setOutlineProvider(new android.view.ViewOutlineProvider() {
+            @Override
+            public void getOutline(View v, android.graphics.Outline o) {
+                float h = v.getHeight() - (v.getHeight() - Ui.dp(activity, FOLDED_DP)) * fold;
+                o.setRoundRect(0, 0, v.getWidth(), Math.round(h), Ui.dp(activity, 18));
+            }
+        });
+        heroCard.setClipToOutline(true);
         label = root.findViewById(R.id.spot_label);
         title = root.findViewById(R.id.spot_title);
         meta = root.findViewById(R.id.spot_meta);
@@ -153,7 +171,7 @@ final class BrowsePage {
     }
 
     private float heroShift() {
-        return Ui.dp(activity, 150);
+        return Ui.dp(activity, ROWS_SHIFT_DP);
     }
 
     // ---- showing ----
@@ -385,6 +403,7 @@ final class BrowsePage {
     /** Title, the line under it and the summary, from what is known now (a film's sheet comes later). */
     private void fillText(Item i) {
         title.setText(i.title);
+        badge(i);
         Xtream.VodInfo vi = movies ? Details.cached(i.id) : null;
         String genre = vi != null && !vi.genre.isEmpty() ? vi.genre : i.genre;
         int year = i.year != 0 ? i.year : vi != null ? vi.year : 0;
@@ -439,7 +458,10 @@ final class BrowsePage {
         heroMode = on;
         rowsView.animate().translationY(on ? heroShift() : 0).setDuration(320)
                 .setInterpolator(new DecelerateInterpolator(1.4f)).start();
-        spotlight.animate().translationY(on ? 0 : -Ui.dp(activity, 44)).setDuration(320).start();
+        foldTo(on ? 0f : 1f);
+        // Folded, the card keeps room for two lines of summary.
+        plot.setMaxLines(on ? 3 : 2);
+        badge.animate().alpha(on ? 1f : 0f).setDuration(200).start();
         heroButtons.setVisibility(on && !hero.isEmpty() ? View.VISIBLE : View.GONE);
         dots.setVisibility(on && hero.size() > 1 ? View.VISIBLE : View.GONE);
         topActions.animate().alpha(on ? 1f : 0f).setDuration(200).start();
@@ -455,6 +477,44 @@ final class BrowsePage {
             });
             picture(heroItem());
         }
+    }
+
+    /** Folds the card to its text (the rows have the focus) or opens it again, with the rows' own pace. */
+    private void foldTo(float target) {
+        if (folding != null) folding.cancel();
+        if (!Motion.on()) {
+            fold = target;
+            heroCard.invalidateOutline();
+            return;
+        }
+        folding = android.animation.ValueAnimator.ofFloat(fold, target);
+        folding.setDuration(320);
+        folding.setInterpolator(new DecelerateInterpolator(1.4f));
+        folding.addUpdateListener(a -> {
+            fold = (float) a.getAnimatedValue();
+            heroCard.invalidateOutline();
+        });
+        folding.start();
+    }
+
+    /**
+     * The badge in the card's corner: how recent the title is ("Ajouté il y a 3 jours", for a series when it last
+     * changed), up to a month; nothing when the panel does not say.
+     */
+    private void badge(Item i) {
+        long days = i == null || i.added <= 0 ? -1
+                : (System.currentTimeMillis() / 1000 - i.added) / 86_400;
+        if (days < 0 || days > 30) {
+            badge.setVisibility(View.GONE);
+            return;
+        }
+        int n = (int) days;
+        String text = n == 0 ? activity.getString(movies ? R.string.badge_added_today : R.string.badge_updated_today)
+                : n == 1 ? activity.getString(movies ? R.string.badge_added_yesterday : R.string.badge_updated_yesterday)
+                : activity.getResources().getQuantityString(movies ? R.plurals.badge_added_days
+                        : R.plurals.badge_updated_days, n, n);
+        badge.setText(text);
+        badge.setVisibility(View.VISIBLE);
     }
 
     /** A card got the focus: the spotlight follows it, its picture a little later (fast scrolling stays light). */

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Films and Séries: a charcoal page, lighter at the top, so the spotlight card stands off it. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient android:angle="270" android:startColor="#FF1E1F23" android:centerColor="#FF121316" android:endColor="#FF070708" />
+</shape>

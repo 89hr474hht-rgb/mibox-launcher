@@ -91,6 +91,11 @@
             android:layout_marginEnd="@dimen/lo_space_3"
             android:background="@color/lo_line" />
 
+        <!-- Search and the sections sit in the middle of the bar. -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
         <FrameLayout
             android:id="@+id/nav_search"
             style="@style/NavIcon"
