@@ -525,6 +525,9 @@ LaunchOS), 21 ms (catégories TV), 9 ms (sélecteurs et interrupteurs TV), 8 ms 
 | M22-03 | Sélecteur | OK sur une autre valeur ; Haut/Bas vers une ligne de valeurs | La pastille glisse ; le focus arrive sur la valeur choisie | MANUEL | Test réussi (émulateur) |
 | M22-04 | Animations coupées | Échelles d'animation à 0, changer une valeur | Pastille et aperçu changent à l'instant | MANUEL | Test réussi (émulateur) |
 | M22-05 | Réglages compacts | Ouvrir Réglages de LaunchOS et de LaunchOS TV | Texte et lignes plus petits, page de largeur fixe, espace libre à droite, rien de coupé | MANUEL | Test réussi (émulateur) |
+| M23-01 | Box inconnue | Émulateur : Réglages › Système › Boutons de la télécommande | « La télécommande de cette box n'est pas une de celles que LaunchOS connaît », aucun bouton listé | MANUEL | Test réussi (émulateur) |
+| M23-02 | Mi Box S 2e génération | Netflix, YouTube, Prime Video sur la vraie télécommande | Comme en 2.2.0 | MANUEL | Validation manuelle nécessaire |
+| M23-03 | Mi Box S (1re génération) | Netflix puis Live sur sa télécommande | Netflix ouvre Netflix, Live ouvre Mi TV+ | MANUEL | Validation manuelle nécessaire |
 | T10-10 | Démarrage plus court | Ouvrir LaunchOS TV depuis l'accueil ; appuyer sur une touche pendant l'animation | Animation d'environ 1,5 s puis l'appli ; une touche l'affiche tout de suite et compte | MANUEL | Test réussi (émulateur) |
 | T10-11 | Lecture plus rapide | Lancer une chaîne et un film, zapper | L'image arrive plus vite, sans coupures nouvelles | MANUEL | Validation manuelle nécessaire |
 

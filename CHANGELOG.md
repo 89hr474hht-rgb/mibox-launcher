@@ -5,6 +5,18 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [2.3.0] - 2026-11-15
+
+Les boutons de la télécommande suivent la box.
+
+### Modifié
+- Les boutons d'applis de la télécommande dépendent maintenant de la box, chacune avec son propre réglage :
+  - Mi Box S 2e génération : Netflix, YouTube et Prime Video, comme avant ;
+  - Mi Box S (1re génération, Android 9) : Netflix ouvre Netflix et Live ouvre Mi TV+, comme avec l'accueil
+    Xiaomi ; les deux restent modifiables (Réglages › Système › Boutons de la télécommande).
+- Sur une autre box, LaunchOS ne prend aucun bouton : la page le dit, et chaque bouton fait ce qu'Android prévoit.
+  Avant, un bouton qui envoyait le même code qu'un bouton de la 2e génération était détourné vers YouTube.
+
 ## [2.2.0] - 2026-11-15
 
 Les réglages de taille et d'opacité se voient avant d'être choisis.
