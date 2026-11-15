@@ -19,9 +19,13 @@ import com.gathin.launchos.design.Monogram;
  * back to it): the "lo" monogram writes itself, its dot settles, and "LaunchOS TV" comes in beside it; then it fades
  * out. {@link #LENGTH_MS} in all, one animator; MainActivity calls {@link #leave} on any key and lets the key through.
  * With Android's animations off it is shown still, briefly. Main thread only.
+ *
+ * <p>While it covers the window, the app behind it is made fully transparent: the renderer then skips it, so each
+ * frame of the animation draws only the monogram instead of the whole page under it, and the box's GPU and CPU are
+ * left to the first load. {@link #leave} gives the page back before the fade.
  */
 final class StartScreen {
-    private static final long LENGTH_MS = 2500;
+    private static final long LENGTH_MS = 1500;
     private static final PathInterpolator EASE = new PathInterpolator(0.2f, 0f, 0f, 1f);
     private static final PathInterpolator WRITE = new PathInterpolator(0.55f, 0f, 0.25f, 1f);
 
@@ -71,8 +75,12 @@ final class StartScreen {
     }
 
     private void start() {
+        View content = activity.findViewById(android.R.id.content);
+        if (content != null) content.setAlpha(0f);
+        // Whatever happens to the animator (the app left before its first frame), the page comes back.
+        screen.postDelayed(this::leave, LENGTH_MS + 1500);
         if (still) {
-            screen.postDelayed(this::leave, 900);
+            screen.postDelayed(this::leave, 600);
             return;
         }
         mark.written = 0f;
@@ -95,11 +103,11 @@ final class StartScreen {
 
     private void tick(long t) {
         float dp = activity.getResources().getDisplayMetrics().density;
-        mark.written = WRITE.getInterpolation(clamp((t - 80) / 900f));
-        float d = clamp((t - 880) / 420f);
+        mark.written = WRITE.getInterpolation(clamp((t - 50) / 560f));
+        float d = clamp((t - 530) / 280f);
         mark.dot = d <= 0 ? 0 : (float) (1 + 0.2 * Math.sin(Math.PI * d) * (1 - d)) * EASE.getInterpolation(d);
         mark.invalidate();
-        float s = EASE.getInterpolation(clamp((t - 1150) / 700f));
+        float s = EASE.getInterpolation(clamp((t - 700) / 450f));
         LinearLayout.LayoutParams nl = (LinearLayout.LayoutParams) name.getLayoutParams();
         lockup.setTranslationX((name.getWidth() + nl.getMarginStart()) / 2f * (1 - s));
         name.setAlpha(s);
@@ -112,13 +120,14 @@ final class StartScreen {
         leaving = true;
         if (clock != null) clock.cancel();
         View content = activity.findViewById(android.R.id.content);
+        if (content != null) content.setAlpha(1f);
         if (content != null && !still) {
             content.setScaleX(1.03f);
             content.setScaleY(1.03f);
-            content.animate().scaleX(1f).scaleY(1f).setDuration(700).setInterpolator(EASE).start();
+            content.animate().scaleX(1f).scaleY(1f).setDuration(450).setInterpolator(EASE).start();
         }
-        lockup.animate().scaleX(1.03f).scaleY(1.03f).alpha(0f).setDuration(380).setInterpolator(EASE).start();
-        screen.animate().alpha(0f).setStartDelay(still ? 0 : 100).setDuration(still ? 200 : 460).setInterpolator(EASE)
+        lockup.animate().scaleX(1.03f).scaleY(1.03f).alpha(0f).setDuration(300).setInterpolator(EASE).start();
+        screen.animate().alpha(0f).setStartDelay(still ? 0 : 60).setDuration(still ? 200 : 360).setInterpolator(EASE)
                 .withEndAction(() -> {
                     ViewGroup parent = (ViewGroup) screen.getParent();
                     if (parent != null) parent.removeView(screen);

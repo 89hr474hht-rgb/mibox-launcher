@@ -8,6 +8,7 @@ import androidx.media3.common.util.UnstableApi;
 import androidx.media3.datasource.DefaultDataSource;
 import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.HttpDataSource;
+import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
@@ -19,6 +20,9 @@ import androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory;
  * error as a sentence, and time formats. Main thread, like Media3.
  */
 final class Players {
+    static final int START_BUFFER_MS = 1500;
+    static final int RESTART_BUFFER_MS = 3000;
+
     private Players() {
     }
 
@@ -38,7 +42,14 @@ final class Players {
                         | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS)
                 .setConstantBitrateSeekingEnabled(true);
         DefaultMediaSourceFactory sources = new DefaultMediaSourceFactory(new DefaultDataSource.Factory(c, http), extractors);
+        // The picture starts once 1.5 s is buffered (Media3's default waits for 2.5 s), and 3 s after a stall instead
+        // of 5: a channel or a film shows sooner, and the 50 s kept ahead still rides out a slow panel.
+        DefaultLoadControl load = new DefaultLoadControl.Builder()
+                .setBufferDurationsMs(DefaultLoadControl.DEFAULT_MIN_BUFFER_MS, DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+                        START_BUFFER_MS, RESTART_BUFFER_MS)
+                .build();
         ExoPlayer p = new ExoPlayer.Builder(c, new DefaultRenderersFactory(c).setEnableDecoderFallback(true))
+                .setLoadControl(load)
                 .setMediaSourceFactory(sources)
                 .setSeekBackIncrementMs(10_000)
                 .setSeekForwardIncrementMs(30_000)

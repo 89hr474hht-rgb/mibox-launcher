@@ -525,6 +525,8 @@ LaunchOS), 21 ms (catégories TV), 9 ms (sélecteurs et interrupteurs TV), 8 ms 
 | M22-03 | Sélecteur | OK sur une autre valeur ; Haut/Bas vers une ligne de valeurs | La pastille glisse ; le focus arrive sur la valeur choisie | MANUEL | Test réussi (émulateur) |
 | M22-04 | Animations coupées | Échelles d'animation à 0, changer une valeur | Pastille et aperçu changent à l'instant | MANUEL | Test réussi (émulateur) |
 | M22-05 | Réglages compacts | Ouvrir Réglages de LaunchOS et de LaunchOS TV | Texte et lignes plus petits, page de largeur fixe, espace libre à droite, rien de coupé | MANUEL | Test réussi (émulateur) |
+| T10-10 | Démarrage plus court | Ouvrir LaunchOS TV depuis l'accueil ; appuyer sur une touche pendant l'animation | Animation d'environ 1,5 s puis l'appli ; une touche l'affiche tout de suite et compte | MANUEL | Test réussi (émulateur) |
+| T10-11 | Lecture plus rapide | Lancer une chaîne et un film, zapper | L'image arrive plus vite, sans coupures nouvelles | MANUEL | Validation manuelle nécessaire |
 | T10-01 | Réglages TV | Parcourir les 5 catégories | Sections titrées, une icône par fonction, valeurs côte à côte | MANUEL | Test réussi (émulateur) |
 | T10-02 | Ouvrir sur | Choisir Dernière chaîne, relancer depuis l'accueil | La dernière chaîne démarre ; Haut/Bas zappent 18 → 19 → 20 | MANUEL | Test réussi (émulateur) |
 | T10-03 | Ouvrir sur TV | Choisir TV, relancer | L'appli s'ouvre sur TV | MANUEL | Test réussi (émulateur) |

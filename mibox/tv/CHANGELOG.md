@@ -24,6 +24,9 @@ dans l'écran Mises à jour de l'appli.
 - Chaque réglage existant garde sa clé et sa valeur ; les nouveaux reprennent par défaut le comportement d'avant.
 - Les Réglages sont plus petits, comme ceux de LaunchOS : texte, lignes, icônes, interrupteurs et jauges réduits,
   et la page garde une largeur fixe au lieu de remplir tout l'écran.
+- Plus rapide : l'écran de démarrage dure 1,5 s au lieu de 2,5 s, et l'appli cachée dessous n'est plus dessinée
+  tant qu'il la couvre, ce qui laisse la box charger les listes. Une chaîne ou un film démarre dès 1,5 s de vidéo
+  reçue au lieu de 2,5 s (3 s au lieu de 5 après une coupure).
 
 ## [0.9.0] - 2026-11-15
 
