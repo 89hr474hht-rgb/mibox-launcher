@@ -6,6 +6,22 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.9.0] - 2026-11-15
+
+### Ajouté
+- Une barre de navigation en haut : Réglages à gauche, puis Rechercher, Accueil, TV, Films et Séries, et le petit
+  logo à droite. Elle s'efface quand on descend dans les rangées et revient en haut.
+- TV rangée pour le direct : Favoris, Récentes, puis un rayon par thème (Généralistes dans l'ordre de la TNT, Info,
+  Sport, Cinéma, Jeunesse…), un rayon par autre pays, et les groupes du fournisseur tels quels, un cran plus loin.
+- Une chaîne proposée en plusieurs versions (HD, SD, 4K, ou dans deux groupes) n'apparaît qu'une fois, avec ses
+  versions indiquées ; chacune reste disponible depuis l'appui long (« Regarder en 4K »).
+- Onglets En direct et Guide en tête de la section TV.
+
+### Modifié
+- Le menu latéral disparaît ; les pages commencent sous la barre.
+- Le classement n'est qu'une présentation : rien n'est changé dans les listes du fournisseur, et deux chaînes
+  différentes ne sont jamais réunies parce que leurs noms se ressemblent.
+
 ## [0.8.0] - 2026-11-14
 
 Mise à niveau : le système de design commun avec LaunchOS, une appli plus stable et plus discrète. Aucune fonction

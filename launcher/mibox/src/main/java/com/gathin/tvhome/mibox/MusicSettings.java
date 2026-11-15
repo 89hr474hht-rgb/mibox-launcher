@@ -111,7 +111,7 @@ final class MusicSettings implements MusicLibrary.Listener {
             first = false;
             TextView row = rowStyle == 0 ? new TextView(activity) : new TextView(activity, null, 0, rowStyle);
             row.setCompoundDrawablesRelativeWithIntrinsicBounds(v.removable ? R.drawable.mibox_tile_storage
-                    : R.drawable.mibox_tile_device, 0, 0, 0);
+                    : R.drawable.mibox_tile_box, 0, 0, 0);
             String name = v.name;
             if (v.tracks > 0) {
                 name += " · " + activity.getResources().getQuantityString(R.plurals.mibox_music_tracks, v.tracks, v.tracks);

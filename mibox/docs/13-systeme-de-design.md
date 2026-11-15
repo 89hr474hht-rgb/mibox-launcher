@@ -14,6 +14,15 @@ leurs ressources et trois classes Java ; une valeur changée là change les deux
 - **Des animations rares** : deux courbes (`Motion.ENTER` pour ce qui arrive, `Motion.MOVE` pour ce qui se déplace),
   trois durées (120, 220, 360 ms). Rien ne tourne en boucle. Animations d'Android coupées : rien ne bouge.
 
+## Transitions (LaunchOS 2.1)
+
+- Un écran du module Mi Box s'ouvre en fondu en montant de 2,5 % (220 ms) et se ferme en descendant (160 ms) ; un
+  écran ouvert depuis une ligne des Réglages entre par la droite et repart par la droite. Le module les pose sur
+  chaque fenêtre ; le thème du launcher d'origine n'est pas modifié.
+- Une page de réglages arrive du côté vers lequel la télécommande s'est déplacée.
+- Les menus du haut s'ouvrent en descendant de la pastille et se ferment de même, Retour compris.
+- LaunchOS TV : la barre du haut s'efface dans les rangées et revient en haut ; le reste du langage est le même.
+
 ## Valeurs
 
 | Jeton | Valeur | Usage |

@@ -490,6 +490,28 @@ n'est pas testé.
 | T08-09 | Réglages | Jauges, Vider le cache, effacer les favoris | Second OK demandé ; textes lisibles sur le focus blanc | MANUEL | Test partiel (double confirmation des favoris vérifiée ; Vider le cache non testé) |
 | T08-10 | Vrai serveur | Chaînes, films, séries sur la box | Comme avant | MANUEL | Validation manuelle nécessaire |
 
+## C duovicies. LaunchOS 2.1.0 et LaunchOS TV 0.9.0 : réglages, menus, transitions, barre du haut, rangement TV
+
+Émulateur Android TV (API 31) ; serveur factice pour LaunchOS TV, avec des cas difficiles (versions HD/SD/4K, même
+chaîne dans deux groupes, chaînes étrangères, noms décorés ou vides, sans logo, sans guide). Mesures de fluidité :
+`audits/apercus/2.1.0/mesures.md` (non versionné).
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| M21-01 | Réglages | Parcourir les 5 catégories | Sections titrées, une icône par fonction, chaque page ouverte sur son titre | MANUEL | Test réussi (émulateur) |
+| M21-02 | Réglages conservés | Changer 4 réglages en 2.0.0, installer 2.1.0 | Applis par ligne, dock, format de l'heure, carte musique inchangés | MANUEL | Test réussi (émulateur) |
+| M21-03 | Menus du haut | Ouvrir et fermer réseau, Bluetooth, minuteur, avec Retour | Même présentation ; fermeture animée ; le focus revient sur la pastille | MANUEL | Test réussi (émulateur, sans appareil Bluetooth) |
+| M21-04 | Transitions | Ouvrir et fermer Réglages, Mises à jour, Boutons, fiche d'une appli | Fondu court ; Retour rend le focus à l'élément qui a ouvert | MANUEL | Test réussi (émulateur) |
+| M21-05 | Animations coupées | Échelles d'animation à 0 | Menus et pages s'affichent à l'instant, rien ne reste à l'écran | MANUEL | Test réussi (émulateur) |
+| M21-06 | Veille sans permission | Ouvrir Veille sans `WRITE_SECURE_SETTINGS` | Choix grisés, message clair, réglage Android accessible | MANUEL | Non testé (permission accordée sur l'émulateur pour l'étude) |
+| T09-01 | Barre du haut | Haut depuis une page, Gauche/Droite, Bas | Entre sur la section affichée, change de section, revient dans la page | MANUEL | Test réussi (émulateur) |
+| T09-02 | Barre qui s'efface | Descendre dans les rangées de Films puis remonter | La barre s'efface puis revient | MANUEL | Test réussi (émulateur) |
+| T09-03 | Rayons TV | Parcourir Favoris, Récentes, thèmes, pays, groupes du fournisseur | Rayons justes ; Retour depuis les groupes revient aux rayons | MANUEL | Test réussi (émulateur) |
+| T09-04 | Versions | Appui long sur une chaîne en HD et 4K | « Regarder en 4K » proposé ; Favoris et Masquer agissent sur la chaîne | MANUEL | Test partiel (lancement d'une autre version non testé) |
+| T09-05 | Favori sur une version | Ajouter une version aux favoris | L'étoile apparaît, le rayon Favoris la contient | MANUEL | Test réussi (émulateur) |
+| T09-06 | En direct / Guide | Haut depuis les rayons, Droite, OK, Retour | Le guide s'ouvre et Retour revient à TV | MANUEL | Test réussi (émulateur) |
+| T09-07 | Vraies listes | Rangement avec le fournisseur réel sur la box | Rayons cohérents, aucune chaîne perdue | MANUEL | Validation manuelle nécessaire |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.

@@ -5,6 +5,26 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [2.1.0] - 2026-11-15
+
+Refonte ciblée : l'accueil ne change pas ; les réglages, les menus du haut et les transitions sont repensés.
+
+### Modifié
+- Réglages en cinq catégories au lieu de sept : Écran d'accueil (disposition, horloge, applis), Apparence, Veille,
+  Musique et une nouvelle page Système (Wi-Fi et réseau, Bluetooth, télécommande, démarrage, mises à jour,
+  appareil). Chaque page a des sections titrées et s'ouvre sur son titre.
+- Plus compact : lignes de 48 dp, texte de 16 sp, aides plus discrètes, colonne des catégories plus étroite.
+- Une icône par fonction (seize nouvelles) : plus d'engrenage, d'horloge ou de maison répétés.
+- Menus Wi-Fi, Bluetooth et minuteur : une seule présentation et une seule navigation pour les trois ; ils se
+  ferment avec le même mouvement qu'à l'ouverture, Retour compris, et gardent la ligne choisie quand la liste change.
+- Transitions : Réglages, le lecteur et l'aperçu de la veille apparaissent en fondu en montant un peu ; Mises à
+  jour et Boutons de la télécommande entrent par la droite et repartent par la droite avec Retour. Une page de
+  réglages arrive du côté vers lequel on se déplace. Animations d'Android coupées : tout s'affiche à l'instant.
+- Veille : sans la permission d'Android, les choix de l'économiseur sont grisés et le message dit comment faire.
+
+### Interne
+- Aucun réglage enregistré ne change : `PreferenceKeysTest` fige la liste des fichiers et clés de préférences.
+
 ## [2.0.0] - 2026-11-14
 
 Mise à niveau : un seul système de design pour LaunchOS et LaunchOS TV, un lecteur plus fiable, du code rangé.
