@@ -228,6 +228,8 @@
     <string name="mibox_settings_title">Réglages</string>
     <string name="mibox_set_section_system">Système</string>
     <string name="mibox_set_hint_system">Connexions, télécommande, démarrage, mises à jour et appareil.</string>
+    <string name="mibox_preview_caption">L\'écran d\'accueil tel qu\'il sera. L\'aperçu suit la sélection ; OK garde le choix.</string>
+    <string name="mibox_preview_peek">Aperçu · OK pour garder</string>
     <string name="mibox_set_group_layout">Disposition</string>
     <string name="mibox_set_group_clock">Horloge</string>
     <string name="mibox_set_group_apps">Applis</string>

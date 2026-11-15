@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A segmented choice's text: dark on the white focus, white on the current value, dimmer for the others. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/lo_on_focus" android:state_focused="true" />
+    <item android:color="@color/lo_text_3" android:state_enabled="false" />
+    <item android:color="@color/lo_text" android:state_selected="true" />
+    <item android:color="@color/lo_text_2" />
+</selector>

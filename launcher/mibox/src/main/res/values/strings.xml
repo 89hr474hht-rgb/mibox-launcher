@@ -229,6 +229,8 @@
     <string name="mibox_settings_title">Settings</string>
     <string name="mibox_set_section_system">System</string>
     <string name="mibox_set_hint_system">Connections, the remote, start-up, updates and the device.</string>
+    <string name="mibox_preview_caption">The home screen as it will look. It follows the focus; OK keeps the choice.</string>
+    <string name="mibox_preview_peek">Preview · OK to keep</string>
     <string name="mibox_set_group_layout">Layout</string>
     <string name="mibox_set_group_clock">Clock</string>
     <string name="mibox_set_group_apps">Apps</string>

@@ -90,6 +90,7 @@ final class SettingsPanes {
         categories[categories.length - 1].setNextFocusDownId(categories[categories.length - 1].getId());
         sleepPage();
         systemPage();
+        homePreview();
         optionalRows();
         music = MusicSettings.attach(activity, () -> {
             if (shown == MUSIC) wireEdges(panes[MUSIC], categories[MUSIC]);
@@ -140,7 +141,16 @@ final class SettingsPanes {
     private boolean enterPane() {
         List<View> f = focusables(panes[shown]);
         if (f.isEmpty()) return false;
-        f.get(0).requestFocus();
+        View first = f.get(0);
+        // A line of choices is entered on its current value, as the remote enters it from above or below.
+        if (first.getParent() instanceof com.gathin.launchos.design.SegmentBar) {
+            ViewGroup bar = (ViewGroup) first.getParent();
+            for (int i = 0; i < bar.getChildCount(); i++) {
+                View c = bar.getChildAt(i);
+                if (c.isSelected() && c.getVisibility() == View.VISIBLE && c.isFocusable()) first = c;
+            }
+        }
+        first.requestFocus();
         return true;
     }
 
@@ -187,6 +197,92 @@ final class SettingsPanes {
             }
             if (c instanceof ViewGroup) collect((ViewGroup) c, out);
         }
+    }
+
+    // ---- Écran d'accueil: the live picture beside the layout's choices ----
+
+    private static final int[] DOCK_OPACITIES = {100, 70, 50, 30};
+    private HomePreview preview;
+    private final View[][] layoutChoices = new View[3][];
+
+    /**
+     * The picture follows the focus over the columns, the rows under the dock and the dock's opacity: a choice only
+     * looked at is shown marked "Aperçu", and once chosen (upstream selects it on OK) it is shown as the home screen
+     * will be. Leaving the three lines puts back what is chosen.
+     */
+    private void homePreview() {
+        View v = UpstreamViews.find(activity, "miboxHomePreview");
+        if (!(v instanceof HomePreview)) return;
+        preview = (HomePreview) v;
+        String[][] ids = {{"columns4", "columns5", "columns6", "columns7"}, {"rows0", "rows1", "rows2", "rows3"},
+                {"dock100", "dock70", "dock50", "dock30"}};
+        for (int line = 0; line < ids.length; line++) {
+            layoutChoices[line] = new View[ids[line].length];
+            for (int i = 0; i < ids[line].length; i++) {
+                View c = UpstreamViews.find(activity, ids[line][i]);
+                if (c == null) return;
+                layoutChoices[line][i] = c;
+            }
+        }
+        for (int line = 0; line < layoutChoices.length; line++) {
+            int l = line;
+            for (int i = 0; i < layoutChoices[line].length; i++) {
+                int index = i;
+                View c = layoutChoices[line][i];
+                View.OnFocusChangeListener before = c.getOnFocusChangeListener();
+                c.setOnFocusChangeListener((view, focused) -> {
+                    if (before != null) before.onFocusChange(view, focused);
+                    if (focused) looked(l, index);
+                    else view.post(() -> {
+                        if (!inLayoutChoices(activity.getCurrentFocus())) showChosen(true);
+                    });
+                });
+            }
+            if (layoutChoices[line][0].getParent() instanceof com.gathin.launchos.design.SegmentBar) {
+                ((com.gathin.launchos.design.SegmentBar) layoutChoices[line][0].getParent())
+                        .setListener(choice -> showChosen(true));
+            }
+        }
+        // The clock in the picture follows Horloge, at once.
+        String[] clockIds = {"clockSystem", "clock12", "clock24"};
+        for (int i = 0; i < clockIds.length; i++) {
+            View c = UpstreamViews.find(activity, clockIds[i]);
+            if (c != null && c.isSelected()) preview.clock(i);
+            if (c != null && i == 0 && c.getParent() instanceof com.gathin.launchos.design.SegmentBar) {
+                ((com.gathin.launchos.design.SegmentBar) c.getParent()).setListener(choice ->
+                        preview.clock(((ViewGroup) choice.getParent()).indexOfChild(choice)));
+            }
+        }
+        showChosen(false);
+    }
+
+    private boolean inLayoutChoices(View f) {
+        if (f == null) return false;
+        for (View[] line : layoutChoices) for (View c : line) if (c == f) return true;
+        return false;
+    }
+
+    private int chosen(int line) {
+        View[] l = layoutChoices[line];
+        for (int i = 0; i < l.length; i++) if (l[i].isSelected()) return i;
+        return line == 0 ? 2 : 0;
+    }
+
+    private void showChosen(boolean animate) {
+        if (preview == null) return;
+        preview.applied(chosen(0) + 4, chosen(1), DOCK_OPACITIES[chosen(2)], animate);
+    }
+
+    /** The focus is on a choice: the picture shows it, marked as a preview while it is not the chosen one. */
+    private void looked(int line, int index) {
+        if (preview == null) return;
+        int[] v = {chosen(0), chosen(1), chosen(2)};
+        if (v[line] == index) {
+            showChosen(true);
+            return;
+        }
+        v[line] = index;
+        preview.peek(v[0] + 4, v[1], DOCK_OPACITIES[v[2]], activity.getString(R.string.mibox_preview_peek));
     }
 
     // ---- Système ----

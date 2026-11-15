@@ -31,7 +31,8 @@ public class UpstreamHooksTest {
 
     private static final Pattern ID = Pattern.compile("@\\+id/(\\w+)");
     private static final Pattern STYLE = Pattern.compile("<style\\s+name=\"([\\w.]+)\"");
-    private static final Pattern LOOKUP = Pattern.compile("UpstreamViews\\.(find|id|style)\\(\\s*\\w+,\\s*\"(\\w+)\"");
+    private static final Pattern ARRAY = Pattern.compile("<string-array\\s+name=\"(\\w+)\"");
+    private static final Pattern LOOKUP = Pattern.compile("UpstreamViews\\.(find|id|style|array)\\(\\s*\\w+,\\s*\"(\\w+)\"");
     private static final Pattern FORK_ID_LITERAL = Pattern.compile("\"(mibox[A-Z]\\w+)\"");
 
     @Test
@@ -46,12 +47,13 @@ public class UpstreamHooksTest {
 
     @Test
     public void everyNameLookedUpExists() throws IOException {
-        Set<String> ids = new HashSet<>(), styles = new HashSet<>();
+        Set<String> ids = new HashSet<>(), styles = new HashSet<>(), arrays = new HashSet<>();
         for (Path res : new Path[]{APP_RES, FORK_RES, OWN_RES}) {
             for (Path f : xml(res)) {
                 String s = read(f);
                 collect(ID, s, ids);
                 collect(STYLE, s, styles);
+                collect(ARRAY, s, arrays);
             }
         }
         List<String> missing = new ArrayList<>();
@@ -59,8 +61,8 @@ public class UpstreamHooksTest {
             String s = read(f);
             Matcher m = LOOKUP.matcher(s);
             while (m.find()) {
-                boolean style = "style".equals(m.group(1));
-                if (!(style ? styles : ids).contains(m.group(2))) missing.add(f.getFileName() + ": " + m.group(2));
+                Set<String> names = "style".equals(m.group(1)) ? styles : "array".equals(m.group(1)) ? arrays : ids;
+                if (!names.contains(m.group(2))) missing.add(f.getFileName() + ": " + m.group(2));
             }
             Matcher fork = FORK_ID_LITERAL.matcher(s);
             while (fork.find()) {

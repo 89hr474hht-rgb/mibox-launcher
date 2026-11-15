@@ -110,39 +110,72 @@
                 <TextView style="@style/MiboxSetPaneHint" android:text="@string/mibox_set_hint_home" />
 
                 <TextView style="@style/MiboxSetSectionFirst" android:text="@string/mibox_set_group_layout" />
-                <LinearLayout style="@style/MiboxSetGroup">
+                <!-- The layout's three choices, and next to them a live picture of the home screen that follows the
+                     focus (HomePreview, wired by SettingsPanes). -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+                <LinearLayout
+                    style="@style/MiboxSetGroup"
+                    android:layout_width="0dp"
+                    android:layout_weight="1">
                     <TextView
                         style="@style/MiboxSetLabel"
                         android:drawableStart="@drawable/mibox_tile_columns"
                         android:text="@string/columns_label" />
-                    <LinearLayout style="@style/MiboxSetSegments">
+                    <com.gathin.tvhome.mibox.MiboxSegments style="@style/MiboxSetSegments">
                         <TextView android:id="@+id/columns4" style="@style/MiboxSetSegment" android:text="4" />
                         <TextView android:id="@+id/columns5" style="@style/MiboxSetSegment" android:text="5" />
                         <TextView android:id="@+id/columns6" style="@style/MiboxSetSegment" android:text="6" />
                         <TextView android:id="@+id/columns7" style="@style/MiboxSetSegment" android:text="7" />
-                    </LinearLayout>
+                    </com.gathin.tvhome.mibox.MiboxSegments>
                     <View style="@style/MiboxSetDivider" />
                     <TextView
                         style="@style/MiboxSetLabel"
                         android:drawableStart="@drawable/mibox_tile_rows"
                         android:text="@string/rows_below_dock_label" />
-                    <LinearLayout style="@style/MiboxSetSegments">
+                    <com.gathin.tvhome.mibox.MiboxSegments style="@style/MiboxSetSegments">
                         <TextView android:id="@+id/rows0" style="@style/MiboxSetSegment" android:text="0" />
                         <TextView android:id="@+id/rows1" style="@style/MiboxSetSegment" android:text="1" />
                         <TextView android:id="@+id/rows2" style="@style/MiboxSetSegment" android:text="2" />
                         <TextView android:id="@+id/rows3" style="@style/MiboxSetSegment" android:text="3" />
-                    </LinearLayout>
+                    </com.gathin.tvhome.mibox.MiboxSegments>
                     <View style="@style/MiboxSetDivider" />
                     <TextView
                         style="@style/MiboxSetLabel"
                         android:drawableStart="@drawable/mibox_tile_dock"
                         android:text="@string/dock_opacity_label" />
-                    <LinearLayout style="@style/MiboxSetSegments">
+                    <com.gathin.tvhome.mibox.MiboxSegments style="@style/MiboxSetSegments">
                         <TextView android:id="@+id/dock100" style="@style/MiboxSetSegment" android:text="100%" />
                         <TextView android:id="@+id/dock70" style="@style/MiboxSetSegment" android:text="70%" />
                         <TextView android:id="@+id/dock50" style="@style/MiboxSetSegment" android:text="50%" />
                         <TextView android:id="@+id/dock30" style="@style/MiboxSetSegment" android:text="30%" />
-                    </LinearLayout>
+                    </com.gathin.tvhome.mibox.MiboxSegments>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="252dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/lo_space_4"
+                    android:orientation="vertical">
+                    <com.gathin.tvhome.mibox.HomePreview
+                        android:id="@+id/miboxHomePreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/miboxHomePreviewCaption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_horizontal"
+                        android:fontFamily="@font/launchos_regular"
+                        android:lineSpacingMultiplier="1.15"
+                        android:text="@string/mibox_preview_caption"
+                        android:textColor="@color/lo_text_3"
+                        android:textSize="@dimen/lo_text_label" />
+                </LinearLayout>
                 </LinearLayout>
 
                 <TextView style="@style/MiboxSetSection" android:text="@string/mibox_set_group_clock" />
@@ -151,11 +184,11 @@
                         style="@style/MiboxSetLabel"
                         android:drawableStart="@drawable/mibox_tile_clock"
                         android:text="@string/mibox_set_time_format" />
-                    <LinearLayout style="@style/MiboxSetSegments">
+                    <com.gathin.tvhome.mibox.MiboxSegments style="@style/MiboxSetSegments">
                         <TextView android:id="@+id/clockSystem" style="@style/MiboxSetSegment" android:text="@string/clock_format_system" />
                         <TextView android:id="@+id/clock12" style="@style/MiboxSetSegment" android:text="@string/clock_format_12" />
                         <TextView android:id="@+id/clock24" style="@style/MiboxSetSegment" android:text="@string/clock_format_24" />
-                    </LinearLayout>
+                    </com.gathin.tvhome.mibox.MiboxSegments>
                 </LinearLayout>
 
                 <!-- Upstream shows "Réorganiser" only where it applies; while it is hidden, so is its group. -->
@@ -233,23 +266,23 @@
                         style="@style/MiboxSetLabel"
                         android:drawableStart="@drawable/mibox_tile_hourglass"
                         android:text="@string/mibox_dream_after" />
-                    <LinearLayout style="@style/MiboxSetSegments">
+                    <com.gathin.tvhome.mibox.MiboxSegments style="@style/MiboxSetSegments">
                         <TextView android:id="@+id/miboxDreamAfter5" style="@style/MiboxSetSegment" android:text="@string/mibox_min_5" />
                         <TextView android:id="@+id/miboxDreamAfter10" style="@style/MiboxSetSegment" android:text="@string/mibox_min_10" />
                         <TextView android:id="@+id/miboxDreamAfter15" style="@style/MiboxSetSegment" android:text="@string/mibox_min_15" />
                         <TextView android:id="@+id/miboxDreamAfter30" style="@style/MiboxSetSegment" android:text="@string/mibox_min_30" />
-                    </LinearLayout>
+                    </com.gathin.tvhome.mibox.MiboxSegments>
                     <View style="@style/MiboxSetDivider" />
                     <TextView
                         style="@style/MiboxSetLabel"
                         android:drawableStart="@drawable/mibox_tile_screen_off"
                         android:text="@string/mibox_dream_off" />
-                    <LinearLayout style="@style/MiboxSetSegments">
+                    <com.gathin.tvhome.mibox.MiboxSegments style="@style/MiboxSetSegments">
                         <TextView android:id="@+id/miboxDreamOff1" style="@style/MiboxSetSegment" android:text="@string/mibox_hour_1" />
                         <TextView android:id="@+id/miboxDreamOff2" style="@style/MiboxSetSegment" android:text="@string/mibox_hour_2" />
                         <TextView android:id="@+id/miboxDreamOff4" style="@style/MiboxSetSegment" android:text="@string/mibox_hour_4" />
                         <TextView android:id="@+id/miboxDreamOffNever" style="@style/MiboxSetSegment" android:text="@string/mibox_never" />
-                    </LinearLayout>
+                    </com.gathin.tvhome.mibox.MiboxSegments>
                 </LinearLayout>
 
                 <TextView
@@ -261,12 +294,12 @@
                         style="@style/MiboxSetLabel"
                         android:drawableStart="@drawable/mibox_tile_style"
                         android:text="@string/mibox_dream_style" />
-                    <LinearLayout style="@style/MiboxSetSegments">
+                    <com.gathin.tvhome.mibox.MiboxSegments style="@style/MiboxSetSegments">
                         <TextView android:id="@+id/miboxDreamStyleClock" style="@style/MiboxSetSegment" android:text="@string/mibox_dream_style_clock" />
                         <TextView android:id="@+id/miboxDreamStyleDate" style="@style/MiboxSetSegment" android:text="@string/mibox_dream_style_date" />
                         <TextView android:id="@+id/miboxDreamStyleSmall" style="@style/MiboxSetSegment" android:text="@string/mibox_dream_style_small" />
                         <TextView android:id="@+id/miboxDreamStyleBlack" style="@style/MiboxSetSegment" android:text="@string/mibox_dream_style_black" />
-                    </LinearLayout>
+                    </com.gathin.tvhome.mibox.MiboxSegments>
                     <View style="@style/MiboxSetDivider" />
                     <TextView
                         android:id="@+id/miboxDreamNight"

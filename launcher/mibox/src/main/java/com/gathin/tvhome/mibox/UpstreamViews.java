@@ -27,6 +27,17 @@ final class UpstreamViews {
         return id;
     }
 
+    /** A string array of the launcher's config.xml (dock_apps), or none. */
+    @SuppressWarnings("DiscouragedApi")
+    static String[] array(Context c, String name) {
+        int id = c.getResources().getIdentifier(name, "array", c.getPackageName());
+        if (id == 0) {
+            Logs.missing("UpstreamViews.array", name);
+            return new String[0];
+        }
+        return c.getResources().getStringArray(id);
+    }
+
     /** The view with that id name in the activity, or null (logged). */
     static View find(Activity a, String name) {
         int id = id(a, name);
