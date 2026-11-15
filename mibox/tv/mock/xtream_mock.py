@@ -4,7 +4,8 @@
 Usage:  python3 -I mibox/tv/mock/xtream_mock.py [--port 8080] [--episodes-as-list] [--redirect]
 
 It listens on 127.0.0.1 only. The Android emulator reaches it at http://10.0.2.2:<port>. The account is
-demo / demo; any other pair gets the "auth": 0 answer real panels give.
+demo / demo, and code1234 alone (a code-only account: the code is also its password); any other pair gets the
+"auth": 0 answer real panels give.
 
 It answers the calls the app makes, with the shapes real panels use, numbers sent as strings included:
   player_api.php                                   account and server info
@@ -39,6 +40,8 @@ from urllib.parse import parse_qs, urlparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 MEDIA = os.path.join(HERE, "media")
 USER, PASSWORD = "demo", "demo"
+# A code-only account, as some providers hand out: one code, used as both the user name and the password.
+ACCOUNTS = {(USER, PASSWORD), ("code1234", "code1234")}
 
 # Sent in this (unsorted) order, decorated as panels do. Category 6 is empty.
 LIVE_CATEGORIES = [("3", "|FR| SPORT ★"), ("1", "FR | Généralistes"), ("5", "FR | Cinéma"), ("2", "★ Information ★"),
@@ -221,7 +224,7 @@ class Handler(BaseHTTPRequestHandler):
         m = re.fullmatch(r"/(live|movie|series)/([^/]+)/([^/]+)/(\d+)\.(\w+)", url.path)
         if m:
             kind, user, password, _id, _ext = m.groups()
-            if (user, password) != (USER, PASSWORD):
+            if (user, password) not in ACCOUNTS:
                 self.send_error(401)
                 return
             if self.redirect and "r=1" not in url.query:
@@ -238,7 +241,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def api(self, q):
         user, password = q.get("username", [""])[0], q.get("password", [""])[0]
-        if (user, password) != (USER, PASSWORD):
+        if (user, password) not in ACCOUNTS:
             return self.send_json({"user_info": {"auth": 0}})
         action = q.get("action", [""])[0]
         cat = q.get("category_id", [None])[0]
@@ -374,7 +377,7 @@ def main():
     Handler.episodes_as_list = a.episodes_as_list
     Handler.redirect = a.redirect
     Handler.plain_epg = a.plain_epg
-    print(f"Fake Xtream server on http://127.0.0.1:{a.port} (emulator: http://10.0.2.2:{a.port}), account demo / demo")
+    print(f"Fake Xtream server on http://127.0.0.1:{a.port} (emulator: http://10.0.2.2:{a.port}), accounts demo / demo and code1234")
     ThreadingHTTPServer(("127.0.0.1", a.port), Handler).serve_forever()
 
 

@@ -10,13 +10,14 @@
     <string name="empty">Rien dans cette catégorie.</string>
     <string name="no_account">Aucun compte enregistré.\nOuvre « Compte » pour entrer ton serveur et tes identifiants.</string>
     <string name="account_title">Compte Xtream</string>
-    <string name="account_hint">Gardé sur cette box, chiffré. Astuce : un lien M3U complet collé dans Serveur remplit aussi l\'identifiant et le mot de passe.</string>
+    <string name="account_hint">Gardé sur cette box, chiffré. Astuce : un lien M3U complet collé dans Serveur remplit aussi l\'identifiant et le mot de passe. Pour un compte à code unique, mets le code en identifiant et laisse le mot de passe vide.</string>
     <string name="field_server">Serveur (http://adresse:port)</string>
     <string name="field_user">Identifiant</string>
-    <string name="field_password">Mot de passe</string>
+    <string name="field_password">Mot de passe (facultatif)</string>
     <string name="remove">Supprimer le compte</string>
     <string name="testing">Connexion au serveur…</string>
-    <string name="missing_fields">Remplis le serveur, l\'identifiant et le mot de passe.</string>
+    <string name="missing_fields">Remplis le serveur et l\'identifiant.</string>
+    <string name="login_code_only_refused">Ce fournisseur refuse l\'identifiant seul : ajoute le mot de passe qu\'il t\'a donné.</string>
     <string name="saved_failed">Impossible d\'enregistrer le compte sur la box (stockage chiffré indisponible).</string>
     <string name="removed">Compte supprimé de la box, avec son historique, ses favoris, ses groupes et chaînes modifiés et les images gardées.</string>
     <string name="live">EN DIRECT</string>

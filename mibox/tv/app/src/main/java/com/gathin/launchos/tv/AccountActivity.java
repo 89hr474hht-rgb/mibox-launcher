@@ -19,6 +19,8 @@ import java.util.Locale;
 
 /**
  * Connexion. The owner types the server, user name and password with the remote; the eye shows or hides the password.
+ * The password may stay empty for a code-only account: the identifier is then sent as the password too, the form
+ * such providers use (an Xtream stream address carries the password, so an empty one cannot work).
  * Se connecter tests the account with the server first (on {@link Bg#run}, the button a spinner meanwhile); only an
  * account the server accepts is kept (AccountStore), and the button then says Continuer. Supprimer le compte asks a
  * second OK ({@link Confirm}), then deletes the account and everything kept for it (AccountStore.forget).
@@ -99,10 +101,12 @@ public final class AccountActivity extends Activity {
         }
         String base = Account.normalizeServer(typed);
         String u = user.getText().toString().trim(), p = password.getText().toString();
-        if (base == null || u.isEmpty() || p.isEmpty()) {
+        if (base == null || u.isEmpty()) {
             show(getString(R.string.missing_fields), true);
             return;
         }
+        boolean codeOnly = p.isEmpty();
+        if (codeOnly) p = u;
         busy = true;
         server.setText(base);
         Account account = new Account(base, u, p);
@@ -113,7 +117,8 @@ public final class AccountActivity extends Activity {
             if (isDestroyed()) return;
             loading(false);
             if (error != null) {
-                show(error.text(this), true);
+                show(codeOnly && error.kind == XtreamException.Kind.AUTH ? getString(R.string.login_code_only_refused)
+                        : error.text(this), true);
                 return;
             }
             if (!AccountStore.save(this, account)) {
