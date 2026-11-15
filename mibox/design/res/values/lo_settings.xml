@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The settings pages' scale, in both apps. Smaller than the rest of the type scale on purpose: a settings page is
+     a list read up close to the choice, not a screen seen from the sofa, and at the full scale it looked zoomed in.
+     The page keeps a fixed width and leaves the rest of the screen empty rather than stretching to fill it. -->
+<resources>
+    <dimen name="lo_set_text_title">20sp</dimen>
+    <dimen name="lo_set_text_heading">16sp</dimen>
+    <dimen name="lo_set_text_body">14sp</dimen>
+    <dimen name="lo_set_text_small">12sp</dimen>
+    <dimen name="lo_set_text_label">11sp</dimen>
+
+    <!-- The categories' column and the page beside it. -->
+    <dimen name="lo_set_nav">224dp</dimen>
+    <dimen name="lo_set_page">520dp</dimen>
+
+    <dimen name="lo_set_category">38dp</dimen>
+    <dimen name="lo_set_row">42dp</dimen>
+    <dimen name="lo_set_icon">18dp</dimen>
+    <dimen name="lo_set_gap">12dp</dimen>
+    <dimen name="lo_set_segment">28dp</dimen>
+    <dimen name="lo_set_segment_min">44dp</dimen>
+    <dimen name="lo_set_button">36dp</dimen>
+</resources>

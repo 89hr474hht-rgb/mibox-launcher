@@ -2,15 +2,15 @@
 <!-- One value of a SegmentBar: white when focused, else clear over the bar's track and pill. -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="36dp"
+    android:layout_height="@dimen/lo_set_segment"
     android:background="@drawable/segment_bg"
     android:focusable="true"
     android:clickable="true"
     android:fontFamily="@font/launchos_medium"
     android:gravity="center"
-    android:minWidth="58dp"
-    android:paddingStart="14dp"
-    android:paddingEnd="14dp"
+    android:minWidth="@dimen/lo_set_segment_min"
+    android:paddingStart="11dp"
+    android:paddingEnd="11dp"
     android:singleLine="true"
     android:textColor="@color/segment_text"
-    android:textSize="@dimen/lo_text_small" />
+    android:textSize="@dimen/lo_set_text_small" />

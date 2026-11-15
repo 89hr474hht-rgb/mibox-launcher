@@ -16,13 +16,13 @@
         android:layout_gravity="bottom"
         android:duplicateParentState="true"
         android:orientation="vertical"
-        android:padding="@dimen/lo_space_4">
+        android:padding="@dimen/lo_space_3">
 
         <ImageView
             android:id="@+id/gauge_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginBottom="@dimen/lo_space_3"
+            android:layout_width="@dimen/lo_set_icon"
+            android:layout_height="@dimen/lo_set_icon"
+            android:layout_marginBottom="@dimen/lo_space_2"
             android:duplicateParentState="true"
             android:importantForAccessibility="no"
             android:tint="@color/lo_icon_on_focus" />
@@ -35,7 +35,7 @@
             android:duplicateParentState="true"
             android:singleLine="true"
             android:textColor="@color/lo_text_on_focus"
-            android:textSize="@dimen/lo_text_body" />
+            android:textSize="@dimen/lo_set_text_body" />
 
         <TextView
             android:id="@+id/gauge_status"
@@ -47,7 +47,7 @@
             android:maxLines="2"
             android:minLines="2"
             android:textColor="@color/lo_text_2_on_focus"
-            android:textSize="@dimen/lo_text_small" />
+            android:textSize="@dimen/lo_set_text_small" />
     </LinearLayout>
 
     <TextView
@@ -55,10 +55,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_margin="@dimen/lo_space_4"
+        android:layout_margin="@dimen/lo_space_3"
         android:duplicateParentState="true"
         android:fontFamily="@font/launchos_bold"
         android:textColor="@color/lo_text_on_focus"
-        android:textSize="@dimen/lo_text_heading"
+        android:textSize="@dimen/lo_set_text_heading"
         android:visibility="gone" />
 </merge>

@@ -3,6 +3,7 @@
     style="@style/Label"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="14dp"
-    android:layout_marginBottom="10dp"
-    android:paddingStart="4dp" />
+    android:layout_marginTop="12dp"
+    android:layout_marginBottom="4dp"
+    android:paddingStart="4dp"
+    android:textSize="@dimen/lo_set_text_label" />

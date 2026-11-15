@@ -22,6 +22,8 @@ dans l'écran Mises à jour de l'appli.
 - Les réglages à plusieurs valeurs se choisissent côte à côte, avec une pastille qui glisse jusqu'au choix ; les
   interrupteurs glissent ; les pages arrivent du côté où va la télécommande, comme dans LaunchOS.
 - Chaque réglage existant garde sa clé et sa valeur ; les nouveaux reprennent par défaut le comportement d'avant.
+- Les Réglages sont plus petits, comme ceux de LaunchOS : texte, lignes, icônes, interrupteurs et jauges réduits,
+  et la page garde une largeur fixe au lieu de remplir tout l'écran.
 
 ## [0.9.0] - 2026-11-15
 

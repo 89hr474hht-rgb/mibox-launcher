@@ -73,7 +73,7 @@ public final class ToggleView extends View {
         edge.setAlpha(Math.round(255 * (1 - t)));
         r.inset(edge.getStrokeWidth() / 2, edge.getStrokeWidth() / 2);
         canvas.drawRoundRect(r, h / 2, h / 2, edge);
-        float radius = 10 * d, inset = 3 * d;
+        float inset = 2.5f * d, radius = h / 2 - inset;
         float x = inset + radius + (w - 2 * (inset + radius)) * t;
         knob.setColor(blend(knobOff, knobOn, t));
         canvas.drawCircle(x, h / 2, radius, knob);

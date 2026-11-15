@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Settings icon (device): a thin line, tinted by the row (white, dark when focused). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    android:width="20dp" android:height="20dp" android:viewportWidth="24" android:viewportHeight="24">
     <path android:pathData="M4,7h9M17,7h3M4,17h3M11,17h9M15,4.5v5M9,14.5v5" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.75"
         android:strokeLineCap="round" android:strokeLineJoin="round" />
 </vector>

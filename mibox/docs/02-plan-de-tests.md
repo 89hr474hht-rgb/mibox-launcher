@@ -524,9 +524,10 @@ LaunchOS), 21 ms (catégories TV), 9 ms (sélecteurs et interrupteurs TV), 8 ms 
 | M22-02 | Aperçu fidèle | Garder 5 colonnes puis 2 rangées et 30 %, revenir à l'accueil | Même taille de tuiles, dock à la même hauteur (à ~10 dp près), même opacité | MANUEL | Test réussi (émulateur) |
 | M22-03 | Sélecteur | OK sur une autre valeur ; Haut/Bas vers une ligne de valeurs | La pastille glisse ; le focus arrive sur la valeur choisie | MANUEL | Test réussi (émulateur) |
 | M22-04 | Animations coupées | Échelles d'animation à 0, changer une valeur | Pastille et aperçu changent à l'instant | MANUEL | Test réussi (émulateur) |
+| M22-05 | Réglages compacts | Ouvrir Réglages de LaunchOS et de LaunchOS TV | Texte et lignes plus petits, page de largeur fixe, espace libre à droite, rien de coupé | MANUEL | Test réussi (émulateur) |
 | T10-01 | Réglages TV | Parcourir les 5 catégories | Sections titrées, une icône par fonction, valeurs côte à côte | MANUEL | Test réussi (émulateur) |
 | T10-02 | Ouvrir sur | Choisir Dernière chaîne, relancer depuis l'accueil | La dernière chaîne démarre ; Haut/Bas zappent 18 → 19 → 20 | MANUEL | Test réussi (émulateur) |
-| T10-03 | Ouvrir sur TV | Choisir TV, relancer | L'appli s'ouvre sur TV | MANUEL | Non testé |
+| T10-03 | Ouvrir sur TV | Choisir TV, relancer | L'appli s'ouvre sur TV | MANUEL | Test réussi (émulateur) |
 | T10-04 | Zapping inversé | Activer, relancer, Haut | De la chaîne 20 à la 19 | MANUEL | Test réussi (émulateur) |
 | T10-05 | Touches Chaîne + / − | Avec l'inversion | Inchangées | MANUEL | Validation manuelle nécessaire (pas de touche Chaîne sur l'émulateur) |
 | T10-06 | Décalage du guide | +1 h | « Météo » de 10:00 passe à 11:00 | MANUEL | Test réussi (émulateur) |

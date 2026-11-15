@@ -20,6 +20,8 @@ Les réglages de taille et d'opacité se voient avant d'être choisis.
 - Chaque réglage à plusieurs valeurs (colonnes, rangées, opacité, format de l'heure, veille) est un sélecteur sur une
   piste sombre ; une pastille cernée de doré glisse jusqu'à la valeur choisie. Venant du dessus ou du dessous, la
   télécommande arrive sur la valeur choisie, et entrer dans une page aussi.
+- Les Réglages sont plus petits : texte, lignes, icônes et choix réduits, colonne des catégories plus étroite, et la
+  page garde une largeur fixe au lieu de remplir tout l'écran ; les choix ne s'étirent plus sur toute la ligne.
 - Aucun réglage, aucune clé ni aucun identifiant ne change ; le launcher d'origine reste identique à l'octet.
 
 ## [2.1.0] - 2026-11-15

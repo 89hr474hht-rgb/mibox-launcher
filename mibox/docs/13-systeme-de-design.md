@@ -36,6 +36,7 @@ leurs ressources et trois classes Java ; une valeur changée là change les deux
 | `lo_focus`, `lo_on_focus` | blanc, presque noir | Élément qui a le focus |
 | `lo_error`, `lo_ok` | rouge, vert | États |
 | Tailles de texte | 40, 28, 20, 16, 14 sp (13 pour les étiquettes) | Affichage, titre, intitulé, texte, petit |
+| Réglages (lo_settings.xml) | 20, 16, 14, 12 sp (11 pour les étiquettes) ; catégories 224 dp, page 520 dp, lignes 42 dp | Plus petit que le reste : une page de réglages se lit de près, et la page ne remplit pas l'écran |
 | Rayons | 12 dp (ligne), 20 dp (panneau), pilule | |
 | Espacements | pas de 4 et 8 dp ; cadre de page 48 × 27 dp | Zone sûre de Google TV |
 

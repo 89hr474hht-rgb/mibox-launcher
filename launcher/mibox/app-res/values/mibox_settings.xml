@@ -9,7 +9,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:padding">6dp</item>
+        <item name="android:padding">4dp</item>
         <item name="android:background">@drawable/mibox_set_group_bg</item>
     </style>
 
@@ -17,11 +17,11 @@
     <style name="MiboxSetSection">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">22dp</item>
-        <item name="android:layout_marginBottom">6dp</item>
-        <item name="android:paddingStart">14dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:paddingStart">12dp</item>
         <item name="android:textColor">@color/lo_text_3</item>
-        <item name="android:textSize">@dimen/lo_text_label</item>
+        <item name="android:textSize">@dimen/lo_set_text_label</item>
         <item name="android:fontFamily">@font/launchos_medium</item>
     </style>
 
@@ -33,15 +33,15 @@
     <!-- A row that opens something or switches something: icon, title, and an arrow or a tick. -->
     <style name="MiboxSetRow">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_height">@dimen/lo_set_row</item>
         <item name="android:gravity">center_vertical|start</item>
-        <item name="android:paddingStart">14dp</item>
-        <item name="android:paddingEnd">14dp</item>
-        <item name="android:drawablePadding">14dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:drawablePadding">@dimen/lo_set_gap</item>
         <item name="android:drawableTint">@color/lo_icon_on_focus</item>
         <item name="android:background">@drawable/mibox_set_row_bg</item>
         <item name="android:textColor">@color/lo_text_on_focus</item>
-        <item name="android:textSize">@dimen/lo_text_body</item>
+        <item name="android:textSize">@dimen/lo_set_text_body</item>
         <item name="android:fontFamily">@font/launchos_medium</item>
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
@@ -58,50 +58,52 @@
     <!-- The title of a segmented setting: its icon and name, not focusable; the choices follow below. -->
     <style name="MiboxSetLabel">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_height">36dp</item>
         <item name="android:gravity">center_vertical|start</item>
-        <item name="android:paddingStart">14dp</item>
-        <item name="android:drawablePadding">14dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:drawablePadding">@dimen/lo_set_gap</item>
         <item name="android:drawableTint">@color/lo_text</item>
         <item name="android:textColor">@color/lo_text</item>
-        <item name="android:textSize">@dimen/lo_text_body</item>
+        <item name="android:textSize">@dimen/lo_set_text_body</item>
         <item name="android:fontFamily">@font/launchos_medium</item>
     </style>
 
     <!-- The row of choices under a label, lined up with the label's text. -->
     <style name="MiboxSetSegments">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
-        <item name="android:paddingStart">52dp</item>
-        <item name="android:paddingEnd">8dp</item>
-        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">42dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:paddingBottom">8dp</item>
     </style>
 
     <style name="MiboxSetSegment">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">36dp</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_marginEnd">6dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/lo_set_segment</item>
+        <item name="android:layout_marginEnd">4dp</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/mibox_set_segment_bg</item>
         <item name="android:textColor">@color/mibox_segment_text</item>
-        <item name="android:textSize">@dimen/lo_text_small</item>
+        <item name="android:textSize">@dimen/lo_set_text_small</item>
         <item name="android:fontFamily">@font/launchos_medium</item>
         <item name="android:singleLine">true</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
+        <item name="android:minWidth">@dimen/lo_set_segment_min</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
     </style>
 
     <!-- A line of help under a row, lined up with the row's text. -->
     <style name="MiboxSetHint">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingStart">52dp</item>
-        <item name="android:paddingEnd">14dp</item>
-        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">42dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingBottom">8dp</item>
         <item name="android:textColor">@color/lo_text_3</item>
-        <item name="android:textSize">@dimen/lo_text_label</item>
+        <item name="android:textSize">@dimen/lo_set_text_small</item>
         <item name="android:lineSpacingMultiplier">1.1</item>
         <item name="android:fontFamily">@font/launchos_regular</item>
     </style>
@@ -110,8 +112,8 @@
     <style name="MiboxSetDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
-        <item name="android:layout_marginStart">52dp</item>
-        <item name="android:layout_marginEnd">14dp</item>
+        <item name="android:layout_marginStart">42dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
         <item name="android:layout_marginTop">1dp</item>
         <item name="android:layout_marginBottom">1dp</item>
         <item name="android:background">@color/lo_line</item>
@@ -120,16 +122,16 @@
     <!-- A category in the left column: white when focused, a faint fill while its page is shown. -->
     <style name="MiboxSetCategory">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_height">@dimen/lo_set_category</item>
         <item name="android:layout_marginBottom">2dp</item>
         <item name="android:gravity">center_vertical|start</item>
-        <item name="android:paddingStart">14dp</item>
-        <item name="android:paddingEnd">14dp</item>
-        <item name="android:drawablePadding">14dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:drawablePadding">@dimen/lo_set_gap</item>
         <item name="android:drawableTint">@color/lo_icon_on_focus</item>
         <item name="android:background">@drawable/mibox_set_cat_bg</item>
         <item name="android:textColor">@color/lo_text_on_focus</item>
-        <item name="android:textSize">@dimen/lo_text_body</item>
+        <item name="android:textSize">@dimen/lo_set_text_body</item>
         <item name="android:fontFamily">@font/launchos_medium</item>
         <item name="android:singleLine">true</item>
         <item name="android:focusable">true</item>
@@ -138,7 +140,7 @@
 
     <!-- One category's page on the right; only the focused category's is shown. -->
     <style name="MiboxSetPane">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_width">@dimen/lo_set_page</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
     </style>
@@ -146,20 +148,20 @@
     <style name="MiboxSetPaneTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingStart">12dp</item>
         <item name="android:fontFamily">@font/launchos_semibold</item>
         <item name="android:textColor">@color/lo_text</item>
-        <item name="android:textSize">@dimen/lo_text_heading</item>
+        <item name="android:textSize">@dimen/lo_set_text_title</item>
     </style>
 
     <style name="MiboxSetPaneHint">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">2dp</item>
-        <item name="android:layout_marginBottom">18dp</item>
-        <item name="android:paddingStart">14dp</item>
+        <item name="android:layout_marginBottom">14dp</item>
+        <item name="android:paddingStart">12dp</item>
         <item name="android:fontFamily">@font/launchos_regular</item>
         <item name="android:textColor">@color/lo_text_2</item>
-        <item name="android:textSize">@dimen/lo_text_small</item>
+        <item name="android:textSize">@dimen/lo_set_text_small</item>
     </style>
 </resources>

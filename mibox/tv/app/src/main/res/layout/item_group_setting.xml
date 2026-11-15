@@ -2,23 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/lo_space_1"
+    android:layout_marginBottom="2dp"
     android:background="@drawable/lo_focus_row"
     android:baselineAligned="false"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:minHeight="64dp"
+    android:minHeight="48dp"
     android:orientation="horizontal"
-    android:paddingStart="@dimen/lo_space_4"
-    android:paddingTop="8dp"
-    android:paddingEnd="@dimen/lo_space_4"
-    android:paddingBottom="8dp">
+    android:paddingStart="12dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="6dp">
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="@dimen/lo_icon"
-        android:layout_height="@dimen/lo_icon"
-        android:layout_marginEnd="@dimen/lo_space_4"
+        android:layout_width="@dimen/lo_set_icon"
+        android:layout_height="@dimen/lo_set_icon"
+        android:layout_marginEnd="@dimen/lo_set_gap"
         android:duplicateParentState="true"
         android:importantForAccessibility="no"
         android:tint="@color/lo_icon_on_focus" />
@@ -39,18 +39,18 @@
             android:fontFamily="@font/launchos_semibold"
             android:singleLine="true"
             android:textColor="@color/lo_text_on_focus"
-            android:textSize="@dimen/lo_text_body" />
+            android:textSize="@dimen/lo_set_text_body" />
 
         <TextView
             android:id="@+id/sub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="1dp"
             android:duplicateParentState="true"
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="@color/lo_text_2_on_focus"
-            android:textSize="@dimen/lo_text_small" />
+            android:textSize="@dimen/lo_set_text_small" />
     </LinearLayout>
 
     <TextView

@@ -3,19 +3,19 @@
      category is activated (a faint fill, its text in the accent). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/lo_button_height"
+    android:layout_height="@dimen/lo_set_category"
     android:layout_marginBottom="@dimen/lo_space_1"
     android:background="@drawable/lo_focus_row"
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingEnd="14dp">
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp">
 
     <ImageView
         android:id="@+id/cat_icon"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="@dimen/lo_set_icon"
+        android:layout_height="@dimen/lo_set_icon"
         android:duplicateParentState="true"
         android:importantForAccessibility="no"
         android:tint="@color/lo_icon_on_focus" />
@@ -24,19 +24,19 @@
         android:id="@+id/cat_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
+        android:layout_marginStart="@dimen/lo_set_gap"
         android:layout_weight="1"
         android:duplicateParentState="true"
         android:ellipsize="end"
         android:fontFamily="@font/launchos_medium"
         android:singleLine="true"
         android:textColor="@color/lo_text_on_focus"
-        android:textSize="@dimen/lo_text_body" />
+        android:textSize="@dimen/lo_set_text_body" />
 
     <View
         android:id="@+id/cat_dot"
-        android:layout_width="9dp"
-        android:layout_height="9dp"
+        android:layout_width="7dp"
+        android:layout_height="7dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/dot_accent"
         android:visibility="gone" />
