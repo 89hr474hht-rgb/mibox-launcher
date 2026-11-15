@@ -23,6 +23,8 @@
     <string name="set_start_home_sub">L\'accueil, avec les nouveautés et les reprises</string>
     <string name="set_start_live_sub">La TV, sur les rayons des chaînes</string>
     <string name="set_start_last_sub">La dernière chaîne regardée démarre tout de suite</string>
+    <string name="set_start_favourites">Favoris</string>
+    <string name="set_start_favourites_sub">Une chaîne favorite au hasard démarre ; Haut et Bas passent d\'un favori à l\'autre</string>
 
     <string name="set_guide_shift">Décalage du guide</string>
     <string name="set_guide_shift_sub">Si les programmes affichés sont en avance ou en retard sur l\'heure</string>

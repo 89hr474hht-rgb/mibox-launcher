@@ -158,6 +158,21 @@ final class LivePlayer {
         }
     }
 
+    /**
+     * While in the window: plays list.get(i) there without growing it, and Up and Down full screen go on through that
+     * list (Favoris: moving through the list changes the channel in the window).
+     */
+    void playInWindow(List<Item> list, int i, String groupName) {
+        if (mode != Mode.MINI || api == null || list.isEmpty() || i < 0 || i >= list.size()) return;
+        Item now = current();
+        channels = new ArrayList<>(list);
+        group = groupName;
+        index = i;
+        if (now != null && now.id.equals(list.get(i).id) && player != null) return;
+        ensurePlayer();
+        playChannel(i);
+    }
+
     void full() {
         if (mode == Mode.HIDDEN) return;
         setMode(Mode.FULL, true);
@@ -469,6 +484,13 @@ final class LivePlayer {
         }
         host.modeChanged(m);
         if (m == Mode.FULL) layer.requestFocus();
+    }
+
+    /** The window's slot moved (the panel above it changed height): the window follows it, without a mode change. */
+    void followWindow() {
+        if (mode != Mode.MINI || (move != null && move.isRunning())) return;
+        Rect target = host.miniBounds();
+        if (target != null && !target.equals(current(layer))) place(target);
     }
 
     private static int lerp(int a, int b, float f) {

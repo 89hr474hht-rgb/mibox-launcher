@@ -114,7 +114,7 @@ final class Options {
     // ---- added in 0.10: each one's default is how the app behaved before, so nothing changes until chosen ----
 
     /** Where the app opens when started from the home screen. */
-    enum StartPage { HOME, LIVE, LAST_CHANNEL }
+    enum StartPage { HOME, LIVE, LAST_CHANNEL, FAVOURITES }
 
     static StartPage startPage(Context c) {
         try {

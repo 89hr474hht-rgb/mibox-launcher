@@ -266,12 +266,15 @@ public final class MainActivity extends Activity {
         status.setVisibility(View.GONE);
         Options.StartPage open = opening;
         opening = null;
-        if (open == Options.StartPage.LIVE || open == Options.StartPage.LAST_CHANNEL) {
+        if (open == Options.StartPage.LIVE || open == Options.StartPage.LAST_CHANNEL
+                || open == Options.StartPage.FAVOURITES) {
             home = false;
             section = Xtream.Section.LIVE;
         }
         if (home) showHome(first);
         else showSection(section, first);
+        // Favoris: a favourite channel at random, and Up and Down through the favourites. None yet: TV, as it is.
+        if (open == Options.StartPage.FAVOURITES) root.post(live::playRandomFavourite);
         if (open == Options.StartPage.LAST_CHANNEL) {
             // The channel watched last plays at once, from History, even before the list is read again.
             History h = History.get(this);

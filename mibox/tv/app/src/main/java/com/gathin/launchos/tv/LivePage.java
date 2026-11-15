@@ -28,6 +28,8 @@ import java.util.Map;
 final class LivePage {
     private static final long GROUP_DELAY_MS = 250;
     private static final int FAVOURITES = 12;
+    /** Favoris, with the window playing: how long the focus rests on a channel before it plays there. */
+    private static final long ZAP_DELAY_MS = 350;
 
     /**
      * SHELF: one of TV's shelves (Favoris, Récentes, a theme, a country). PROVIDERS opens the panel's own groups, BACK
@@ -88,6 +90,7 @@ final class LivePage {
 
     private Xtream api;
     private Group group;
+    private Runnable zapInWindow;
     private String groupKey;
     private int lastChannel;
     private int shownGroupsVersion = -1, shownHistory = -1;
@@ -111,6 +114,10 @@ final class LivePage {
         groupsColumn = root.findViewById(R.id.groups_column);
         channelsColumn = root.findViewById(R.id.channels_column);
         pipSlot = root.findViewById(R.id.pip_slot);
+        // The detail above it changes height from channel to channel: the window playing there follows the slot.
+        pipSlot.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+            if (t != ot || l != ol) player.followWindow();
+        });
         retry = root.findViewById(R.id.retry);
         retry.setOnClickListener(v -> {
             retry.setVisibility(View.GONE);
@@ -385,6 +392,43 @@ final class LivePage {
         // Back on the list: the focus goes to the channel that was playing.
         if (activity.showing(this)) focusChannels(true);
         if (shownHistory != History.version() && mode == LivePlayer.Mode.HIDDEN) rebuild(false);
+    }
+
+    /**
+     * Favoris, with the window playing: Up and Down through the list change the channel in the window, once the focus
+     * rests (a quick run of presses plays only where it stops). Elsewhere, moving only moves.
+     */
+    private void zapFavourite(int p) {
+        channelsView.removeCallbacks(zapInWindow);
+        if (group == null || group.shelf == null || group.shelf.kind != TvShelves.Kind.FAVOURITES) return;
+        if (player.mode() != LivePlayer.Mode.MINI) return;
+        List<Item> items = channelAdapter.items;
+        String name = group.name;
+        zapInWindow = () -> player.playInWindow(items, p, name);
+        channelsView.postDelayed(zapInWindow, ZAP_DELAY_MS);
+    }
+
+    /**
+     * Opening on Favoris (Réglages › Général): one of the favourite channels, picked at random, plays full screen, and
+     * Up and Down zap through the favourites; Back lands on the Favoris shelf. Works before the panel's lists are read,
+     * from the channels added by hand and the most watched ones. False when there is no favourite yet.
+     */
+    boolean playRandomFavourite() {
+        Channels chs = Channels.get(activity);
+        History h = History.get(activity);
+        List<Item> list = new ArrayList<>();
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        List<Item> found = new ArrayList<>();
+        if (chs != null) found.addAll(chs.starredItems());
+        if (h != null) found.addAll(h.favourites(FAVOURITES));
+        for (Item i : found) {
+            if (chs != null && chs.hidden(i.id)) continue;
+            if (seen.add(i.id)) list.add(i);
+        }
+        if (list.isEmpty()) return false;
+        groupKey = "s:" + TvShelves.Kind.FAVOURITES.name();
+        player.play(list, new java.util.Random().nextInt(list.size()), activity.getString(R.string.group_favourites));
+        return true;
     }
 
     /** Plays a channel found by search, inside Toutes les chaînes (or its group). */
@@ -848,7 +892,10 @@ final class LivePage {
             h.itemView.setOnFocusChangeListener((v, focused) -> {
                 if (!focused) return;
                 int p = h.getBindingAdapterPosition();
-                if (p != RecyclerView.NO_POSITION) lastChannel = p;
+                if (p != RecyclerView.NO_POSITION) {
+                    lastChannel = p;
+                    zapFavourite(p);
+                }
                 detail.show(item);
             });
             h.itemView.setOnClickListener(v -> {

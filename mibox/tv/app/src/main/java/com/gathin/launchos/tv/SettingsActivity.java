@@ -248,7 +248,7 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
                 .click(v -> startActivity(new Intent(this, AccountActivity.class)));
         Rows.section(pane, R.string.set_sec_start);
         start = Rows.choice(pane, R.drawable.ic_power, R.string.set_start, labels(R.string.set_start_home,
-                R.string.set_start_live, R.string.set_start_last), i -> {
+                R.string.set_start_live, R.string.set_start_last, R.string.set_start_favourites), i -> {
                     Options.setStartPage(this, Options.StartPage.values()[i]);
                     states();
                 });
@@ -518,7 +518,8 @@ public final class SettingsActivity extends Activity implements SyncStore.Listen
 
         Options.StartPage sp = Options.startPage(this);
         start.select(sp.ordinal()).sub(sp == Options.StartPage.HOME ? R.string.set_start_home_sub
-                : sp == Options.StartPage.LIVE ? R.string.set_start_live_sub : R.string.set_start_last_sub);
+                : sp == Options.StartPage.LIVE ? R.string.set_start_live_sub
+                : sp == Options.StartPage.LAST_CHANNEL ? R.string.set_start_last_sub : R.string.set_start_favourites_sub);
         Smart.GroupOrder go = Options.groupOrder(this);
         groupOrder.select(go.ordinal()).sub(go == Smart.GroupOrder.SMART ? R.string.order_smart_sub
                 : go == Smart.GroupOrder.AZ ? R.string.order_az_sub : R.string.order_panel_sub);
