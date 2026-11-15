@@ -62,6 +62,9 @@ final class Names {
             if (rest.trim().isEmpty()) break;
             s = rest;
         }
+        // Stars and signs around the name ("★ M6 HD ★") first, so the quality at the end can be read.
+        String unmarked = MARKS.matcher(s).replaceAll("").trim();
+        if (!unmarked.isEmpty()) s = unmarked;
         String tag = "";
         int year = 0;
         for (int i = 0; i < 3; i++) {

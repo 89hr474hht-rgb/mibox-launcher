@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TV's shelves (TvShelves): what they are called, the panel's own groups, the versions of a channel. -->
+<resources>
+    <string name="shelf_recent">Récentes</string>
+    <string name="shelf_providers">Groupes du fournisseur</string>
+    <string name="shelf_back">Rayons</string>
+    <string name="shelf_general">Généralistes</string>
+    <string name="shelf_news">Info</string>
+    <string name="shelf_sport">Sport</string>
+    <string name="shelf_movies">Cinéma</string>
+    <string name="shelf_series">Séries</string>
+    <string name="shelf_kids">Jeunesse</string>
+    <string name="shelf_docs">Documentaires</string>
+    <string name="shelf_entertainment">Divertissement</string>
+    <string name="shelf_music">Musique</string>
+    <string name="shelf_regional">Régionales</string>
+    <string name="shelf_other">Autres chaînes</string>
+    <string name="shelf_adult">Adultes</string>
+    <string name="tv_tab_live">En direct</string>
+    <string name="tv_tab_guide">Guide</string>
+    <string name="channel_play_version">Regarder en %1$s</string>
+    <string name="channel_play_version_n">Regarder la version %1$d</string>
+    <plurals name="count_shelves">
+        <item quantity="one">%d rayon</item>
+        <item quantity="other">%d rayons</item>
+    </plurals>
+    <plurals name="count_versions">
+        <item quantity="one">%d version</item>
+        <item quantity="other">%d versions</item>
+    </plurals>
+    <string-array name="shelf_country_codes" translatable="false">
+        <item>be</item><item>ch</item><item>ca</item><item>lu</item><item>mc</item><item>uk</item><item>us</item>
+        <item>de</item><item>it</item><item>es</item><item>pt</item><item>nl</item><item>ar</item><item>tr</item>
+        <item>ma</item><item>dz</item><item>tn</item><item>af</item><item>pl</item><item>ro</item><item>in</item>
+        <item>exyu</item>
+    </string-array>
+    <string-array name="shelf_country_names">
+        <item>Belgique</item><item>Suisse</item><item>Canada</item><item>Luxembourg</item><item>Monaco</item>
+        <item>Royaume-Uni</item><item>États-Unis</item><item>Allemagne</item><item>Italie</item><item>Espagne</item>
+        <item>Portugal</item><item>Pays-Bas</item><item>Monde arabe</item><item>Turquie</item><item>Maroc</item>
+        <item>Algérie</item><item>Tunisie</item><item>Afrique</item><item>Pologne</item><item>Roumanie</item>
+        <item>Inde</item><item>Ex-Yougoslavie</item>
+    </string-array>
+</resources>

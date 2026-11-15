@@ -42,7 +42,18 @@ USER, PASSWORD = "demo", "demo"
 
 # Sent in this (unsorted) order, decorated as panels do. Category 6 is empty.
 LIVE_CATEGORIES = [("3", "|FR| SPORT ★"), ("1", "FR | Généralistes"), ("5", "FR | Cinéma"), ("2", "★ Information ★"),
-                   ("6", "FR | Vide"), ("4", "01 - Jeunesse")]
+                   ("6", "FR | Vide"), ("4", "01 - Jeunesse"), ("7", "FR | SPORT HD"), ("8", "UK | Entertainment"),
+                   ("9", "BE | Généralistes"), ("20", "Bouquet")]
+
+# Hard cases for TV's shelves: the same channel in other qualities and in a second group, a channel abroad with a
+# home channel's name, a country written in front of a name, decorated names, names with nothing left once cleaned,
+# names that only look alike, and no logo. Their stream ids follow the regular ones.
+LIVE_HARD = [
+    ("7", "FR: Sport Un HD"), ("7", "FR: Sport Un SD"), ("7", "Foot Max 4K"), ("3", "|FR| Sport Un FHD"),
+    ("8", "UK: Antenne 2"), ("8", "BBC Drama HD"), ("9", "La Une HD"), ("9", "La Une SD"),
+    ("20", "UK: Sky Nouvelles"), ("20", "★ M6 HD ★"), ("20", "M6"), ("20", "***"), ("20", "***"),
+    ("1", "France 2 HD"), ("1", "France 24"), ("1", "France 3 Alpes"),
+]
 VOD_CATEGORIES = [("12", "VOD | Comédie"), ("10", "VOD | Nouveautés 2024"), ("13", "VOD | Animation"),
                   ("11", "VOD | Action")]
 SERIES_CATEGORIES = [("21", "Séries US"), ("20", "Séries françaises"), ("22", "Documentaires")]
@@ -85,6 +96,13 @@ def build_catalogue():
                 "added": "1700000000", "category_id": cat_id, "custom_sid": "", "tv_archive": 0,
                 "direct_source": "", "tv_archive_duration": 0,
             })
+    for cat_id, name in LIVE_HARD:
+        n += 1
+        live.append({
+            "num": n, "name": name, "stream_type": "live", "stream_id": 100 + n, "stream_icon": "",
+            "epg_channel_id": "", "added": "1700000000", "category_id": cat_id, "custom_sid": "", "tv_archive": 0,
+            "direct_source": "", "tv_archive_duration": 0,
+        })
     n = 0
     for cat_id in ["10", "11", "12", "13"]:
         for i in range(1, 13):

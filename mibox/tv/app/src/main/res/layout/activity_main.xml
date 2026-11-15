@@ -108,7 +108,6 @@
 
         <TextView android:id="@+id/nav_home" style="@style/NavTab" android:text="@string/nav_home" />
         <TextView android:id="@+id/nav_live" style="@style/NavTab" android:text="@string/nav_tv" />
-        <TextView android:id="@+id/nav_guide" style="@style/NavTab" android:text="@string/nav_guide" />
         <TextView android:id="@+id/nav_movies" style="@style/NavTab" android:text="@string/nav_movies" />
         <TextView android:id="@+id/nav_series" style="@style/NavTab" android:text="@string/nav_series" />
 

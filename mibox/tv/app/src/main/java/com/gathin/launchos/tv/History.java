@@ -174,6 +174,19 @@ final class History {
         return out;
     }
 
+    /** The channels watched lately, the most recent first, as items that can be played before the list is read. */
+    List<Item> recentChannels(int max) {
+        List<Map.Entry<String, Long>> at = new ArrayList<>();
+        for (Iterator<String> it = watch.keys(); it.hasNext(); ) {
+            String id = it.next();
+            JSONObject o = watch.optJSONObject(id);
+            if (o != null) at.add(new java.util.AbstractMap.SimpleEntry<>(id, o.optLong(W_AT)));
+        }
+        List<Item> out = new ArrayList<>();
+        for (String id : top(at, max, 1)) out.add(channel(id, watch.optJSONObject(id)));
+        return out;
+    }
+
     /** A remembered channel as an item. Pure. */
     static Item channel(String id, JSONObject o) {
         return Item.live(id, o.optString(W_NAME), o.optString(W_IMAGE), o.optInt(W_NUM), o.optString(W_CAT));

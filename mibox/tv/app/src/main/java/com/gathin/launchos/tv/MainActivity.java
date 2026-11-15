@@ -14,7 +14,7 @@ import com.gathin.launchos.design.Focus;
 import com.gathin.launchos.design.Motion;
 
 /**
- * The main screen: the navigation bar along the top (Réglages, Rechercher, Accueil, TV, Guide TV, Films, Séries, and
+ * The main screen: the navigation bar along the top (Réglages, Rechercher, Accueil, TV, Films, Séries, and
  * the app's logo) and one page at a time (HomePage, LivePage with the {@link LivePlayer}, or a BrowsePage for Films
  * and Séries). Main thread only.
  *
@@ -30,8 +30,7 @@ import com.gathin.launchos.design.Motion;
 public final class MainActivity extends Activity {
     static final String EXTRA_PLAY_CHANNEL = "play_channel";
     private static final long SECTION_DELAY_MS = 320;
-    private static final int NAV_SEARCH = 0, NAV_HOME = 1, NAV_LIVE = 2, NAV_GUIDE = 3, NAV_MOVIES = 4, NAV_SERIES = 5,
-            NAV_SETTINGS = 6;
+    private static final int NAV_SEARCH = 0, NAV_HOME = 1, NAV_LIVE = 2, NAV_MOVIES = 3, NAV_SERIES = 4, NAV_SETTINGS = 5;
     /** The login screen opens by itself once, when there is no account yet. */
     private static boolean loginOffered;
 
@@ -81,7 +80,7 @@ public final class MainActivity extends Activity {
         banner = findViewById(R.id.update_banner);
         liveLayer = findViewById(R.id.live_layer);
 
-        int[] ids = {R.id.nav_search, R.id.nav_home, R.id.nav_live, R.id.nav_guide, R.id.nav_movies, R.id.nav_series,
+        int[] ids = {R.id.nav_search, R.id.nav_home, R.id.nav_live, R.id.nav_movies, R.id.nav_series,
                 R.id.nav_settings};
         navItems = new View[ids.length];
         for (int i = 0; i < ids.length; i++) {
@@ -89,7 +88,7 @@ public final class MainActivity extends Activity {
             Focus.lift(navItems[i]);
         }
         barOrder = new View[]{navItems[NAV_SETTINGS], navItems[NAV_SEARCH], navItems[NAV_HOME], navItems[NAV_LIVE],
-                navItems[NAV_GUIDE], navItems[NAV_MOVIES], navItems[NAV_SERIES]};
+                navItems[NAV_MOVIES], navItems[NAV_SERIES]};
         sectionItems = new View[]{navItems[NAV_LIVE], navItems[NAV_MOVIES], navItems[NAV_SERIES]};
         // Réglages holds the account, the lists' refresh and the updates.
         navUpdates = navItems[NAV_SETTINGS];
@@ -123,7 +122,6 @@ public final class MainActivity extends Activity {
             enterPage();
         });
         navItems[NAV_SEARCH].setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
-        navItems[NAV_GUIDE].setOnClickListener(v -> startActivity(new Intent(this, GuideActivity.class)));
         navItems[NAV_SETTINGS].setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
 
         player = new LivePlayer(this, liveLayer, new LivePlayer.Host() {

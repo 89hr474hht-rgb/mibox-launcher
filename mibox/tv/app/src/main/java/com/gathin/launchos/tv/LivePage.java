@@ -14,35 +14,65 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gathin.launchos.design.Focus;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Chaînes: three panels side by side. The groups (Favoris, then Toutes les chaînes and the groups in the order chosen
- * in Réglages), the chosen group's channels with what is on now, and the focused channel's details above the small
- * player's slot. Left and Right move from panel to panel, Up and Down stay inside one. Main thread only; the list
+ * TV, En direct: three panels side by side. The shelves (Favoris, Récentes, the themes, other countries, see
+ * {@link TvShelves}; the panel's own groups one step further), the chosen shelf's channels with what is on now and
+ * the versions each comes in, and the focused channel's details above the small player's slot. Guide, next to En
+ * direct, opens the guide. Left and Right move from panel to panel, Up and Down stay inside one. Main thread only; the list
  * comes from {@link Library}, the programmes from {@link Epg}, and playing goes to the {@link LivePlayer}.
  */
 final class LivePage {
     private static final long GROUP_DELAY_MS = 250;
     private static final int FAVOURITES = 12;
 
-    private enum Kind { FAVOURITES, ALL, GROUP }
+    /**
+     * SHELF: one of TV's shelves (Favoris, Récentes, a theme, a country). PROVIDERS opens the panel's own groups, BACK
+     * comes back to the shelves; there, ALL and GROUP are the panel's lists as they were.
+     */
+    private enum Kind { SHELF, PROVIDERS, BACK, ALL, GROUP }
 
     private static final class Group {
         final Kind kind;
         final Xtream.Category category;
+        final TvShelves.Shelf shelf;
         final String name;
         List<Item> channels;
+        /** For a shelf: every version of each channel shown, by the shown one's id. */
+        Map<String, List<Item>> versions = new HashMap<>();
+        /** For PROVIDERS: how many groups it opens. */
+        int count;
 
         Group(Kind kind, Xtream.Category category, String name, List<Item> channels) {
             this.kind = kind;
             this.category = category;
+            this.shelf = null;
             this.name = name;
             this.channels = channels;
         }
 
+        Group(TvShelves.Shelf shelf, String name) {
+            this.kind = Kind.SHELF;
+            this.category = null;
+            this.shelf = shelf;
+            this.name = name;
+            this.channels = new ArrayList<>();
+            for (TvShelves.Entry e : shelf.entries) {
+                channels.add(e.main);
+                versions.put(e.main.id, e.versions);
+            }
+        }
+
         String key() {
-            return kind == Kind.GROUP ? "g:" + category.id : kind.name();
+            return kind == Kind.GROUP ? "g:" + category.id : kind == Kind.SHELF ? "s:" + shelf.key() : kind.name();
+        }
+
+        /** A row the remote can stop on without changing the list of channels shown. */
+        boolean opensList() {
+            return kind == Kind.PROVIDERS || kind == Kind.BACK;
         }
     }
 
@@ -51,7 +81,7 @@ final class LivePage {
     private final LivePlayer player;
     private final RecyclerView groupsView, channelsView;
     private final TextView groupsCount, groupTitle, groupCount, channelsStatus;
-    private final View groupsColumn, channelsColumn, pipSlot, retry;
+    private final View groupsColumn, channelsColumn, pipSlot, retry, tabs, tabLive;
     private final GroupAdapter groupAdapter = new GroupAdapter();
     private final ChannelAdapter channelAdapter = new ChannelAdapter();
     private final Detail detail;
@@ -64,6 +94,9 @@ final class LivePage {
     private String shownStamp = "";
     private final Runnable applyGroup = this::showGroup;
     private Group pendingGroup;
+    /** The panel's own groups are shown instead of the shelves. */
+    private boolean providerMode;
+    private static final int RECENT = 12;
 
     LivePage(MainActivity activity, View root, LivePlayer player) {
         this.activity = activity;
@@ -84,6 +117,15 @@ final class LivePage {
             show(this.api);
         });
         Focus.lift(retry);
+        // TV's two views: En direct is this page (marked as shown), Guide opens the guide's own screen.
+        tabs = root.findViewById(R.id.tv_tabs);
+        tabLive = root.findViewById(R.id.tab_live);
+        View tabGuide = root.findViewById(R.id.tab_guide);
+        tabLive.setActivated(true);
+        tabLive.setOnClickListener(v -> focusGroups());
+        tabGuide.setOnClickListener(v -> activity.startActivity(new android.content.Intent(activity, GuideActivity.class)));
+        Focus.lift(tabLive);
+        Focus.lift(tabGuide);
         detail = new Detail(root);
         groupsView.setLayoutManager(new LinearLayoutManager(activity));
         groupsView.setAdapter(groupAdapter);
@@ -131,7 +173,7 @@ final class LivePage {
         });
     }
 
-    /** Builds the groups again (after a load, a change in Réglages, or new favourites). */
+    /** Builds the shelves, or the panel's groups, again (after a load, a change in Réglages, or new favourites). */
     private void rebuild(boolean focusDefault) {
         Library lib = Library.of(Xtream.Section.LIVE);
         Groups g = Groups.get(activity);
@@ -141,34 +183,45 @@ final class LivePage {
         shownHistory = History.version();
         shownStamp = stamp();
         List<Group> list = new ArrayList<>();
-        // Favoris: the channels added by hand, in that order, then the most watched ones.
-        List<Item> fav = new ArrayList<>();
-        java.util.Set<String> inFav = new java.util.HashSet<>();
-        List<Item> picked = new ArrayList<>();
-        if (chs != null) picked.addAll(chs.starredItems());
-        if (h != null) picked.addAll(h.favourites(FAVOURITES));
-        for (Item stored : picked) {
-            if (inFav.contains(stored.id) || (chs != null && chs.hidden(stored.id))) continue;
-            Item fresh = lib.find(stored.id);
-            if (fresh != null || lib.partial() || lib.all() == null) {
-                fav.add(fresh != null ? fresh : stored);
-                inFav.add(stored.id);
-            }
-        }
-        if (!fav.isEmpty()) list.add(new Group(Kind.FAVOURITES, null, activity.getString(R.string.group_favourites), fav));
-        if (lib.all() != null && !lib.all().isEmpty()) {
-            list.add(new Group(Kind.ALL, null, activity.getString(R.string.group_all_channels), arranged(lib.all(), chs)));
-        }
         List<Xtream.Category> cats = lib.categories() == null ? new ArrayList<>() : lib.categories();
-        int shownGroups = 0;
-        for (Xtream.Category c : g == null ? cats : g.ordered(Xtream.Section.LIVE, cats, false)) {
-            List<Item> items = lib.items(c.id);
-            if (!lib.partial() && (items == null || items.isEmpty())) continue;   // empty groups are left out
-            list.add(new Group(Kind.GROUP, c, g == null ? Groups.panelName(Xtream.Section.LIVE, c) : g.name(Xtream.Section.LIVE, c),
-                    items == null ? null : arranged(items, chs)));
-            shownGroups++;
+        // The shelves need the whole list; while only some groups are read, the panel's groups are shown.
+        boolean shelves = !providerMode && lib.all() != null && !lib.all().isEmpty();
+        if (shelves) {
+            TvShelves.Input in = new TvShelves.Input();
+            in.all = lib.all();
+            for (Xtream.Category c : cats) in.groupNames.put(c.id, c.name);
+            in.hidden = i -> (chs != null && chs.hidden(i.id)) || (g != null && g.hidden(Xtream.Section.LIVE, i.categoryId));
+            in.showAdult = !Options.hideAdult(activity);
+            // Favoris: the channels added by hand, in that order, then the most watched ones.
+            if (chs != null) in.favourites.addAll(chs.starredItems());
+            if (h != null) {
+                in.favourites.addAll(h.favourites(FAVOURITES));
+                in.recent.addAll(h.recentChannels(RECENT));
+            }
+            for (TvShelves.Shelf sh : TvShelves.build(in)) list.add(new Group(sh, shelfName(sh)));
+            Group providers = new Group(Kind.PROVIDERS, null, activity.getString(R.string.shelf_providers), null);
+            for (Xtream.Category c : g == null ? cats : g.ordered(Xtream.Section.LIVE, cats, false)) {
+                List<Item> items = lib.items(c.id);
+                if (items != null && !items.isEmpty()) providers.count++;
+            }
+            list.add(providers);
+            groupsCount.setText(activity.getResources().getQuantityString(R.plurals.count_shelves, list.size() - 1,
+                    list.size() - 1));
+        } else {
+            if (providerMode) list.add(new Group(Kind.BACK, null, activity.getString(R.string.shelf_back), null));
+            if (lib.all() != null && !lib.all().isEmpty()) {
+                list.add(new Group(Kind.ALL, null, activity.getString(R.string.group_all_channels), arranged(lib.all(), chs)));
+            }
+            int shownGroups = 0;
+            for (Xtream.Category c : g == null ? cats : g.ordered(Xtream.Section.LIVE, cats, false)) {
+                List<Item> items = lib.items(c.id);
+                if (!lib.partial() && (items == null || items.isEmpty())) continue;   // empty groups are left out
+                list.add(new Group(Kind.GROUP, c, g == null ? Groups.panelName(Xtream.Section.LIVE, c) : g.name(Xtream.Section.LIVE, c),
+                        items == null ? null : arranged(items, chs)));
+                shownGroups++;
+            }
+            groupsCount.setText(activity.getResources().getQuantityString(R.plurals.count_groups, shownGroups, shownGroups));
         }
-        groupsCount.setText(activity.getResources().getQuantityString(R.plurals.count_groups, shownGroups, shownGroups));
         groupAdapter.set(list);
         if (list.isEmpty()) {
             group = null;
@@ -178,9 +231,11 @@ final class LivePage {
             status(activity.getString(R.string.empty));
             return;
         }
-        // Stay on the group shown before, else the favourites, else the first group.
-        Group keep = list.get(0);
+        // Stay on the list shown before, else the first one that shows channels.
+        Group keep = null;
+        for (Group x : list) if (keep == null && !x.opensList()) keep = x;
         for (Group x : list) if (x.key().equals(groupKey)) keep = x;
+        if (keep == null) keep = list.get(0);
         group = null;
         select(keep, true);
         // Not while the remote is in the bar: previewing TV from there must not pull the focus away.
@@ -191,6 +246,47 @@ final class LivePage {
     private String stamp() {
         return Options.tidyNames(activity) + "|" + Options.channelOrder(activity) + "|" + Options.dedupe(activity) + "|"
                 + Options.hideAdult(activity) + "|" + Options.groupOrder(activity) + "|" + Channels.version();
+    }
+
+    /** A shelf's name: Favoris, Récentes, the theme, or the country. */
+    private String shelfName(TvShelves.Shelf sh) {
+        switch (sh.kind) {
+            case FAVOURITES:
+                return activity.getString(R.string.group_favourites);
+            case RECENT:
+                return activity.getString(R.string.shelf_recent);
+            case COUNTRY:
+                return countryName(sh.country);
+            default:
+                return themeName(sh.theme);
+        }
+    }
+
+    private String themeName(Smart.Theme t) {
+        int id;
+        switch (t) {
+            case GENERAL: id = R.string.shelf_general; break;
+            case NEWS: id = R.string.shelf_news; break;
+            case SPORT: id = R.string.shelf_sport; break;
+            case MOVIES: id = R.string.shelf_movies; break;
+            case SERIES: id = R.string.shelf_series; break;
+            case KIDS: id = R.string.shelf_kids; break;
+            case DOCS: id = R.string.shelf_docs; break;
+            case ENTERTAINMENT: id = R.string.shelf_entertainment; break;
+            case MUSIC: id = R.string.shelf_music; break;
+            case REGIONAL: id = R.string.shelf_regional; break;
+            case ADULT: id = R.string.shelf_adult; break;
+            default: id = R.string.shelf_other; break;
+        }
+        return activity.getString(id);
+    }
+
+    /** A country's name in French, from its code; the code itself for one without a name here. */
+    private String countryName(String code) {
+        String[] codes = activity.getResources().getStringArray(R.array.shelf_country_codes);
+        String[] names = activity.getResources().getStringArray(R.array.shelf_country_names);
+        for (int i = 0; i < codes.length && i < names.length; i++) if (codes[i].equals(code)) return names[i];
+        return code.toUpperCase(java.util.Locale.ROOT);
     }
 
     /** A group's channels as they are shown: hidden ones out, doubles merged, in the order chosen in Réglages. */
@@ -206,6 +302,7 @@ final class LivePage {
     }
 
     private void select(Group g, boolean now) {
+        if (g.opensList()) return;   // Groupes du fournisseur and Rayons change the list on OK only
         pendingGroup = g;
         groupAdapter.markSelected(g);
         channelsView.removeCallbacks(applyGroup);
@@ -238,11 +335,32 @@ final class LivePage {
         }
         List<Item> items = g.channels == null ? new ArrayList<>() : g.channels;
         groupCount.setText(activity.getResources().getQuantityString(R.plurals.count_channels, items.size(), items.size()));
-        channelAdapter.set(items);
-        if (items.isEmpty()) status(activity.getString(g.kind == Kind.FAVOURITES ? R.string.favourites_hint : R.string.empty));
+        channelAdapter.set(items, g.versions);
+        if (items.isEmpty()) status(activity.getString(R.string.empty));
         else channelsStatus.setVisibility(View.GONE);
         channelsView.scrollToPosition(sameGroup ? lastChannel : 0);
         if (!items.isEmpty()) detail.show(items.get(Math.min(lastChannel, items.size() - 1)));
+    }
+
+    /** Shows the panel's own groups, or the shelves again; the focus goes to the first row that lists channels. */
+    private void openProviders(boolean on) {
+        providerMode = on;
+        groupKey = null;
+        group = null;
+        rebuild(false);
+        if (on) {
+            groupsView.scrollToPosition(0);
+            groupsView.post(this::focusGroups);
+            return;
+        }
+        // Back on the shelves: the focus goes back to Groupes du fournisseur, where the remote left them.
+        int at = groupAdapter.getItemCount() - 1;
+        groupsView.scrollToPosition(at);
+        groupsView.post(() -> {
+            RecyclerView.ViewHolder h = groupsView.findViewHolderForAdapterPosition(at);
+            if (h != null) h.itemView.requestFocus();
+            else focusGroups();
+        });
     }
 
     // ---- the player ----
@@ -352,9 +470,17 @@ final class LivePage {
         boolean inChannels = Root.inside(focused, channelsColumn);
         boolean inPip = focused == activity.liveLayer();
         boolean vertical = direction == View.FOCUS_UP || direction == View.FOCUS_DOWN;
+        if (!vertical && Root.inside(focused, tabs)) {
+            return Root.inside(proposed, tabs) ? proposed : focused;   // Left and Right stay on En direct / Guide
+        }
         if (vertical) {
-            // Up and Down stay in a panel; Up at the top of a list goes to the bar, Down at the bottom stays.
+            // Up and Down stay in a panel; Up at the top of the shelves goes to En direct / Guide, then to the bar.
             boolean up = direction == View.FOCUS_UP;
+            if (Root.inside(focused, tabs)) {
+                View row = groupRow();
+                return up ? null : row != null ? row : focused;
+            }
+            if (inGroups && up && !Root.inside(proposed, groupsView)) return tabLive;
             if (inGroups && !Root.inside(proposed, groupsColumn)) return up ? null : focused;
             if (inChannels && !Root.inside(proposed, channelsColumn)) return up ? null : focused;
             if (inPip) return focused;
@@ -394,6 +520,10 @@ final class LivePage {
         }
         if (Root.inside(focused, channelsColumn)) {
             focusGroups();
+            return true;
+        }
+        if (providerMode && Root.inside(focused, groupsColumn)) {
+            openProviders(false);   // from the panel's groups, Back comes back to the shelves first
             return true;
         }
         return false;
@@ -515,15 +645,20 @@ final class LivePage {
             View v = h.itemView;
             ((TextView) v.findViewById(R.id.name)).setText(g.name);
             TextView count = v.findViewById(R.id.count);
-            count.setText(g.channels == null ? "" : String.valueOf(g.channels.size()));
+            count.setText(g.kind == Kind.PROVIDERS ? String.valueOf(g.count)
+                    : g.channels == null || g.kind == Kind.BACK ? "" : String.valueOf(g.channels.size()));
             ImageView icon = v.findViewById(R.id.icon);
-            icon.setImageResource(g.kind == Kind.FAVOURITES ? R.drawable.ic_star : g.kind == Kind.ALL ? R.drawable.ic_all
-                    : themeIcon(Smart.theme(g.category.name)));
+            icon.setRotation(g.kind == Kind.BACK ? 180 : 0);
+            icon.setImageResource(icon(g));
             v.setActivated(g == selected);
             v.setOnFocusChangeListener((view, focused) -> {
                 if (focused) select(g, false);
             });
             v.setOnClickListener(view -> {
+                if (g.opensList()) {
+                    openProviders(g.kind == Kind.PROVIDERS);
+                    return;
+                }
                 channelsView.removeCallbacks(applyGroup);
                 select(g, true);
                 focusChannels(true);
@@ -547,6 +682,25 @@ final class LivePage {
         @Override
         public int getItemCount() {
             return items.size();
+        }
+    }
+
+    /** A row's icon: the shelf's kind or theme, or the panel's group's theme. */
+    private static int icon(Group g) {
+        switch (g.kind) {
+            case PROVIDERS:
+                return R.drawable.ic_folder;
+            case BACK:
+                return R.drawable.ic_chevron;
+            case ALL:
+                return R.drawable.ic_all;
+            case GROUP:
+                return themeIcon(Smart.theme(g.category.name));
+            default:
+                if (g.shelf.kind == TvShelves.Kind.FAVOURITES) return R.drawable.ic_star;
+                if (g.shelf.kind == TvShelves.Kind.RECENT) return R.drawable.ic_history;
+                if (g.shelf.kind == TvShelves.Kind.COUNTRY) return R.drawable.ic_globe;
+                return themeIcon(g.shelf.theme);
         }
     }
 
@@ -584,6 +738,8 @@ final class LivePage {
         static final String GUIDE = "guide";
         static final String PLAYING = "playing";
         List<Item> items = new ArrayList<>();
+        /** Every version of each channel shown, by the shown one's id (a shelf); empty for the panel's lists. */
+        Map<String, List<Item>> versions = new HashMap<>();
         String playingId;
 
         final class Holder extends RecyclerView.ViewHolder {
@@ -609,8 +765,22 @@ final class LivePage {
 
         @SuppressWarnings("NotifyDataSetChanged") // the whole list changes
         void set(List<Item> list) {
+            set(list, new HashMap<>());
+        }
+
+        @SuppressWarnings("NotifyDataSetChanged") // the whole list changes
+        void set(List<Item> list, Map<String, List<Item>> versions) {
             items = list;
+            this.versions = versions;
             notifyDataSetChanged();
+        }
+
+        List<Item> versionsOf(Item item) {
+            List<Item> v = versions.get(item.id);
+            if (v != null) return v;
+            List<Item> one = new ArrayList<>();
+            one.add(item);
+            return one;
         }
 
         void guides() {
@@ -662,11 +832,15 @@ final class LivePage {
             int number = tnt > 0 ? tnt : item.num;
             h.num.setText(number > 0 ? String.valueOf(number) : "");
             Channels chs = Channels.get(activity);
-            h.star.setVisibility(chs != null && chs.starred(item.id) ? View.VISIBLE : View.GONE);
+            List<Item> all = versionsOf(item);
+            boolean starred = false;
+            for (Item v : all) starred |= chs != null && chs.starred(v.id);
+            h.star.setVisibility(starred ? View.VISIBLE : View.GONE);
             h.title.setText(display(activity, item));
             boolean tidy = Options.tidyNames(activity);
-            h.tag.setText(item.tag);
-            h.tag.setVisibility(tidy && !item.tag.isEmpty() ? View.VISIBLE : View.GONE);
+            String tags = qualities(all);
+            h.tag.setText(tags);
+            h.tag.setVisibility(tidy && !tags.isEmpty() ? View.VISIBLE : View.GONE);
             h.initials.setText(Ui.initials(item.title));
             Images.load(h.image, item.image, Ui.dp(activity, 64), h.initials);
             playing(h, item);
@@ -684,13 +858,33 @@ final class LivePage {
                 player.play(items, p, group.name);
             });
             h.itemView.setOnLongClickListener(v -> {
-                ChannelOptions.show(activity, item, () -> {
+                int at = h.getBindingAdapterPosition();
+                ChannelOptions.show(activity, item, all, version -> {
+                    // Another version plays in the list's place of this channel, so zapping goes on from there.
+                    List<Item> list = new ArrayList<>(items);
+                    int p = at == RecyclerView.NO_POSITION ? 0 : at;
+                    list.set(p, version);
+                    lastChannel = p;
+                    player.play(list, p, group == null ? "" : group.name);
+                }, () -> {
                     int keep = lastChannel;
                     rebuild(false);
                     channelsView.post(() -> focusChannelAt(keep));
                 });
                 return true;
             });
+        }
+
+        /**
+         * The versions a channel comes in, as its tag: "FHD · HD · SD"; "2 versions" when they carry the same mark (the
+         * same channel in two groups); the one tag when there is one version.
+         */
+        private String qualities(List<Item> all) {
+            if (all.size() < 2) return all.isEmpty() ? "" : all.get(0).tag;
+            java.util.LinkedHashSet<String> tags = new java.util.LinkedHashSet<>();
+            for (Item v : all) if (!v.tag.isEmpty()) tags.add(v.tag);
+            if (tags.size() >= 2) return String.join(" · ", tags);
+            return activity.getResources().getQuantityString(R.plurals.count_versions, all.size(), all.size());
         }
 
         private void guide(Holder h, Item item) {
