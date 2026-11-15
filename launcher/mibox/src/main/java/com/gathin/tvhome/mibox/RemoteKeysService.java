@@ -9,8 +9,8 @@ import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 
 /**
- * Makes the remote's Netflix, YouTube and Prime Video buttons open the app chosen for each in LaunchOS's settings
- * (RemoteRemap), from any screen. Google TV's home used to answer them; with it disabled, they reach no one. Every
+ * Makes the remote's app buttons (Netflix, YouTube and Prime Video on the 2nd gen remote, Netflix and Live on the Mi
+ * Box S one) open the app chosen for each in LaunchOS's settings (RemoteRemap), from any screen. Google TV's home used to answer them; with it disabled, they reach no one. Every
  * other key, volume included, passes through untouched. It never reads what is on screen; the one thing it watches is
  * when an app of mibox_a11y_pause_packages comes up, to take LaunchOS's helpers away while it is in front (A11yPause).
  * It also puts the box to sleep at the end of the sleep timer (SleepTimer), the one way an app can do that.
@@ -79,8 +79,9 @@ public final class RemoteKeysService extends AccessibilityService {
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
-        int code = event.getKeyCode();
-        if (!RemoteRemap.isAppButton(code)) return false;
+        // Only the app buttons of the remote this box ships with (RemoteRemap); every other key passes untouched.
+        int code = RemoteRemap.button(event);
+        if (code < 0) return false;
         String target = RemoteRemap.target(this, code);
         // A press opens on release, once; the held repeats and the release are kept from the app in front too.
         if (event.getAction() == KeyEvent.ACTION_DOWN) {

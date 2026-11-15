@@ -102,6 +102,8 @@
     <string name="mibox_rk_btn_netflix">Netflix button</string>
     <string name="mibox_rk_btn_youtube">YouTube button</string>
     <string name="mibox_rk_btn_prime">Prime Video button</string>
+    <string name="mibox_rk_btn_live">Live button</string>
+    <string name="mibox_rk_unknown_remote">This box\'s remote is not one LaunchOS knows: its buttons do what Android makes them do.</string>
     <string name="mibox_rk_none">No action</string>
     <string name="mibox_rk_none_sub">The button does nothing</string>
     <string name="mibox_rk_missing">App not found: the button does nothing</string>

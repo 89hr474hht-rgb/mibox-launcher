@@ -23,6 +23,8 @@ com.gathin.tvhome.extra.REORDER_FROM_SETTINGS
 com.gathin.tvhome.mibox.SLEEP_NOW
 com.gathin.tvhome.mibox.SLEEP_WARN
 com.google.android.youtube.tv
+com.mitv.tvhome.mitvplus
+com.netflix.ninja
 config.json
 dock_opacity
 end

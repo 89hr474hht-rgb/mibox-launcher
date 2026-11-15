@@ -78,6 +78,13 @@ public final class RemoteKeysActivity extends Activity {
                 Toast.makeText(this, R.string.mibox_screen_unavailable, Toast.LENGTH_LONG).show();
             }
         });
+        // The drawing is the 2nd gen remote: shown only with it. An unknown box lists no button and says why.
+        RemoteRemap.Model model = RemoteRemap.model();
+        if (model != RemoteRemap.Model.MIBOX_S2) findViewById(R.id.mibox_rk_remote).setVisibility(View.GONE);
+        if (model == null) {
+            subtitle.setText(R.string.mibox_rk_unknown_remote);
+            rows.setVisibility(View.GONE);
+        }
         buildRows();
         UiFonts.apply(getWindow().getDecorView());
         if (rows.getChildCount() > 0) rows.getChildAt(0).requestFocus();
@@ -87,7 +94,8 @@ public final class RemoteKeysActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        service.setVisibility(RemoteRemap.serviceOn(this) ? View.GONE : View.VISIBLE);
+        // On a box whose remote is unknown the service has nothing to do: no notice about it.
+        service.setVisibility(RemoteRemap.serviceOn(this) || RemoteRemap.model() == null ? View.GONE : View.VISIBLE);
         if (picking == 0) refreshRows();
     }
 
@@ -102,7 +110,7 @@ public final class RemoteKeysActivity extends Activity {
 
     private void buildRows() {
         rows.removeAllViews();
-        for (int key : RemoteRemap.KEYS) {
+        for (int key : RemoteRemap.keys(RemoteRemap.model())) {
             LinearLayout row = row();
             row.setTag(key);
             row.addView(new RemoteView.Chip(this, key), new LinearLayout.LayoutParams(px(104), px(44)));
@@ -331,7 +339,8 @@ public final class RemoteKeysActivity extends Activity {
     }
 
     private static int buttonName(int key) {
-        return key == RemoteRemap.NETFLIX ? R.string.mibox_rk_btn_netflix
+        return key == RemoteRemap.NETFLIX || key == RemoteRemap.S_NETFLIX ? R.string.mibox_rk_btn_netflix
+                : key == RemoteRemap.S_LIVE ? R.string.mibox_rk_btn_live
                 : key == RemoteRemap.YOUTUBE ? R.string.mibox_rk_btn_youtube : R.string.mibox_rk_btn_prime;
     }
 }

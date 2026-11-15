@@ -101,6 +101,8 @@
     <string name="mibox_rk_btn_netflix">Bouton Netflix</string>
     <string name="mibox_rk_btn_youtube">Bouton YouTube</string>
     <string name="mibox_rk_btn_prime">Bouton Prime Video</string>
+    <string name="mibox_rk_btn_live">Bouton Live</string>
+    <string name="mibox_rk_unknown_remote">La télécommande de cette box n\'est pas une de celles que LaunchOS connaît : ses boutons font ce qu\'Android prévoit.</string>
     <string name="mibox_rk_none">Aucune action</string>
     <string name="mibox_rk_none_sub">Le bouton ne fait rien</string>
     <string name="mibox_rk_missing">Appli introuvable : le bouton ne fait rien</string>

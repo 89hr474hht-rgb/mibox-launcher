@@ -453,13 +453,20 @@ final class RemoteView extends View {
             text.setTextAlign(Paint.Align.CENTER);
             text.setTextScaleX(1f);
             text.setLetterSpacing(0);
-            if (code == RemoteRemap.NETFLIX) {
+            if (code == RemoteRemap.NETFLIX || code == RemoteRemap.S_NETFLIX) {
                 text.setTypeface(bold);
                 text.setTextSize(9.6f);
                 text.setTextScaleX(0.84f);
                 text.setLetterSpacing(0.03f);
                 text.setColor(withAlpha(0xFFE50914, a));
                 c.drawText("NETFLIX", 0, baseline(0), text);
+            } else if (code == RemoteRemap.S_LIVE) {
+                // The Mi Box S remote's Live button.
+                text.setTypeface(bold);
+                text.setTextSize(8.4f);
+                text.setLetterSpacing(0.12f);
+                text.setColor(withAlpha(0xFF232A33, a));
+                c.drawText("LIVE", 0, baseline(0), text);
             } else if (code == RemoteRemap.PRIME) {
                 text.setTypeface(medium);
                 text.setTextSize(7.4f);
