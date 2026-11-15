@@ -5,6 +5,23 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [2.2.0] - 2026-11-15
+
+Les réglages de taille et d'opacité se voient avant d'être choisis.
+
+### Ajouté
+- Un aperçu animé de l'écran d'accueil à côté de la disposition (Réglages › Écran d'accueil) : les vraies applis
+  dans le dock, l'horloge au format choisi, la lueur de fond. Il suit la sélection : en passant sur 5 colonnes, sur
+  2 rangées sous le dock ou sur 30 % d'opacité, il montre le résultat, marqué « Aperçu · OK pour garder » ; les
+  tuiles grandissent ou rétrécissent, le dock remonte, la barre s'estompe. OK garde le choix, en quitter la ligne
+  remet ce qui est choisi. Il reprend les calculs de taille de l'accueil, et un test vérifie qu'ils restent les mêmes.
+
+### Modifié
+- Chaque réglage à plusieurs valeurs (colonnes, rangées, opacité, format de l'heure, veille) est un sélecteur sur une
+  piste sombre ; une pastille cernée de doré glisse jusqu'à la valeur choisie. Venant du dessus ou du dessous, la
+  télécommande arrive sur la valeur choisie, et entrer dans une page aussi.
+- Aucun réglage, aucune clé ni aucun identifiant ne change ; le launcher d'origine reste identique à l'octet.
+
 ## [2.1.0] - 2026-11-15
 
 Refonte ciblée : l'accueil ne change pas ; les réglages, les menus du haut et les transitions sont repensés.

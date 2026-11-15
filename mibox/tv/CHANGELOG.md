@@ -6,6 +6,23 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.10.0] - 2026-11-15
+
+### Ajouté
+- Ouvrir sur : l'appli peut s'ouvrir sur l'Accueil (comme avant), sur la TV ou sur la dernière chaîne regardée, qui
+  démarre tout de suite ; Haut et Bas zappent dans toutes les chaînes dès que la liste est lue.
+- Décalage du guide, de −2 h à +2 h, pour un fournisseur dont les horaires sont décalés.
+- Inverser Haut et Bas pour zapper ; les touches Chaîne + et − ne changent pas.
+- Format de l'image : Adapté (comme avant), Zoom ou Étiré, pour la TV, les films et les séries.
+- Actualiser les listes toutes les 6 h (comme avant), 12 h ou 24 h.
+
+### Modifié
+- Réglages en cinq catégories : Général (compte, démarrage, mises à jour), Chaînes et guide, Films et séries,
+  Lecture, Données (listes, cache, historique). Chaque page a des sections titrées et des lignes plus compactes.
+- Les réglages à plusieurs valeurs se choisissent côte à côte, avec une pastille qui glisse jusqu'au choix ; les
+  interrupteurs glissent ; les pages arrivent du côté où va la télécommande, comme dans LaunchOS.
+- Chaque réglage existant garde sa clé et sa valeur ; les nouveaux reprennent par défaut le comportement d'avant.
+
 ## [0.9.0] - 2026-11-15
 
 ### Ajouté

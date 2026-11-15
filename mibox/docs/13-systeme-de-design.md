@@ -22,6 +22,9 @@ leurs ressources et trois classes Java ; une valeur changée là change les deux
 - Une page de réglages arrive du côté vers lequel la télécommande s'est déplacée.
 - Les menus du haut s'ouvrent en descendant de la pastille et se ferment de même, Retour compris.
 - LaunchOS TV : la barre du haut s'efface dans les rangées et revient en haut ; le reste du langage est le même.
+- Un choix parmi quelques valeurs est un `SegmentBar` : une piste sombre, une pastille cernée de l'accent qui glisse
+  (220 ms) jusqu'à la valeur choisie. Un interrupteur glisse de même. Un réglage qui change l'écran se montre en
+  aperçu avant OK (l'aperçu de l'accueil de LaunchOS).
 
 ## Valeurs
 
@@ -41,7 +44,8 @@ leurs ressources et trois classes Java ; une valeur changée là change les deux
 - Fonds : `lo_focus_row`, `lo_focus_button`, `lo_button_primary`, `lo_focus_chip`, `lo_focus_tile`, `lo_panel`,
   `lo_field`, `lo_track`, `lo_progress`.
 - Couleurs selon le focus : `lo_text_on_focus`, `lo_text_2_on_focus`, `lo_icon_on_focus`, `lo_text_on_accent`.
-- Java (`com.gathin.launchos.design`) : `Motion`, `Focus.lift(vue)`, `Monogram` (le « lo » qui s'écrit au démarrage).
+- Java (`com.gathin.launchos.design`) : `Motion`, `Focus.lift(vue)`, `Monogram` (le « lo » qui s'écrit au démarrage),
+  `SegmentBar` (les couleurs de la piste et de la pastille lui sont passées par l'appli).
 - Icônes : 24 dp, au trait de 1,75, blanches, teintées par la ligne qui les porte.
 
 ## Règles pour une nouvelle vue

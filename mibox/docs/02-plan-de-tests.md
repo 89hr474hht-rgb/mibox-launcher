@@ -512,6 +512,28 @@ chaîne dans deux groupes, chaînes étrangères, noms décorés ou vides, sans 
 | T09-06 | En direct / Guide | Haut depuis les rayons, Droite, OK, Retour | Le guide s'ouvre et Retour revient à TV | MANUEL | Test réussi (émulateur) |
 | T09-07 | Vraies listes | Rangement avec le fournisseur réel sur la box | Rayons cohérents, aucune chaîne perdue | MANUEL | Validation manuelle nécessaire |
 
+## C tervicies. LaunchOS 2.2.0 et LaunchOS TV 0.10.0 : aperçu de l'accueil, sélecteurs, réglages TV
+
+Émulateur Android TV (API 31), serveur factice pour LaunchOS TV. Fluidité mesurée pendant la navigation
+(`dumpsys gfxinfo`) : 0 image saccadée ; 99ᵉ centile 9 ms (choix de disposition avec aperçu), 8 ms (catégories
+LaunchOS), 21 ms (catégories TV), 9 ms (sélecteurs et interrupteurs TV), 8 ms (défilement d'une page TV).
+
+| ID | Test | Action | Attendu | Type | Résultat |
+|---|---|---|---|---|---|
+| M22-01 | Aperçu de l'accueil | Passer sur 4, 5, 7 colonnes, 2 rangées, 30 % | L'aperçu suit, marqué « Aperçu », sans rien changer avant OK | MANUEL | Test réussi (émulateur) |
+| M22-02 | Aperçu fidèle | Garder 5 colonnes puis 2 rangées et 30 %, revenir à l'accueil | Même taille de tuiles, dock à la même hauteur (à ~10 dp près), même opacité | MANUEL | Test réussi (émulateur) |
+| M22-03 | Sélecteur | OK sur une autre valeur ; Haut/Bas vers une ligne de valeurs | La pastille glisse ; le focus arrive sur la valeur choisie | MANUEL | Test réussi (émulateur) |
+| M22-04 | Animations coupées | Échelles d'animation à 0, changer une valeur | Pastille et aperçu changent à l'instant | MANUEL | Test réussi (émulateur) |
+| T10-01 | Réglages TV | Parcourir les 5 catégories | Sections titrées, une icône par fonction, valeurs côte à côte | MANUEL | Test réussi (émulateur) |
+| T10-02 | Ouvrir sur | Choisir Dernière chaîne, relancer depuis l'accueil | La dernière chaîne démarre ; Haut/Bas zappent 18 → 19 → 20 | MANUEL | Test réussi (émulateur) |
+| T10-03 | Ouvrir sur TV | Choisir TV, relancer | L'appli s'ouvre sur TV | MANUEL | Non testé |
+| T10-04 | Zapping inversé | Activer, relancer, Haut | De la chaîne 20 à la 19 | MANUEL | Test réussi (émulateur) |
+| T10-05 | Touches Chaîne + / − | Avec l'inversion | Inchangées | MANUEL | Validation manuelle nécessaire (pas de touche Chaîne sur l'émulateur) |
+| T10-06 | Décalage du guide | +1 h | « Météo » de 10:00 passe à 11:00 | MANUEL | Test réussi (émulateur) |
+| T10-07 | Format de l'image | Vidéo 4:3, Adapté puis Zoom | Bandes noires, puis image pleine rognée en haut et en bas | MANUEL | Test partiel (TV testée ; Étiré, films et séries non testés) |
+| T10-08 | Actualiser les listes | 12 h ou 24 h | Les listes ne se rechargent qu'après ce délai | MANUEL | Non testé (délai trop long pour l'émulateur) |
+| T10-09 | Réglages conservés | Mise à jour 0.9.0 → 0.10.0 sur la box | Tous les choix d'avant gardés | MANUEL | Validation manuelle nécessaire |
+
 ## D. Applications
 
 La liste est à ajuster après l'audit, selon les applications réellement installées et celles que vous utilisez.
