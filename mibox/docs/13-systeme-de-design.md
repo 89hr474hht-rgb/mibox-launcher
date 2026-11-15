@@ -52,6 +52,8 @@ leurs ressources et trois classes Java ; une valeur changée là change les deux
   (`hero_card_bg`), image dedans, voile à gauche, boutons et puces translucides (`Button.Glass`, `Chip.Glass` :
   blanc à 28 % au repos, blancs une fois sélectionnés), étiquette en bas à droite (`hero_badge_bg`), page anthracite
   (`browse_bg`). Elle se replie sur son texte en coupant son contour, sans refaire la mise en page à chaque image.
+- Saisie d'un code (LaunchOS TV, `PinDialog`) : quatre cases, celle en cours blanche ; Haut et Bas changent le
+  chiffre, Gauche et Droite la case, OK valide ; un code refusé secoue les cases et le dit en couleur d'accent.
 - Barre du haut (LaunchOS TV) : centrée ; la section affichée porte une pastille grise (`nav_tab_bg`, `nav_tab_text`).
 
 ## Règles pour une nouvelle vue

@@ -538,6 +538,20 @@ LaunchOS), 21 ms (catégories TV), 9 ms (sélecteurs et interrupteurs TV), 8 ms 
 | T11-04 | Films et Séries | Ouvrir Films puis Séries ; descendre dans les rangées puis remonter | Carte arrondie avec texte, boutons, étiquette ; elle se replie puis se rouvre | MANUEL | Test réussi (émulateur) |
 | T11-05 | Barre centrée | Passer d'une section à l'autre | Section affichée en pastille grise, barre centrée | MANUEL | Test réussi (émulateur) |
 | T11-06 | Sur la box | Mêmes tests avec le vrai fournisseur et de vraies images | Même comportement, fluide | MANUEL | Validation manuelle nécessaire |
+
+### LaunchOS TV 0.12.0 (émulateur, 15/11/2026)
+
+| ID | Test | Étapes | Attendu | Type | Statut |
+|---|---|---|---|---|---|
+| T12-01 | Accueil en carte | Ouvrir l'Accueil, sélectionner Regarder | Carte arrondie, bouton sélectionné entier | MANUEL | Test réussi (émulateur) |
+| T12-02 | Déplacer un favori | Favoris : appui long sur la 2e chaîne › Monter | Elle passe en tête, le panneau propose Descendre, la sélection suit | MANUEL | Test réussi (émulateur) |
+| T12-03 | Mes chaînes seulement | Retirer l'étoile d'une chaîne très regardée, activer l'option | Sans l'option elle reste (sans étoile) ; avec, l'étagère ne garde que les chaînes étoilées | MANUEL | Test réussi (émulateur) |
+| T12-04 | Créer le code | Code parental : 1234, puis confirmation fausse, puis juste | La confirmation fausse est refusée ; « Code actif » | MANUEL | Test réussi (émulateur) |
+| T12-05 | Montrer les contenus adultes | Avec un code : désactiver « Masquer », code faux puis juste | Code faux refusé ; le bon montre les groupes | MANUEL | Test réussi (émulateur) |
+| T12-06 | Verrou au départ | Après déverrouillage : Accueil de la box, revenir | Les contenus adultes sont de nouveau masqués | MANUEL | Test réussi (émulateur) |
+| T12-07 | Supprimer le code | Code parental › code › Supprimer | « Aucun code », contenus adultes masqués | MANUEL | Test réussi (émulateur) |
+| T12-08 | Groupe adulte réaffiché | Avec un code : Groupes des chaînes › groupe adulte › Afficher | Le code est demandé | MANUEL | Non testé |
+| T12-09 | Sur la box | Mêmes tests avec le vrai fournisseur | Même comportement | MANUEL | Validation manuelle nécessaire |
 | T10-01 | Réglages TV | Parcourir les 5 catégories | Sections titrées, une icône par fonction, valeurs côte à côte | MANUEL | Test réussi (émulateur) |
 | T10-02 | Ouvrir sur | Choisir Dernière chaîne, relancer depuis l'accueil | La dernière chaîne démarre ; Haut/Bas zappent 18 → 19 → 20 | MANUEL | Test réussi (émulateur) |
 | T10-03 | Ouvrir sur TV | Choisir TV, relancer | L'appli s'ouvre sur TV | MANUEL | Test réussi (émulateur) |

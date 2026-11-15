@@ -6,6 +6,25 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.12.0] - 2026-11-15
+
+Un code parental, des favoris rangés à la main, et un Accueil assorti à Films et Séries.
+
+### Ajouté
+- Code parental (Réglages › Chaînes et guide) : 4 chiffres, tapés avec les flèches (Haut et Bas : chiffre, Gauche et
+  Droite : case). Avec un code, les contenus adultes restent masqués : il est demandé pour les montrer, pour réafficher
+  un groupe pour adultes, et ils se cachent à nouveau dès que l'appli quitte l'écran. Le code peut être changé ou
+  supprimé (en donnant l'ancien) ; le créer, le changer ou le supprimer remasque les contenus adultes. Il est gardé
+  sur la box seulement, haché (SHA-256 avec sel), jamais en clair.
+- Favoris rangés à la main : appui long sur OK dans l'étagère Favoris › Monter, Descendre, Mettre en premier ; le
+  panneau reste ouvert pour enchaîner, et la liste suit.
+- Favoris : mes chaînes seulement (Réglages › Chaînes et guide) : l'étagère ne garde que les chaînes ajoutées à la
+  main, sans les plus regardées.
+
+### Modifié
+- Accueil : la mise en avant est la même carte arrondie que dans Films et Séries, sur la page anthracite, avec les
+  boutons translucides.
+
 ## [0.11.0] - 2026-11-15
 
 Films et Séries prennent un nouveau visage, et les favoris se regardent plus vite.
