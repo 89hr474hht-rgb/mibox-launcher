@@ -527,6 +527,17 @@ LaunchOS), 21 ms (catégories TV), 9 ms (sélecteurs et interrupteurs TV), 8 ms 
 | M22-05 | Réglages compacts | Ouvrir Réglages de LaunchOS et de LaunchOS TV | Texte et lignes plus petits, page de largeur fixe, espace libre à droite, rien de coupé | MANUEL | Test réussi (émulateur) |
 | T10-10 | Démarrage plus court | Ouvrir LaunchOS TV depuis l'accueil ; appuyer sur une touche pendant l'animation | Animation d'environ 1,5 s puis l'appli ; une touche l'affiche tout de suite et compte | MANUEL | Test réussi (émulateur) |
 | T10-11 | Lecture plus rapide | Lancer une chaîne et un film, zapper | L'image arrive plus vite, sans coupures nouvelles | MANUEL | Validation manuelle nécessaire |
+
+### LaunchOS TV 0.11.0 (émulateur, 15/11/2026)
+
+| ID | Test | Étapes | Attendu | Type | Statut |
+|---|---|---|---|---|---|
+| T11-01 | Ouvrir sur Favoris | Réglages › Général › Ouvrir sur › Favoris ; relancer deux fois depuis l'accueil | Une chaîne favorite au hasard en plein écran, étiquette « Favoris » | MANUEL | Test réussi (émulateur) |
+| T11-02 | Zapping des favoris | Pendant la lecture ouverte sur Favoris : Haut, puis Retour | Haut passe à l'autre favori ; Retour mène à l'étagère Favoris | MANUEL | Test réussi (émulateur) |
+| T11-03 | Bas dans les Favoris | Mini-lecteur allumé, étagère Favoris : Bas | Le mini-lecteur passe à la chaîne sélectionnée, cadre bien placé | MANUEL | Test réussi (émulateur) |
+| T11-04 | Films et Séries | Ouvrir Films puis Séries ; descendre dans les rangées puis remonter | Carte arrondie avec texte, boutons, étiquette ; elle se replie puis se rouvre | MANUEL | Test réussi (émulateur) |
+| T11-05 | Barre centrée | Passer d'une section à l'autre | Section affichée en pastille grise, barre centrée | MANUEL | Test réussi (émulateur) |
+| T11-06 | Sur la box | Mêmes tests avec le vrai fournisseur et de vraies images | Même comportement, fluide | MANUEL | Validation manuelle nécessaire |
 | T10-01 | Réglages TV | Parcourir les 5 catégories | Sections titrées, une icône par fonction, valeurs côte à côte | MANUEL | Test réussi (émulateur) |
 | T10-02 | Ouvrir sur | Choisir Dernière chaîne, relancer depuis l'accueil | La dernière chaîne démarre ; Haut/Bas zappent 18 → 19 → 20 | MANUEL | Test réussi (émulateur) |
 | T10-03 | Ouvrir sur TV | Choisir TV, relancer | L'appli s'ouvre sur TV | MANUEL | Test réussi (émulateur) |

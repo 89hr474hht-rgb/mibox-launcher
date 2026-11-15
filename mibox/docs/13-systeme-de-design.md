@@ -48,6 +48,11 @@ leurs ressources et trois classes Java ; une valeur changée là change les deux
 - Java (`com.gathin.launchos.design`) : `Motion`, `Focus.lift(vue)`, `Monogram` (le « lo » qui s'écrit au démarrage),
   `SegmentBar` (les couleurs de la piste et de la pastille lui sont passées par l'appli).
 - Icônes : 24 dp, au trait de 1,75, blanches, teintées par la ligne qui les porte.
+- Carte de mise en avant (LaunchOS TV, Films et Séries) : carte arrondie de 18 dp en retrait des bords
+  (`hero_card_bg`), image dedans, voile à gauche, boutons et puces translucides (`Button.Glass`, `Chip.Glass` :
+  blanc à 28 % au repos, blancs une fois sélectionnés), étiquette en bas à droite (`hero_badge_bg`), page anthracite
+  (`browse_bg`). Elle se replie sur son texte en coupant son contour, sans refaire la mise en page à chaque image.
+- Barre du haut (LaunchOS TV) : centrée ; la section affichée porte une pastille grise (`nav_tab_bg`, `nav_tab_text`).
 
 ## Règles pour une nouvelle vue
 

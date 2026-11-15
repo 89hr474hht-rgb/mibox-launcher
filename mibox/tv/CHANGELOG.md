@@ -6,6 +6,26 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.11.0] - 2026-11-15
+
+Films et Séries prennent un nouveau visage, et les favoris se regardent plus vite.
+
+### Ajouté
+- Ouvrir sur › Favoris : l'appli s'ouvre sur une chaîne favorite prise au hasard, en plein écran ; Haut et Bas passent
+  d'un favori à l'autre, Retour mène à l'étagère Favoris. Sans favori, elle s'ouvre sur la TV.
+- Dans l'étagère Favoris, avec le mini-lecteur allumé, Haut et Bas dans la liste changent la chaîne du mini-lecteur
+  dès que la sélection s'arrête.
+
+### Modifié
+- Films et Séries : la mise en avant est une carte arrondie, en retrait des bords, sur une page anthracite. L'image du
+  titre la remplit ; le texte, les boutons Regarder et Plus d'infos (translucides, blancs une fois sélectionnés), et une
+  étiquette en bas à droite (« Ajouté il y a 3 jours », « Mis à jour hier ») sont dedans, avec la recherche et la liste
+  complète en haut à droite. Les rangées apparaissent sous la carte ; en y descendant, la carte se replie sur son texte.
+- La barre du haut est centrée ; la section affichée a une pastille grise au lieu d'un texte coloré.
+
+### Corrigé
+- Le mini-lecteur suit sa place quand la fiche de la chaîne au-dessus change de hauteur.
+
 ## [0.10.0] - 2026-11-15
 
 ### Ajouté
