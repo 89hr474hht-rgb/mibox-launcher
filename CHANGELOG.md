@@ -5,6 +5,14 @@ Les changements de CleanYourTV lui-même sont dans son propre historique Git.
 
 ## [Non publié]
 
+## [2.3.1] - 2026-11-15
+
+### Corrigé
+- Mi Box S (1re génération) : la touche Netflix ouvre l'appli choisie dans Réglages › Système › Boutons de la
+  télécommande. Cette box intercepte elle-même la touche et demande Netflix avant que LaunchOS ne la voie ; quand
+  Netflix est désactivé, LaunchOS répond à cette demande à sa place. Le relais n'est actif que sur cette box et
+  seulement tant que Netflix y est désactivé.
+
 ## [2.3.0] - 2026-11-15
 
 Les boutons de la télécommande suivent la box.
