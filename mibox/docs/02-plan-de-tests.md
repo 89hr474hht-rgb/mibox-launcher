@@ -552,6 +552,14 @@ LaunchOS), 21 ms (catégories TV), 9 ms (sélecteurs et interrupteurs TV), 8 ms 
 | T12-07 | Supprimer le code | Code parental › code › Supprimer | « Aucun code », contenus adultes masqués | MANUEL | Test réussi (émulateur) |
 | T12-08 | Groupe adulte réaffiché | Avec un code : Groupes des chaînes › groupe adulte › Afficher | Le code est demandé | MANUEL | Non testé |
 | T12-09 | Sur la box | Mêmes tests avec le vrai fournisseur | Même comportement | MANUEL | Validation manuelle nécessaire |
+
+### LaunchOS TV 0.13.0 (émulateur, 15/11/2026)
+
+| ID | Test | Étapes | Attendu | Type | Statut |
+|---|---|---|---|---|---|
+| T13-01 | Identifiant seul | Compte : code du compte à code unique en identifiant, mot de passe vide | Connecté, compte enregistré | MANUEL | Test réussi (émulateur) |
+| T13-02 | Identifiant seul refusé | Identifiant inconnu, mot de passe vide | « Ce fournisseur refuse l'identifiant seul… », compte enregistré inchangé | MANUEL | Test réussi (émulateur) |
+| T13-03 | Avec le vrai fournisseur | Essayer l'identifiant seul | Selon le fournisseur : connecté, ou refus clair | MANUEL | Validation manuelle nécessaire |
 | T10-01 | Réglages TV | Parcourir les 5 catégories | Sections titrées, une icône par fonction, valeurs côte à côte | MANUEL | Test réussi (émulateur) |
 | T10-02 | Ouvrir sur | Choisir Dernière chaîne, relancer depuis l'accueil | La dernière chaîne démarre ; Haut/Bas zappent 18 → 19 → 20 | MANUEL | Test réussi (émulateur) |
 | T10-03 | Ouvrir sur TV | Choisir TV, relancer | L'appli s'ouvre sur TV | MANUEL | Test réussi (émulateur) |

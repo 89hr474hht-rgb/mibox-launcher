@@ -6,6 +6,13 @@ dans l'écran Mises à jour de l'appli.
 
 ## [Non publié]
 
+## [0.13.0] - 2026-11-15
+
+### Ajouté
+- Connexion avec l'identifiant seul : le mot de passe est facultatif. Laissé vide, l'identifiant sert aussi de mot de
+  passe, la forme des comptes à code unique de certains fournisseurs. Si le fournisseur refuse, l'écran le dit et
+  demande le mot de passe qu'il a donné. Une connexion refusée ne remplace pas le compte enregistré.
+
 ## [0.12.0] - 2026-11-15
 
 Un code parental, des favoris rangés à la main, et un Accueil assorti à Films et Séries.
