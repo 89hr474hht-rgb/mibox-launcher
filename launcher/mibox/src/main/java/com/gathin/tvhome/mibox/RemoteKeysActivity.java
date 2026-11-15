@@ -97,6 +97,7 @@ public final class RemoteKeysActivity extends Activity {
         // On a box whose remote is unknown the service has nothing to do: no notice about it.
         service.setVisibility(RemoteRemap.serviceOn(this) || RemoteRemap.model() == null ? View.GONE : View.VISIBLE);
         if (picking == 0) refreshRows();
+        NetflixKeyActivity.sync(this);
     }
 
     @SuppressWarnings("deprecation")

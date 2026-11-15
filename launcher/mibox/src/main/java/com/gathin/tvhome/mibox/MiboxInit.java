@@ -93,6 +93,8 @@ public final class MiboxInit extends ContentProvider {
                     EXTRAS.put(activity, extras);
                 }
                 extras.resume();
+                // The Mi Box S Netflix key's stand-in follows Netflix being disabled or back (NetflixKeyActivity).
+                NetflixKeyActivity.sync(activity);
                 // After the home screen has drawn, so the prompt never delays the first frame.
                 activity.getWindow().getDecorView().postDelayed(MiboxInit::promptIfHomeVisible, 1500);
             } else if (SETTINGS.equals(name)) {

@@ -110,6 +110,22 @@
             android:exported="false"
             android:theme="@style/MiboxUpdatesTheme" />
 
+        <!-- The Mi Box S remote's Netflix key while Netflix is disabled: the box asks for nflx://, this answers and
+             opens the app set for the button. Off by default; NetflixKeyActivity.sync switches it on that box only. -->
+        <activity
+            android:name=".NetflixKeyActivity"
+            android:enabled="false"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="nflx" android:host="www.netflix.com" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".RemoteKeysService"
             android:exported="true"
